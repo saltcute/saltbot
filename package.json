@@ -23,7 +23,7 @@
   },
   "homepage": "https://github.com/HexaNona/kasumi-template#readme",
   "dependencies": {
-    "kasumi.js": "^0.6.0",
+    "kasumi.js": "^0.6.8",
     "ts-node": "^10.9.1",
     "tsconfig-paths": "^4.1.2",
     "upath": "^2.0.1"
