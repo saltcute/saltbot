@@ -1,5 +1,5 @@
 {
-  "name": "kasumi-template",
+  "name": "saltbot",
   "version": "0.1.0",
   "description": "Template for Kasumi",
   "main": "index.js",
@@ -23,7 +23,11 @@
   },
   "homepage": "https://github.com/HexaNona/kasumi-template#readme",
   "dependencies": {
+    "@saltcute/kasumi-essential": "^0.1.4",
+    "@saltcute/kasumi-maimai": "^0.1.0",
+    "discord.js": "^14.16.3",
     "kasumi.js": "^0.6.0",
+    "maidraw": "^0.1.4",
     "ts-node": "^10.9.1",
     "tsconfig-paths": "^4.1.2",
     "upath": "^2.0.1"

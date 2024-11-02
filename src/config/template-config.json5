@@ -1,7 +1,7 @@
 {
     "kasumi::config.disableSnOrderCheck": true,
     "kasumi::config.token": "1/CR4Zyt=/thUr5d4YVme50pLSq5Ee9MA==",
-    "kasumi::config.connection": "webhook",
+    "kasumi::config.connection": "kookts",
     "kasumi::config.webhookVerifyToken": "",
     "kasumi::config.webhookEncryptKey": "",
     "kasumi::config.webhookPort": 11451,
@@ -12,4 +12,13 @@
     "kasumi::config.mongoConnectionString": "mongodb://localhost:27017",
     "kasumi::config.mongoDatabaseName": "kasumi",
     "kasumi::config.mongoCollectionName": "template",
+
+    "maimai::lxns.token": "",
+
+    "maimai::config.useLocalDatabase": false,
+    "maimai::config.localDatabasePath": "",
+
+    "discord::auth.clientId": "",
+    "discord::auth.token": "",
 }
+
