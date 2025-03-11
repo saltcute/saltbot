@@ -10,20 +10,20 @@ import {
 
 const themes = [
     {
-        name: "maimai でらっくす BUDDiES (Japan), landscape",
+        name: "maimai でらっくす PRiSM (Japan), landscape",
         name_localizations: {
-            "zh-CN": "maimai でらっくす BUDDiES（日服），横向",
-            "zh-TW": "maimai でらっくす BUDDiES（日本），橫向",
+            "zh-CN": "maimai でらっくす PRiSM（日服），横向",
+            "zh-TW": "maimai でらっくす PRiSM（日本），橫向",
         },
-        value: "jp-buddies-landscape",
+        value: "jp-prism-landscape",
     },
     {
-        name: "maimai でらっくす BUDDiES (Japan), portrait",
+        name: "maimai でらっくす PRiSM (Japan), portrait",
         name_localizations: {
-            "zh-CN": "maimai でらっくす BUDDiES（日服），纵向",
-            "zh-TW": "maimai でらっくす BUDDiES（日本），縱向",
+            "zh-CN": "maimai でらっくす PRiSM（日服），纵向",
+            "zh-TW": "maimai でらっくす PRiSM（日本），縱向",
         },
-        value: "jp-buddies-portrait",
+        value: "jp-prism-portrait",
     },
     {
         name: "maimai でらっくす BUDDiES PLUS (Japan), landscape",
@@ -42,6 +42,22 @@ const themes = [
         value: "jp-buddiesplus-portrait",
     },
     {
+        name: "maimai でらっくす BUDDiES (Japan), landscape",
+        name_localizations: {
+            "zh-CN": "maimai でらっくす BUDDiES（日服），横向",
+            "zh-TW": "maimai でらっくす BUDDiES（日本），橫向",
+        },
+        value: "jp-buddies-landscape",
+    },
+    {
+        name: "maimai でらっくす BUDDiES (Japan), portrait",
+        name_localizations: {
+            "zh-CN": "maimai でらっくす BUDDiES（日服），纵向",
+            "zh-TW": "maimai でらっくす BUDDiES（日本），縱向",
+        },
+        value: "jp-buddies-portrait",
+    },
+    {
         name: "舞萌DX 2024 (China), landscape",
         name_localizations: {
             "zh-CN": "舞萌DX 2024（国服），横向",
@@ -56,6 +72,33 @@ const themes = [
             "zh-TW": "舞萌DX 2024（中國），縱向",
         },
         value: "cn-2024-portrait",
+    },
+];
+
+const versions = [
+    {
+        name: "maimai でらっくす PRiSM (Japan)",
+        name_localizations: {
+            "zh-CN": "maimai でらっくす PRiSM（日服）",
+            "zh-TW": "maimai でらっくす PRiSM（日本）",
+        },
+        value: "jp-prism",
+    },
+    {
+        name: "maimai でらっくす BUDDiES PLUS (Japan)",
+        name_localizations: {
+            "zh-CN": "maimai でらっくす BUDDiES PLUS（日服）",
+            "zh-TW": "maimai でらっくす BUDDiES PLUS（日本）",
+        },
+        value: "jp-buddiesplus",
+    },
+    {
+        name: "maimai でらっくす BUDDiES (Japan)",
+        name_localizations: {
+            "zh-CN": "maimai でらっくす BUDDiES （日服）",
+            "zh-TW": "maimai でらっくす BUDDiES （日本）",
+        },
+        value: "jp-buddies",
     },
 ];
 
@@ -117,6 +160,21 @@ const commands = [
                                 description_localizations: {
                                     "zh-CN": "选择 b50 图片的主题。",
                                     "zh-TW": "選擇 Best 50 圖像的主題。",
+                                },
+                                choices: themes,
+                            },
+                            {
+                                type: 3,
+                                name: "version",
+                                name_localizations: {
+                                    "zh-CN": "版本",
+                                    "zh-TW": "版本",
+                                },
+                                description:
+                                    "Select the target version for New Version scores.",
+                                description_localizations: {
+                                    "zh-CN": "选择 b15 的版本。",
+                                    "zh-TW": "選擇 New Version 分數的版本。",
                                 },
                                 choices: themes,
                             },

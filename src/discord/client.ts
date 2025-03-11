@@ -22,15 +22,53 @@ client.on("interactionCreate", async (interaction) => {
 
     if (interaction.commandName === "mai") {
         let result: Buffer | null = null;
+        const version =
+            interaction.options.getString("version", false) || "jp-buddiesplus";
         const theme =
-            interaction.options.getString("theme", false) || undefined;
+            interaction.options.getString("theme", false) ||
+            (version ? `${version}-landscape` : "jp-buddiesplus-landscape");
         interaction.deferReply();
         switch (interaction.options.getSubcommand()) {
             case "kamai": {
                 const username = interaction.options.getString("userid", true);
-                result = await maidraw.drawWithScoreSource(kamai, username, {
-                    theme,
-                });
+                switch (version) {
+                    case "jp-buddies":
+                        result = await maidraw.drawWithScoreSource(
+                            kamai.buddies(),
+                            username,
+                            {
+                                theme,
+                            }
+                        );
+                        break;
+                    case "jp-buddiesplus":
+                        result = await maidraw.drawWithScoreSource(
+                            kamai.buddiesplus(),
+                            username,
+                            {
+                                theme,
+                            }
+                        );
+                        break;
+                    case "jp-prism":
+                        result = await maidraw.drawWithScoreSource(
+                            kamai.prism(),
+                            username,
+                            {
+                                theme,
+                            }
+                        );
+                        break;
+                    default:
+                        result = await maidraw.drawWithScoreSource(
+                            kamai,
+                            username,
+                            {
+                                theme,
+                            }
+                        );
+                        break;
+                }
                 break;
             }
             case "divingfish": {
