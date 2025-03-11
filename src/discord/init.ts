@@ -176,7 +176,7 @@ const commands = [
                                     "zh-CN": "选择 b15 的版本。",
                                     "zh-TW": "選擇 New Version 分數的版本。",
                                 },
-                                choices: themes,
+                                choices: versions,
                             },
                         ],
                     },
