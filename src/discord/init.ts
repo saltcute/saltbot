@@ -10,6 +10,22 @@ import {
 
 const themes = [
     {
+        name: "maimai でらっくす PRiSM PLUS (Japan), landscape",
+        name_localizations: {
+            "zh-CN": "maimai でらっくす PRiSM PLUS（日服），横向",
+            "zh-TW": "maimai でらっくす PRiSM（日本），橫向",
+        },
+        value: "jp-prismplus-landscape",
+    },
+    {
+        name: "maimai でらっくす PRiSM PLUS (Japan), portrait",
+        name_localizations: {
+            "zh-CN": "maimai でらっくす PRiSM PLUS（日服），纵向",
+            "zh-TW": "maimai でらっくす PRiSM PLUS（日本），縱向",
+        },
+        value: "jp-prismplus-portrait",
+    },
+    {
         name: "maimai でらっくす PRiSM (Japan), landscape",
         name_localizations: {
             "zh-CN": "maimai でらっくす PRiSM（日服），横向",
@@ -76,6 +92,14 @@ const themes = [
 ];
 
 const versions = [
+    {
+        name: "maimai でらっくす PRiSM PLUS (Japan)",
+        name_localizations: {
+            "zh-CN": "maimai でらっくす PRiSM PLUS（日服）",
+            "zh-TW": "maimai でらっくす PRiSM PLUS（日本）",
+        },
+        value: "jp-prismplus",
+    },
     {
         name: "maimai でらっくす PRiSM (Japan)",
         name_localizations: {
