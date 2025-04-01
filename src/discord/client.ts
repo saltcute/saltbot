@@ -23,10 +23,10 @@ client.on("interactionCreate", async (interaction) => {
     if (interaction.commandName === "mai") {
         let result: Buffer | null = null;
         const version =
-            interaction.options.getString("version", false) || "jp-buddiesplus";
+            interaction.options.getString("version", false) || "jp-prism";
         const theme =
             interaction.options.getString("theme", false) ||
-            (version ? `${version}-landscape` : "jp-buddiesplus-landscape");
+            (version ? `${version}-landscape` : "jp-prism-landscape");
         interaction.deferReply();
         switch (interaction.options.getSubcommand()) {
             case "kamai": {
