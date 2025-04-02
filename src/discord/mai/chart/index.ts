@@ -1,8 +1,8 @@
 import upath from 'upath';
 import fs from 'fs';
 import { ApplicationCommandOption, Events } from 'discord.js';
-import { client } from '@/discord/client';
 import * as fuzzySearch from '@m31coding/fuzzy-search';
+import { client } from "@/discord/client";
 
 const Kuroshiro = require("kuroshiro").default;
 const KuromojiAnalyzer = require("kuroshiro-analyzer-kuromoji");

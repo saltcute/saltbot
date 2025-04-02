@@ -1,4 +1,5 @@
-import { ChartQueryCommand } from './chart/command';
+import { ChartQueryCommand } from './chart';
+import './b50';
 
 const themes = [
     {

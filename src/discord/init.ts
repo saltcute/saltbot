@@ -5,7 +5,6 @@ import {
 } from "discord.js";
 import { maiCommand } from "./mai/command";
 
-
 const commands = [
     maiCommand
 ];
