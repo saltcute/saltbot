@@ -8,6 +8,7 @@ import upath from "upath";
     await client.connect();
     client.plugin.load(new MaiMenu(), new EssentialMenu());
     const basicPath = upath.join(__dirname, "menu");
+    if (!fs.existsSync(basicPath)) return;
     const menus = fs.readdirSync(basicPath);
     for (const menu of menus) {
         try {
