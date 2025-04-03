@@ -1,3 +1,3 @@
-# Kasumi-Template
+## saltbot
 
-See example commands in src/menu for hands on tutorial. Document for Kasumi.js is available at https://kasumi.js.org.
+Pretty much just a frontend adapter that connects [maiDraw](https://github.com/saltcute/maiDraw) to various messaging apps.
