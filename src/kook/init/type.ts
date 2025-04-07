@@ -7,4 +7,11 @@ export interface CustomStorage {
 
     "discord::auth.clientId": string;
     "discord::auth.token": string;
+
+    [
+        k: `salt::connection.discord.${"kamai" | "divingfish" | "lxns"}.${string}`
+    ]: string | undefined;
+    [
+        k: `salt::connection.discord.ignore.${"kamai" | "divingfish" | "lxns"}.${string}`
+    ]: boolean | undefined;
 }
