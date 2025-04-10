@@ -15,7 +15,6 @@ export class Best50ChartCommand {
                 interaction.commandName === "mai" &&
                 interaction.options.getSubcommandGroup() == "b50"
             ) {
-                await interaction.deferReply();
                 let result: Buffer | null = null;
                 const version =
                     interaction.options.getString("version", false) ||
@@ -56,14 +55,16 @@ export class Best50ChartCommand {
                         `salt::connection.discord.${tracker}.${interaction.user.id}`
                     );
                     if (!dbUsername) {
-                        await interaction.editReply({
+                        await interaction.reply({
                             content: `Please provide your ${tracker == "lxns" ? "friend code" : "username"}. To use without a ${tracker == "lxns" ? "friend code" : "username"}, you need to select "remember my username" after generating a chart or use \`/mai link\` to link your account.`,
+                            ephemeral: true,
                         });
                         return;
                     } else {
                         username = dbUsername;
                     }
                 }
+                await interaction.deferReply();
                 switch (tracker) {
                     case "kamai": {
                         switch (version) {
