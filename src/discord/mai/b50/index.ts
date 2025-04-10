@@ -1,13 +1,26 @@
 import { AttachmentBuilder, Events } from "discord.js";
-import { LXNS, KamaiTachi, DivingFish } from "maidraw";
+import { MaiDraw } from "maidraw";
 import { client as kasumi } from "@/kook/init/client";
-import { client, maidraw } from "@/discord/client";
+import { client } from "@/discord/client";
 
-const lxns = new LXNS(maidraw, kasumi.config.getSync("maimai::lxns.token"));
-const kamai = new KamaiTachi(maidraw);
-const divingfish = new DivingFish(maidraw);
+const lxns = new MaiDraw.Maimai.Best50.LXNS(
+    kasumi.config.getSync("maimai::lxns.token")
+);
+const kamai = new MaiDraw.Maimai.Best50.KamaiTachi();
+const divingfish = new MaiDraw.Maimai.Best50.DivingFish(
+    kasumi.config.getSync("maimai::divingFish.token")
+);
 
 export class Best50ChartCommand {
+    private static readonly AVAILABLE_VERSION_THEME = [
+        "jp-finale",
+        "jp-buddies",
+        "jp-buddiesplus",
+        "jp-prism",
+        "jp-prismplus",
+    ];
+    private static readonly DEFAULT_VERSION = "jp-prism";
+    private static readonly DEFAULT_THEME = "jp-prism-landscape";
     static {
         client.on(Events.InteractionCreate, async (interaction) => {
             if (!interaction.isChatInputCommand()) return;
@@ -18,10 +31,12 @@ export class Best50ChartCommand {
                 let result: Buffer | null = null;
                 const version =
                     interaction.options.getString("version", false) ||
-                    "jp-prism";
+                    this.DEFAULT_VERSION;
                 const theme =
                     interaction.options.getString("theme", false) ||
-                    (version ? `${version}-landscape` : "jp-prism-landscape");
+                    (version && this.AVAILABLE_VERSION_THEME.includes(version)
+                        ? `${version}-landscape`
+                        : this.DEFAULT_THEME);
                 const tracker = interaction.options.getSubcommand();
                 if (
                     !(
@@ -67,64 +82,117 @@ export class Best50ChartCommand {
                 await interaction.deferReply();
                 switch (tracker) {
                     case "kamai": {
+                        let kamaiInstance;
                         switch (version) {
+                            case "jp-maimai":
+                                kamaiInstance = kamai.maimai();
+                                break;
+                            case "jp-maimaiplus":
+                                kamaiInstance = kamai.maimaiPlus();
+                                break;
+                            case "jp-green":
+                                kamaiInstance = kamai.green();
+                                break;
+                            case "jp-greenplus":
+                                kamaiInstance = kamai.greenPlus();
+                                break;
+                            case "jp-orange":
+                                kamaiInstance = kamai.orange();
+                                break;
+                            case "jp-orangeplus":
+                                kamaiInstance = kamai.orangePlus();
+                                break;
+                            case "jp-pink":
+                                kamaiInstance = kamai.pink();
+                                break;
+                            case "jp-pinkplus":
+                                kamaiInstance = kamai.pinkPlus();
+                                break;
+                            case "jp-murasaki":
+                                kamaiInstance = kamai.murasaki();
+                                break;
+                            case "jp-murasakiplus":
+                                kamaiInstance = kamai.murasakiPlus();
+                                break;
+                            case "jp-milk":
+                                kamaiInstance = kamai.milk();
+                                break;
+                            case "jp-milkplus":
+                                kamaiInstance = kamai.milkPlus();
+                                break;
+                            case "jp-finale":
+                                kamaiInstance = kamai.finale();
+                                break;
+                            case "jp-dx":
+                                kamaiInstance = kamai.dx();
+                                break;
+                            case "jp-dxplus":
+                                kamaiInstance = kamai.dxPlus();
+                                break;
+                            case "jp-splash":
+                                kamaiInstance = kamai.splash();
+                                break;
+                            case "jp-splashplus":
+                                kamaiInstance = kamai.splashPlus();
+                                break;
+                            case "jp-universe":
+                                kamaiInstance = kamai.universe();
+                                break;
+                            case "jp-universeplus":
+                                kamaiInstance = kamai.universePlus();
+                                break;
+                            case "jp-festival":
+                                kamaiInstance = kamai.festival();
+                                break;
+                            case "jp-festivalplus":
+                                kamaiInstance = kamai.festivalPlus();
+                                break;
                             case "jp-buddies":
-                                result = await maidraw.drawWithScoreSource(
-                                    kamai.buddies(),
-                                    username,
-                                    {
-                                        theme,
-                                    }
-                                );
+                                kamaiInstance = kamai.buddies();
                                 break;
                             case "jp-buddiesplus":
-                                result = await maidraw.drawWithScoreSource(
-                                    kamai.buddiesplus(),
-                                    username,
-                                    {
-                                        theme,
-                                    }
-                                );
+                                kamaiInstance = kamai.buddiesPlus();
                                 break;
                             case "jp-prism":
-                                result = await maidraw.drawWithScoreSource(
-                                    kamai.prism(),
-                                    username,
-                                    {
-                                        theme,
-                                    }
-                                );
+                                kamaiInstance = kamai.prism();
+                                break;
+                            case "jp-prismplus":
+                                kamaiInstance = kamai.prismPlus();
                                 break;
                             default:
-                                result = await maidraw.drawWithScoreSource(
-                                    kamai,
-                                    username,
-                                    {
-                                        theme,
-                                    }
-                                );
+                                kamaiInstance = kamai;
                                 break;
                         }
+                        result =
+                            await MaiDraw.Maimai.Best50.drawWithScoreSource(
+                                kamaiInstance,
+                                username,
+                                {
+                                    theme,
+                                }
+                            );
                         break;
                     }
                     case "divingfish": {
-                        result = await maidraw.drawWithScoreSource(
-                            divingfish,
-                            username,
-                            {
-                                theme,
-                            }
-                        );
+                        result =
+                            await MaiDraw.Maimai.Best50.drawWithScoreSource(
+                                divingfish,
+                                username,
+                                {
+                                    theme,
+                                }
+                            );
                         break;
                     }
                     case "lxns": {
-                        result = await maidraw.drawWithScoreSource(
-                            lxns,
-                            username,
-                            {
-                                theme,
-                            }
-                        );
+                        result =
+                            await MaiDraw.Maimai.Best50.drawWithScoreSource(
+                                lxns,
+                                username,
+                                {
+                                    theme,
+                                }
+                            );
                         break;
                     }
                 }
@@ -250,6 +318,22 @@ export class Best50ChartCommand {
             value: "jp-buddies-portrait",
         },
         {
+            name: "maimai FiNALE (Japan), landscape",
+            name_localizations: {
+                "zh-CN": "maimai FiNALE（日服），横向",
+                "zh-TW": "maimai FiNALE（日本），橫向",
+            },
+            value: "jp-finale-landscape",
+        },
+        {
+            name: "maimai FiNALE (Japan), portrait",
+            name_localizations: {
+                "zh-CN": "maimai FiNALE（日服），纵向",
+                "zh-TW": "maimai FiNALE（日本），縱向",
+            },
+            value: "jp-finale-portrait",
+        },
+        {
             name: "舞萌DX 2024 (China), landscape",
             name_localizations: {
                 "zh-CN": "舞萌DX 2024（国服），横向",
@@ -299,6 +383,174 @@ export class Best50ChartCommand {
                 "zh-TW": "maimai でらっくす BUDDiES （日本）",
             },
             value: "jp-buddies",
+        },
+        {
+            name: "maimai でらっくす FESTiVAL PLUS (Japan)",
+            name_localizations: {
+                "zh-CN": "maimai でらっくす FESTiVAL PLUS（日服）",
+                "zh-TW": "maimai でらっくす FESTiVAL PLUS（日本）",
+            },
+            value: "jp-festivalplus",
+        },
+        {
+            name: "maimai でらっくす FESTiVAL (Japan)",
+            name_localizations: {
+                "zh-CN": "maimai でらっくす FESTiVAL （日服）",
+                "zh-TW": "maimai でらっくす FESTiVAL （日本）",
+            },
+            value: "jp-festival",
+        },
+        {
+            name: "maimai でらっくす UNiVERSE PLUS (Japan)",
+            name_localizations: {
+                "zh-CN": "maimai でらっくす UNiVERSE PLUS（日服）",
+                "zh-TW": "maimai でらっくす UNiVERSE PLUS（日本）",
+            },
+            value: "jp-universeplus",
+        },
+        {
+            name: "maimai でらっくす UNiVERSE (Japan)",
+            name_localizations: {
+                "zh-CN": "maimai でらっくす UNiVERSE （日服）",
+                "zh-TW": "maimai でらっくす UNiVERSE （日本）",
+            },
+            value: "jp-universe",
+        },
+        {
+            name: "maimai でらっくす Splash PLUS (Japan)",
+            name_localizations: {
+                "zh-CN": "maimai でらっくす Splash PLUS（日服）",
+                "zh-TW": "maimai でらっくす Splash PLUS（日本）",
+            },
+            value: "jp-splashplus",
+        },
+        {
+            name: "maimai でらっくす Splash (Japan)",
+            name_localizations: {
+                "zh-CN": "maimai でらっくす Splash （日服）",
+                "zh-TW": "maimai でらっくす Splash （日本）",
+            },
+            value: "jp-splash",
+        },
+        {
+            name: "maimai でらっくす PLUS (Japan)",
+            name_localizations: {
+                "zh-CN": "maimai でらっくす PLUS（日服）",
+                "zh-TW": "maimai でらっくす PLUS（日本）",
+            },
+            value: "jp-dxplus",
+        },
+        {
+            name: "maimai でらっくす (Japan)",
+            name_localizations: {
+                "zh-CN": "maimai でらっくす（日服）",
+                "zh-TW": "maimai でらっくす（日本）",
+            },
+            value: "jp-dx",
+        },
+        {
+            name: "maimai FiNALE (Japan)",
+            name_localizations: {
+                "zh-CN": "maimai FiNALE（日服）",
+                "zh-TW": "maimai FiNALE（日本）",
+            },
+            value: "jp-finale",
+        },
+        {
+            name: "maimai MiLK PLUS (Japan)",
+            name_localizations: {
+                "zh-CN": "maimai MiLK PLUS（日服）",
+                "zh-TW": "maimai MiLK PLUS（日本）",
+            },
+            value: "jp-milkplus",
+        },
+        {
+            name: "maimai MiLK (Japan)",
+            name_localizations: {
+                "zh-CN": "maimai MiLK（日服）",
+                "zh-TW": "maimai MiLK（日本）",
+            },
+            value: "jp-milk",
+        },
+        {
+            name: "maimai MURASAKi PLUS (Japan)",
+            name_localizations: {
+                "zh-CN": "maimai MURASAKi PLUS（日服）",
+                "zh-TW": "maimai MURASAKi PLUS（日本）",
+            },
+            value: "jp-murasakiplus",
+        },
+        {
+            name: "maimai MURASAKi (Japan)",
+            name_localizations: {
+                "zh-CN": "maimai MURASAKi（日服）",
+                "zh-TW": "maimai MURASAKi（日本）",
+            },
+            value: "jp-murasaki",
+        },
+        {
+            name: "maimai PiNK PLUS (Japan)",
+            name_localizations: {
+                "zh-CN": "maimai PiNK PLUS（日服）",
+                "zh-TW": "maimai PiNK PLUS（日本）",
+            },
+            value: "jp-pinkplus",
+        },
+        {
+            name: "maimai PiNK (Japan)",
+            name_localizations: {
+                "zh-CN": "maimai PiNK（日服）",
+                "zh-TW": "maimai PiNK（日本）",
+            },
+            value: "jp-pink",
+        },
+        {
+            name: "maimai ORANGE PLUS (Japan)",
+            name_localizations: {
+                "zh-CN": "maimai ORANGE PLUS（日服）",
+                "zh-TW": "maimai ORANGE PLUS（日本）",
+            },
+            value: "jp-orangeplus",
+        },
+        {
+            name: "maimai ORANGE (Japan)",
+            name_localizations: {
+                "zh-CN": "maimai ORANGE（日服）",
+                "zh-TW": "maimai ORANGE（日本）",
+            },
+            value: "jp-orange",
+        },
+        {
+            name: "maimai GreeN PLUS (Japan)",
+            name_localizations: {
+                "zh-CN": "maimai GreeN PLUS（日服）",
+                "zh-TW": "maimai GreeN PLUS（日本）",
+            },
+            value: "jp-greenplus",
+        },
+        {
+            name: "maimai GreeN (Japan)",
+            name_localizations: {
+                "zh-CN": "maimai GreeN（日服）",
+                "zh-TW": "maimai GreeN（日本）",
+            },
+            value: "jp-green",
+        },
+        {
+            name: "maimai PLUS (Japan)",
+            name_localizations: {
+                "zh-CN": "maimai PLUS（日服）",
+                "zh-TW": "maimai PLUS（日本）",
+            },
+            value: "jp-maimaiplus",
+        },
+        {
+            name: "maimai (Japan)",
+            name_localizations: {
+                "zh-CN": "maimai（日服）",
+                "zh-TW": "maimai（日本）",
+            },
+            value: "jp-maimai",
         },
     ];
 

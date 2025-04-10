@@ -102,7 +102,6 @@ export class LinkUserCommand {
                     }
                     default: {
                         const [tracker, userId, username] = action.split(".");
-                        console.log(tracker, userId, username);
                         if (tracker && userId && username) {
                             if (!interaction.user.id) return;
                             if (userId !== interaction.user.id) {

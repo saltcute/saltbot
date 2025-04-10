@@ -4,7 +4,7 @@ import { MaiDraw } from "maidraw";
 
 export const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 
-export const maidraw = new MaiDraw(
+MaiDraw.Maimai.Chart.Database.setLocalDatabasePath(
     kasumi.config.getSync("maimai::config.useLocalDatabase")
         ? kasumi.config.getSync("maimai::config.localDatabasePath")
         : ""
