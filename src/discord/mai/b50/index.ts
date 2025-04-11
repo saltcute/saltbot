@@ -21,6 +21,7 @@ export class Best50ChartCommand {
     ];
     private static readonly DEFAULT_VERSION = "jp-prism";
     private static readonly DEFAULT_THEME = "jp-prism-landscape";
+    private static readonly DEFAULT_USE_TRACKER_PROFILE_PICTURE = true;
     static {
         client.on(Events.InteractionCreate, async (interaction) => {
             if (!interaction.isChatInputCommand()) return;
@@ -37,6 +38,14 @@ export class Best50ChartCommand {
                     (version && this.AVAILABLE_VERSION_THEME.includes(version)
                         ? `${version}-landscape`
                         : this.DEFAULT_THEME);
+                const pfpOption = interaction.options.getBoolean(
+                    "use_profile_picture",
+                    false
+                );
+                const useProfilePicture =
+                    pfpOption == null
+                        ? this.DEFAULT_USE_TRACKER_PROFILE_PICTURE
+                        : pfpOption;
                 const tracker = interaction.options.getSubcommand();
                 if (
                     !(
@@ -169,6 +178,9 @@ export class Best50ChartCommand {
                                 username,
                                 {
                                     theme,
+                                    profilePicture: useProfilePicture
+                                        ? undefined
+                                        : null,
                                 }
                             );
                         break;
@@ -191,6 +203,9 @@ export class Best50ChartCommand {
                                 username,
                                 {
                                     theme,
+                                    profilePicture: useProfilePicture
+                                        ? undefined
+                                        : null,
                                 }
                             );
                         break;
@@ -621,6 +636,22 @@ export class Best50ChartCommand {
                                 },
                                 choices: this.versions,
                             },
+                            {
+                                type: 5,
+                                name: "use_profile_picture",
+                                name_localizations: {
+                                    "zh-CN": "使用头像",
+                                    "zh-TW": "使用個人資料圖像",
+                                },
+                                description:
+                                    "Use your profile picture from Kamaitachi.",
+                                description_localizations: {
+                                    "zh-CN": "使用你在 Kamaitachi 上的头像。",
+                                    "zh-TW":
+                                        "使用您在 Kamaitachi 上的個人資料圖像。",
+                                },
+                                choices: this.versions,
+                            },
                         ],
                     },
                     {
@@ -662,6 +693,21 @@ export class Best50ChartCommand {
                                     "zh-TW": "選擇 Best 50 圖像的主題。",
                                 },
                                 choices: this.themes,
+                            },
+                            {
+                                type: 5,
+                                name: "use_profile_picture",
+                                name_localizations: {
+                                    "zh-CN": "使用头像",
+                                    "zh-TW": "使用個人資料圖像",
+                                },
+                                description:
+                                    "Use your profile picture from LXNS.",
+                                description_localizations: {
+                                    "zh-CN": "使用你在 落雪查分器 上的头像。",
+                                    "zh-TW": "使用您在 LXNS 上的個人資料圖像。",
+                                },
+                                choices: this.versions,
                             },
                         ],
                     },
