@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node --nolazy -r ts-node/register -r tsconfig-paths/register src/index.ts",
-    "test": "npm start | bunyan -L",
+    "test": "export LOG_LEVEL=trace && npm start | bunyan -L",
     "pm2": "node src/pm2/index.js"
   },
   "repository": {
@@ -31,7 +31,7 @@
     "kasumi.js": "^0.6.0",
     "kuroshiro": "^1.2.0",
     "kuroshiro-analyzer-kuromoji": "^1.1.0",
-    "maidraw": "^0.3.1",
+    "maidraw": "^0.4.0",
     "ts-node": "^10.9.1",
     "tsconfig-paths": "^4.1.2",
     "upath": "^2.0.1",

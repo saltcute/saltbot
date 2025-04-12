@@ -3,13 +3,13 @@ import { MaiDraw } from "maidraw";
 import { client as kasumi } from "@/kook/init/client";
 import { client } from "@/discord/client";
 
-const lxns = new MaiDraw.Maimai.Best50.LXNS(
-    kasumi.config.getSync("maimai::lxns.token")
-);
+const lxns = new MaiDraw.Maimai.Best50.LXNS({
+    auth: kasumi.config.getSync("maimai::lxns.token"),
+});
 const kamai = new MaiDraw.Maimai.Best50.KamaiTachi();
-const divingfish = new MaiDraw.Maimai.Best50.DivingFish(
-    kasumi.config.getSync("maimai::divingFish.token")
-);
+const divingfish = new MaiDraw.Maimai.Best50.DivingFish({
+    auth: kasumi.config.getSync("maimai::divingFish.token"),
+});
 
 export class Best50ChartCommand {
     private static readonly AVAILABLE_VERSION_THEME = [
