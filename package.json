@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node --nolazy -r ts-node/register -r tsconfig-paths/register src/index.ts",
-    "test": "export LOG_LEVEL=trace && npm start | bunyan -L",
+    "test": "npx install-local \"../maiDraw\" && export LOG_LEVEL=trace && npm start | bunyan -L",
     "pm2": "node src/pm2/index.js"
   },
   "repository": {
