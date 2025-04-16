@@ -1,13 +1,9 @@
 import { client } from "@/kook/init/client";
-import {
-    REST,
-    Routes,
-} from "discord.js";
-import { maiCommand } from "./mai/command";
+import { REST, Routes } from "discord.js";
+import { maiCommand } from "./mai";
+import { chuCommand } from "./chu";
 
-const commands = [
-    maiCommand
-];
+const commands = [maiCommand, chuCommand];
 (async () => {
     const rest = new REST({ version: "10" }).setToken(
         client.config.getSync("discord::auth.token")
