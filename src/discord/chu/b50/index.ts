@@ -6,7 +6,7 @@ import { client } from "@/discord/client";
 const kamai = new MaiDraw.Chuni.Best50.KamaiTachi();
 export class Best50ChartCommand {
     private static readonly AVAILABLE_VERSION_THEME = ["jp-verse"];
-    private static readonly DEFAULT_VERSION = "jp-sun";
+    private static readonly DEFAULT_VERSION = "jp-sunplus";
     private static readonly DEFAULT_THEME = "jp-verse-landscape";
     private static readonly DEFAULT_USE_TRACKER_PROFILE_PICTURE = true;
     static {
