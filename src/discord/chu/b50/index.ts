@@ -116,7 +116,6 @@ export class Best50ChartCommand {
                             case "jp-paradiselost":
                                 kamaiInstance = kamai.paradiseLost();
                                 break;
-
                             case "jp-new":
                                 kamaiInstance = kamai.new();
                                 break;
@@ -252,7 +251,7 @@ export class Best50ChartCommand {
                 "zh-CN": "CHUNITHM VERSE（日服）",
                 "zh-TW": "CHUNITHM VERSE（日本）",
             },
-            value: "jp-VERSE",
+            value: "jp-verse",
         },
         {
             name: "CHUNITHM LUMINOUS PLUS (Japan)",
