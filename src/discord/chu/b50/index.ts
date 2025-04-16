@@ -25,6 +25,10 @@ export class Best50ChartCommand {
                     (version && this.AVAILABLE_VERSION_THEME.includes(version)
                         ? `${version}-landscape`
                         : this.DEFAULT_THEME);
+                const type =
+                    interaction.options.getString("type", false) == "recents"
+                        ? "recents"
+                        : "new";
                 const pfpOption = interaction.options.getBoolean(
                     "use_profile_picture",
                     false
@@ -149,6 +153,7 @@ export class Best50ChartCommand {
                                 profilePicture: useProfilePicture
                                     ? undefined
                                     : null,
+                                type,
                             }
                         );
                         break;
@@ -232,6 +237,18 @@ export class Best50ChartCommand {
             }
         });
     }
+    static readonly types = [
+        {
+            name: "Best 50 (New 20 + Old 30)",
+            name_localizations: { "zh-CN": "B50（b20 + b30）" },
+            value: "new",
+        },
+        {
+            name: "Best 40 (Recent 10 + Best 30)",
+            name_localizations: { "zh-CN": "B50（r10 + b30）" },
+            value: "recents",
+        },
+    ];
 
     static readonly themes = [
         {
@@ -435,6 +452,23 @@ export class Best50ChartCommand {
                                     "zh-TW":
                                         "輸入使用者名稱或在 https://kamai.tachi.ac/u/me 檢視您的使用者 ID。",
                                 },
+                            },
+                            {
+                                type: 3,
+                                name: "type",
+                                name_localizations: {
+                                    "zh-CN": "模式",
+                                    "zh-TW": "模式",
+                                },
+                                description:
+                                    "Choose between generating Best 40 (recents 10) or Best 50 (new 20).",
+                                description_localizations: {
+                                    "zh-CN":
+                                        "选择生成 b40 (r10 + b30) 或是 b50 (b20 + b30)。",
+                                    "zh-TW":
+                                        "選擇生成 Best 40 (recents 10) 或是 Best 50 (new 20)。",
+                                },
+                                choices: this.types,
                             },
                             {
                                 type: 3,
