@@ -9,6 +9,32 @@ export class Best50ChartCommand {
     private static readonly DEFAULT_VERSION = "jp-sunplus";
     private static readonly DEFAULT_THEME = "jp-verse-landscape";
     private static readonly DEFAULT_USE_TRACKER_PROFILE_PICTURE = true;
+    private static readonly DEFAULT_RATING_ALOGRITHM = "new";
+
+    private static readonly DEFAULT_VERSION_RATING_ALOGRITHM_MAP: Record<
+        string,
+        "new" | "recents"
+    > = {
+        "jp-verse": "new",
+        "jp-luminousplus": "recents",
+        "jp-luminous": "recents",
+        "jp-sunplus": "recents",
+        "jp-sun": "recents",
+        "jp-newplus": "recents",
+        "jp-new": "recents",
+        "jp-paradiselost": "recents",
+        "jp-paradise": "recents",
+        "jp-crystalplus": "recents",
+        "jp-crystal": "recents",
+        "jp-amazonplus": "recents",
+        "jp-amazon": "recents",
+        "jp-starplus": "recents",
+        "jp-star": "recents",
+        "jp-airplus": "recents",
+        "jp-air": "recents",
+        "jp-chunithmplus": "recents",
+        "jp-chunithm": "recents",
+    };
     static {
         client.on(Events.InteractionCreate, async (interaction) => {
             if (!interaction.isChatInputCommand()) return;
@@ -28,7 +54,11 @@ export class Best50ChartCommand {
                 const type =
                     interaction.options.getString("type", false) == "recents"
                         ? "recents"
-                        : "new";
+                        : interaction.options.getString("type", false) == "new"
+                          ? "new"
+                          : this.DEFAULT_VERSION_RATING_ALOGRITHM_MAP[
+                                version
+                            ] || this.DEFAULT_RATING_ALOGRITHM;
                 const pfpOption = interaction.options.getBoolean(
                     "use_profile_picture",
                     false
