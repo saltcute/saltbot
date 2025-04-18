@@ -190,9 +190,7 @@ export class Best50ChartCommand {
                             await MaiDraw.Maimai.Best50.drawWithScoreSource(
                                 divingfish,
                                 username,
-                                {
-                                    theme,
-                                }
+                                { theme }
                             );
                         break;
                     }
@@ -654,104 +652,128 @@ export class Best50ChartCommand {
                             },
                         ],
                     },
-                    {
-                        type: 1,
-                        name: "lxns",
-                        description: "Get best 50 scores from LXNS.",
-                        description_localizations: {
-                            "zh-CN": "从 落雪查分器 获取 b50 信息。",
-                            "zh-TW": "從 LXNS 獲取 Best 50 資料。",
-                        },
-                        options: [
-                            {
-                                type: 3,
-                                name: "friendcode",
-                                name_localizations: {
-                                    "zh-CN": "好友码",
-                                    "zh-TW": "好友代號",
-                                },
-                                description:
-                                    "You can see your friend code at https://maimai.lxns.net/user/profile.",
-                                description_localizations: {
-                                    "zh-CN":
-                                        "你可以在 https://maimai.lxns.net/user/profile 看到你的好友码。",
-                                    "zh-TW":
-                                        "您可以在 https://maimai.lxns.net/user/profile 檢視您的好友代號。",
-                                },
-                            },
-                            {
-                                type: 3,
-                                name: "theme",
-                                name_localizations: {
-                                    "zh-CN": "主题",
-                                    "zh-TW": "主題",
-                                },
-                                description:
-                                    "Choose from a variety of themes for your Best 50 chart.",
-                                description_localizations: {
-                                    "zh-CN": "选择 b50 图片的主题。",
-                                    "zh-TW": "選擇 Best 50 圖像的主題。",
-                                },
-                                choices: this.themes,
-                            },
-                            {
-                                type: 5,
-                                name: "use_profile_picture",
-                                name_localizations: {
-                                    "zh-CN": "使用头像",
-                                    "zh-TW": "使用個人資料圖像",
-                                },
-                                description:
-                                    "Use your profile picture from LXNS.",
-                                description_localizations: {
-                                    "zh-CN": "使用你在 落雪查分器 上的头像。",
-                                    "zh-TW": "使用您在 LXNS 上的個人資料圖像。",
-                                },
-                                choices: this.versions,
-                            },
-                        ],
-                    },
-                    {
-                        type: 1,
-                        name: "divingfish",
-                        description: "Get best 50 scores from DivingFish.",
-                        description_localizations: {
-                            "zh-CN": "从 水鱼查分器 获取 b50 信息。",
-                            "zh-TW": "從 DivingFish 獲取 Best 50 資料。",
-                        },
-                        options: [
-                            {
-                                type: 3,
-                                name: "username",
-                                name_localizations: {
-                                    "zh-CN": "用户名",
-                                    "zh-TW": "使用者名稱",
-                                },
-                                description:
-                                    "Use the username you use to log in DivingFish.",
-                                description_localizations: {
-                                    "zh-CN":
-                                        "使用你用来登录水鱼查分器的用户名。",
-                                    "zh-TW":
-                                        "使用您用來登入 DivingFish 的使用者名稱。",
-                                },
-                            },
-                            {
-                                type: 3,
-                                name: "theme",
-                                name_localizations: {
-                                    "zh-CN": "主题",
-                                    "zh-TW": "主題",
-                                },
-                                description:
-                                    "Choose from a variety of themes for your Best 50 chart.",
-                                description_localizations: {
-                                    "zh-CN": "选择 b50 图片的主题。",
-                                    "zh-TW": "選擇 Best 50 圖像的主題。",
-                                },
-                            },
-                        ],
-                    },
+                    ...(() => {
+                        return kasumi.config.getSync("maimai::lxns.token")
+                            ? [
+                                  {
+                                      type: 1,
+                                      name: "lxns",
+                                      description:
+                                          "Get best 50 scores from LXNS.",
+                                      description_localizations: {
+                                          "zh-CN":
+                                              "从 落雪查分器 获取 b50 信息。",
+                                          "zh-TW":
+                                              "從 LXNS 獲取 Best 50 資料。",
+                                      },
+                                      options: [
+                                          {
+                                              type: 3,
+                                              name: "friendcode",
+                                              name_localizations: {
+                                                  "zh-CN": "好友码",
+                                                  "zh-TW": "好友代號",
+                                              },
+                                              description:
+                                                  "You can see your friend code at https://maimai.lxns.net/user/profile.",
+                                              description_localizations: {
+                                                  "zh-CN":
+                                                      "你可以在 https://maimai.lxns.net/user/profile 看到你的好友码。",
+                                                  "zh-TW":
+                                                      "您可以在 https://maimai.lxns.net/user/profile 檢視您的好友代號。",
+                                              },
+                                          },
+                                          {
+                                              type: 3,
+                                              name: "theme",
+                                              name_localizations: {
+                                                  "zh-CN": "主题",
+                                                  "zh-TW": "主題",
+                                              },
+                                              description:
+                                                  "Choose from a variety of themes for your Best 50 chart.",
+                                              description_localizations: {
+                                                  "zh-CN":
+                                                      "选择 b50 图片的主题。",
+                                                  "zh-TW":
+                                                      "選擇 Best 50 圖像的主題。",
+                                              },
+                                              choices: this.themes,
+                                          },
+                                          {
+                                              type: 5,
+                                              name: "use_profile_picture",
+                                              name_localizations: {
+                                                  "zh-CN": "使用头像",
+                                                  "zh-TW": "使用個人資料圖像",
+                                              },
+                                              description:
+                                                  "Use your profile picture from LXNS.",
+                                              description_localizations: {
+                                                  "zh-CN":
+                                                      "使用你在 落雪查分器 上的头像。",
+                                                  "zh-TW":
+                                                      "使用您在 LXNS 上的個人資料圖像。",
+                                              },
+                                              choices: this.versions,
+                                          },
+                                      ],
+                                  },
+                              ]
+                            : [];
+                    })(),
+                    ...(() => {
+                        return kasumi.config.getSync("maimai::divingFish.token")
+                            ? [
+                                  {
+                                      type: 1,
+                                      name: "divingfish",
+                                      description:
+                                          "Get best 50 scores from DivingFish.",
+                                      description_localizations: {
+                                          "zh-CN":
+                                              "从 水鱼查分器 获取 b50 信息。",
+                                          "zh-TW":
+                                              "從 DivingFish 獲取 Best 50 資料。",
+                                      },
+                                      options: [
+                                          {
+                                              type: 3,
+                                              name: "username",
+                                              name_localizations: {
+                                                  "zh-CN": "用户名",
+                                                  "zh-TW": "使用者名稱",
+                                              },
+                                              description:
+                                                  "Use the username you use to log in DivingFish.",
+                                              description_localizations: {
+                                                  "zh-CN":
+                                                      "使用你用来登录水鱼查分器的用户名。",
+                                                  "zh-TW":
+                                                      "使用您用來登入 DivingFish 的使用者名稱。",
+                                              },
+                                          },
+                                          {
+                                              type: 3,
+                                              name: "theme",
+                                              name_localizations: {
+                                                  "zh-CN": "主题",
+                                                  "zh-TW": "主題",
+                                              },
+                                              description:
+                                                  "Choose from a variety of themes for your Best 50 chart.",
+                                              description_localizations: {
+                                                  "zh-CN":
+                                                      "选择 b50 图片的主题。",
+                                                  "zh-TW":
+                                                      "選擇 Best 50 圖像的主題。",
+                                              },
+                                          },
+                                      ],
+                                  },
+                              ]
+                            : [];
+                    })(),
                 ],
             },
         ];
