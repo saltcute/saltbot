@@ -2,6 +2,8 @@ import { AttachmentBuilder, Events } from "discord.js";
 import { MaiDraw } from "maidraw";
 import { client as kasumi } from "@/kook/init/client";
 import { client } from "@/discord/client";
+import { Telemetry } from "@/util/telemetry";
+import { EResultTypes } from "@/util/telemetry/type";
 
 const kamai = new MaiDraw.Chuni.Best50.KamaiTachi();
 export class Best50ChartCommand {
@@ -36,12 +38,16 @@ export class Best50ChartCommand {
         "jp-chunithm": "recents",
     };
     static {
-        client.on(Events.InteractionCreate, async (interaction) => {
-            if (!interaction.isChatInputCommand()) return;
-            if (
-                interaction.commandName === "chu" &&
-                interaction.options.getSubcommandGroup() == "b50"
-            ) {
+        client.on(
+            Events.InteractionCreate,
+            Telemetry.discordMiddleware(async (interaction) => {
+                if (!interaction.isChatInputCommand())
+                    return EResultTypes.IGNORED;
+                if (interaction.commandName != "chu")
+                    return EResultTypes.IGNORED;
+                if (interaction.options.getSubcommandGroup() != "b50")
+                    return EResultTypes.IGNORED;
+
                 let result: Buffer | null = null;
                 const version =
                     interaction.options.getString("version", false) ||
@@ -78,7 +84,7 @@ export class Best50ChartCommand {
                     await interaction.editReply({
                         content: "Invalid tracker. Please try again.",
                     });
-                    return;
+                    return EResultTypes.INVALID_TRACKER;
                 }
                 let username: string | null = null;
                 switch (tracker) {
@@ -104,7 +110,7 @@ export class Best50ChartCommand {
                             content: `Please provide your ${tracker == "lxns" ? "friend code" : "username"}. To use without a ${tracker == "lxns" ? "friend code" : "username"}, you need to select "remember my username" after generating a chart or use \`/mai link\` to link your account.`,
                             ephemeral: true,
                         });
-                        return;
+                        return EResultTypes.INVALID_USERNAME;
                     } else {
                         username = dbUsername;
                     }
@@ -217,6 +223,7 @@ export class Best50ChartCommand {
                         content:
                             "Failed to generate a chart. Please check your input.",
                     });
+                    return EResultTypes.TRACKER_BAD_RESPONSE;
                 } else {
                     await interaction.editReply({
                         content: "",
@@ -263,9 +270,10 @@ export class Best50ChartCommand {
                             ],
                         });
                     }
+                    return EResultTypes.GENERATE_SUCCESS;
                 }
-            }
-        });
+            })
+        );
     }
     static readonly types = [
         {

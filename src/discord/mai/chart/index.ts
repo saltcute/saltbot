@@ -3,6 +3,8 @@ import fs from "fs";
 import { ApplicationCommandOption, Events } from "discord.js";
 import * as fuzzySearch from "@m31coding/fuzzy-search";
 import { client } from "@/discord/client";
+import { EResultTypes } from "@/util/telemetry/type";
+import { Telemetry } from "@/util/telemetry";
 
 const Kuroshiro = require("kuroshiro").default;
 const KuromojiAnalyzer = require("kuroshiro-analyzer-kuromoji");
@@ -82,47 +84,50 @@ export class ChartQueryCommand {
                 else interaction.respond([]);
             }
         });
-        client.on(Events.InteractionCreate, async (interaction) => {
-            if (!interaction.isChatInputCommand()) return;
+        client.on(
+            Events.InteractionCreate,
+            Telemetry.discordMiddleware(async (interaction) => {
+                if (!interaction.isChatInputCommand())
+                    return EResultTypes.IGNORED;
+                if (interaction.commandName != "mai")
+                    return EResultTypes.IGNORED;
+                if (interaction.options.getSubcommand() != "chart")
+                    return EResultTypes.IGNORED;
 
-            if (
-                interaction.commandName == "mai" &&
-                interaction.options.getSubcommand() == "chart"
-            ) {
                 await interaction.deferReply();
-
-                const songid = parseInt(
-                    interaction.options.getString("song") || ""
+                const songId = parseInt(
+                    interaction.options.getString("song", true)
                 );
-                if (!isNaN(songid)) {
-                    const charts = this.getChartsBySongId(songid).sort(
-                        (a, b) => a.difficulty - b.difficulty
-                    );
-                    interaction.editReply(
-                        `**${charts[0].name}**\n\n${charts
-                            .map((v) => {
-                                return `${(() => {
-                                    switch (v.difficulty) {
-                                        case 0:
-                                            return "Basic";
-                                        case 1:
-                                            return "Advanced";
-                                        case 2:
-                                            return "Expert";
-                                        case 3:
-                                            return "Master";
-                                        case 4:
-                                            return "Re:Master";
-                                        case 5:
-                                            return "UTAGE";
-                                    }
-                                })()} Lv ${v.level}`;
-                            })
-                            .join("\n")}`
-                    );
-                }
-            }
-        });
+                if (isNaN(songId)) return EResultTypes.INVALID_INPUT;
+                const charts = this.getChartsBySongId(songId).sort(
+                    (a, b) => a.difficulty - b.difficulty
+                );
+                await interaction.editReply(
+                    `**${charts[0].name}**\n\n${charts
+                        .map((v) => {
+                            return `${(() => {
+                                switch (v.difficulty) {
+                                    case 0:
+                                        return "Basic";
+                                    case 1:
+                                        return "Advanced";
+                                    case 2:
+                                        return "Expert";
+                                    case 3:
+                                        return "Master";
+                                    case 4:
+                                        return "Re:Master";
+                                    case 5:
+                                        return "UTAGE";
+                                }
+                            })()} Lv ${v.level}`;
+                        })
+                        .join("\n")}`
+                );
+
+                return EResultTypes.SUCCESS;
+            })
+        );
     }
 
     static getChartsBySongId(id: number) {

@@ -1,15 +1,21 @@
 import { client } from "@/discord/client";
 import { Events } from "discord.js";
 import { client as kasumi } from "@/kook/init/client";
+import { Telemetry } from "@/util/telemetry";
+import { EResultTypes } from "@/util/telemetry/type";
 
 export class LinkUserCommand {
     static {
-        client.on(Events.InteractionCreate, async (interaction) => {
-            if (!interaction.isChatInputCommand()) return;
-            if (
-                interaction.commandName === "mai" &&
-                interaction.options.getSubcommandGroup() == "link"
-            ) {
+        client.on(
+            Events.InteractionCreate,
+            Telemetry.discordMiddleware(async (interaction) => {
+                if (!interaction.isChatInputCommand())
+                    return EResultTypes.IGNORED;
+                if (interaction.commandName != "mai")
+                    return EResultTypes.IGNORED;
+                if (interaction.options.getSubcommandGroup() != "link")
+                    return EResultTypes.IGNORED;
+
                 const tracker = interaction.options.getSubcommand();
                 let username;
                 switch (tracker) {
@@ -46,8 +52,10 @@ export class LinkUserCommand {
                         });
                         break;
                 }
-            }
-        });
+
+                return EResultTypes.LINK_SUCCESS;
+            })
+        );
 
         client.on(Events.InteractionCreate, async (interaction) => {
             if (!interaction.isButton()) return;
