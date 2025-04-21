@@ -1,3 +1,5 @@
 node_modules/
 
 src/config/config.json5
+
+test/
