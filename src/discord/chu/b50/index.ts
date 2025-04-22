@@ -335,8 +335,8 @@ export class Best50ChartCommand {
         {
             name: "CHUNITHM SUN (Japan)",
             name_localizations: {
-                "zh-CN": "CHUNITHM SUN （日服）",
-                "zh-TW": "CHUNITHM SUN （日本）",
+                "zh-CN": "CHUNITHM SUN（日服）",
+                "zh-TW": "CHUNITHM SUN（日本）",
             },
             value: "jp-sun",
         },
@@ -351,8 +351,8 @@ export class Best50ChartCommand {
         {
             name: "CHUNITHM NEW (Japan)",
             name_localizations: {
-                "zh-CN": "CHUNITHM NEW （日服）",
-                "zh-TW": "CHUNITHM NEW （日本）",
+                "zh-CN": "CHUNITHM NEW（日服）",
+                "zh-TW": "CHUNITHM NEW（日本）",
             },
             value: "jp-new",
         },
@@ -367,8 +367,8 @@ export class Best50ChartCommand {
         {
             name: "CHUNITHM PARADISE (Japan)",
             name_localizations: {
-                "zh-CN": "CHUNITHM PARADISE （日服）",
-                "zh-TW": "CHUNITHM PARADISE （日本）",
+                "zh-CN": "CHUNITHM PARADISE（日服）",
+                "zh-TW": "CHUNITHM PARADISE（日本）",
             },
             value: "jp-paradise",
         },
