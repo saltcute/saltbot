@@ -46,42 +46,52 @@ export class Telemetry {
         ) => Promise<EResultTypes> | EResultTypes
     ) {
         return async (interaction: Interaction<CacheType>) => {
-            if (interaction.isCommand()) {
-                const result = await handler(interaction);
-                if (result == EResultTypes.IGNORED) return;
-                else
-                    this.logCommandUsage({
-                        source: "discord",
-                        user: {
-                            name: interaction.user.username,
-                            id: interaction.user.id,
-                        },
-                        place: {
-                            guildId: interaction.guildId || "",
-                            channelId: interaction.channelId || "",
-                        },
-                        command: (() => {
-                            const commands = [interaction.commandName];
-                            if (interaction.isChatInputCommand()) {
-                                const subCommandGroup =
-                                    interaction.options.getSubcommandGroup(
-                                        false
-                                    );
-                                const subCommand =
-                                    interaction.options.getSubcommand(false);
-                                if (subCommandGroup)
-                                    commands.push(subCommandGroup);
-                                if (subCommand) commands.push(subCommand);
-                            }
-                            return commands;
-                        })(),
-                        args: interaction.options.data.map((v) => ({
-                            name: v.name,
-                            value: v.value?.toString() || "",
-                        })),
-                        result,
-                    });
-            } else handler(interaction);
+            try {
+                if (interaction.isCommand()) {
+                    const returnValue = handler(interaction);
+                    if (returnValue instanceof Promise) {
+                        returnValue.catch(kasumi.logger.error);
+                    }
+                    const result = await returnValue;
+                    if (result == EResultTypes.IGNORED) return;
+                    else
+                        this.logCommandUsage({
+                            source: "discord",
+                            user: {
+                                name: interaction.user.username,
+                                id: interaction.user.id,
+                            },
+                            place: {
+                                guildId: interaction.guildId || "",
+                                channelId: interaction.channelId || "",
+                            },
+                            command: (() => {
+                                const commands = [interaction.commandName];
+                                if (interaction.isChatInputCommand()) {
+                                    const subCommandGroup =
+                                        interaction.options.getSubcommandGroup(
+                                            false
+                                        );
+                                    const subCommand =
+                                        interaction.options.getSubcommand(
+                                            false
+                                        );
+                                    if (subCommandGroup)
+                                        commands.push(subCommandGroup);
+                                    if (subCommand) commands.push(subCommand);
+                                }
+                                return commands;
+                            })(),
+                            args: interaction.options.data.map((v) => ({
+                                name: v.name,
+                                value: v.value?.toString() || "",
+                            })),
+                            result,
+                        });
+                } else handler(interaction);
+            } catch (e) {
+                kasumi.logger.error(e);
+            }
         };
     }
 }
