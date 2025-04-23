@@ -18,16 +18,16 @@ export class Best50ChartCommand {
         "refresh" | "classic"
     > = {
         "jp-refresh": "refresh",
-        "jp-brightmemoryact3": "refresh",
-        "jp-brightmemoryact2": "refresh",
-        "jp-brightmemoryact1": "refresh",
-        "jp-bright": "refresh",
-        "jp-redplus": "refresh",
-        "jp-red": "refresh",
-        "jp-summerplus": "refresh",
-        "jp-summer": "refresh",
-        "jp-plus": "refresh",
-        "jp-ongeki": "refresh",
+        "jp-brightmemoryact3": "classic",
+        "jp-brightmemoryact2": "classic",
+        "jp-brightmemoryact1": "classic",
+        "jp-bright": "classic",
+        "jp-redplus": "classic",
+        "jp-red": "classic",
+        "jp-summerplus": "classic",
+        "jp-summer": "classic",
+        "jp-plus": "classic",
+        "jp-ongeki": "classic",
     };
     static {
         client.on(
@@ -250,11 +250,11 @@ export class Best50ChartCommand {
             name_localizations: { "zh-CN": "B50（b10 + b50 + p50）" },
             value: "refresh",
         },
-        // {
-        //     name: "Best 55 (New 15 + Best 30 + Recent 10)",
-        //     name_localizations: { "zh-CN": "B55（b15 + b30 + r10）" },
-        //     value: "classic",
-        // },
+        {
+            name: "Best 55 (New 15 + Best 30 + Recent 10)",
+            name_localizations: { "zh-CN": "B55（b15 + b30 + r10）" },
+            value: "classic",
+        },
     ];
 
     static readonly themes = [
