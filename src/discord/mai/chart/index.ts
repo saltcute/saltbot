@@ -102,7 +102,12 @@ export class ChartQueryCommand {
                     interaction.editReply(`"${songId}" is not a valid music ID!`);
                     return EResultTypes.INVALID_INPUT;
                 }
-                const charts = this.getChartsBySongId(songId).sort(
+                let charts = this.getChartsBySongId(songId);
+                if(charts == null) {
+                    interaction.editReply(`No charts are found with the provided ID!`);
+                    return EResultTypes.INVALID_INPUT;
+                }
+                charts = charts.sort(
                     (a, b) => a.difficulty - b.difficulty
                 );
                 await interaction.editReply(
@@ -127,7 +132,6 @@ export class ChartQueryCommand {
                         })
                         .join("\n")}`
                 );
-
                 return EResultTypes.SUCCESS;
             })
         );
@@ -146,7 +150,7 @@ export class ChartQueryCommand {
             }
             return charts;
         }
-        return [];
+        return null;
     }
 
     static getAllSongs() {
