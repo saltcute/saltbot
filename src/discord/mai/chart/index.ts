@@ -77,7 +77,7 @@ export class ChartQueryCommand {
                                         v.entity.id < 100000
                                             ? " DX"
                                             : ""),
-                                    value: v.entity.id.toString(),
+                                    value: v.entity.id,
                                 };
                             })
                     );
@@ -96,15 +96,10 @@ export class ChartQueryCommand {
 
                 await interaction.deferReply();
     
-                const song = interaction.options.getString("song", true)
-                const songId = parseInt(song);
-                if (isNaN(songId)) {
-                    interaction.editReply(`"${song}" is not a valid music ID!`);
-                    return EResultTypes.INVALID_INPUT;
-                }
-                let charts = this.getChartsBySongId(songId);
+                const song = interaction.options.getInteger("song", true)
+                let charts = this.getChartsBySongId(song);
                 if(charts == null) {
-                    interaction.editReply(`No charts are found with the provided ID!`);
+                    interaction.editReply(`No charts are found!`);
                     return EResultTypes.INVALID_INPUT;
                 }
                 charts = charts.sort(
@@ -188,7 +183,7 @@ export class ChartQueryCommand {
                     },
                     options: [
                         {
-                            type: 3,
+                            type: 4,
                             name: "song",
                             nameLocalizations: {
                                 "zh-CN": "歌曲",
