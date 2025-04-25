@@ -95,11 +95,11 @@ export class ChartQueryCommand {
                     return EResultTypes.IGNORED;
 
                 await interaction.deferReply();
-                const songId = parseInt(
-                    interaction.options.getString("song", true)
-                );
+    
+                const song = interaction.options.getString("song", true)
+                const songId = parseInt(song);
                 if (isNaN(songId)) {
-                    interaction.editReply(`"${songId}" is not a valid music ID!`);
+                    interaction.editReply(`"${song}" is not a valid music ID!`);
                     return EResultTypes.INVALID_INPUT;
                 }
                 let charts = this.getChartsBySongId(songId);
