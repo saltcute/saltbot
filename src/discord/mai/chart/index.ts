@@ -98,7 +98,10 @@ export class ChartQueryCommand {
                 const songId = parseInt(
                     interaction.options.getString("song", true)
                 );
-                if (isNaN(songId)) return EResultTypes.INVALID_INPUT;
+                if (isNaN(songId)) {
+                    interaction.editReply(`"${songId}" is not a valid music ID!`);
+                    return EResultTypes.INVALID_INPUT;
+                }
                 const charts = this.getChartsBySongId(songId).sort(
                     (a, b) => a.difficulty - b.difficulty
                 );
