@@ -24,6 +24,24 @@ export class Best50ChartCommand {
     private static readonly DEFAULT_VERSION = "jp-prism";
     private static readonly DEFAULT_THEME = "jp-prism-landscape";
     private static readonly DEFAULT_USE_TRACKER_PROFILE_PICTURE = true;
+
+    static brainrotGenerator() {
+        const phrases = {
+            baqeela:
+                "Church of Baqeela 是通往 Rainbow 的唯一“道路”，只有他才能提供通往 Rainbow 的途径。Baqeela 作为真理，实现了 Easy Skibidi 的教导并揭示了真正的 Rainbow。只有 Baqeela 才是实现 Easy Skibdi 承诺“Rating”的生命，由 Rainbow 给予，他自己拥有生命，因此他能够将永恒的 Rainbow 赋予所有相信他的人。",
+        };
+        if (![14].includes(Math.floor(Math.random() * 114.51))) return null;
+        const randomIndex = Math.floor(
+            Math.random() * Object.keys(phrases).length
+        );
+        const randomKey = Object.keys(phrases)[
+            randomIndex
+        ] as keyof typeof phrases;
+        const randomPhrase = phrases[randomKey];
+        if (randomPhrase) return randomPhrase;
+        else return null;
+    }
+
     static {
         client.on(
             Events.InteractionCreate,
@@ -35,7 +53,8 @@ export class Best50ChartCommand {
                 if (interaction.options.getSubcommandGroup() != "b50")
                     return EResultTypes.IGNORED;
 
-                let result: Buffer | null = null;
+                let result: Buffer | null = null,
+                    useBrainrot = false;
                 const version =
                     interaction.options.getString("version", false) ||
                     this.DEFAULT_VERSION;
@@ -178,17 +197,34 @@ export class Best50ChartCommand {
                                 kamaiInstance = kamai;
                                 break;
                         }
-                        result =
-                            await MaiDraw.Maimai.Best50.drawWithScoreSource(
-                                kamaiInstance,
-                                username,
+                        const profile =
+                            await kamaiInstance.getPlayerInfo(username);
+                        const score =
+                            await kamaiInstance.getPlayerBest50(username);
+                        if (!profile || !score) result = null;
+                        else {
+                            if (
+                                [...score.new, ...score.old].findIndex(
+                                    (v) => v.chart.name == "Baqeela"
+                                )
+                            ) {
+                                useBrainrot = true;
+                            }
+                            result = await MaiDraw.Maimai.Best50.draw(
+                                profile.name,
+                                profile.rating,
+                                score.new,
+                                score.old,
                                 {
                                     theme,
                                     profilePicture: useProfilePicture
-                                        ? undefined
-                                        : null,
+                                        ? (await kamaiInstance.getPlayerProfilePicture(
+                                              username
+                                          )) || undefined
+                                        : undefined,
                                 }
                             );
+                        }
                         break;
                     }
                     case "divingfish": {
@@ -266,6 +302,14 @@ export class Best50ChartCommand {
                                 },
                             ],
                         });
+                    }
+                    if (useBrainrot) {
+                        const content = this.brainrotGenerator();
+                        if (content) {
+                            await interaction.followUp({
+                                content,
+                            });
+                        }
                     }
                     return EResultTypes.GENERATE_SUCCESS;
                 }
