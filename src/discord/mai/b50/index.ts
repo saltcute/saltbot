@@ -310,6 +310,7 @@ export class Best50ChartCommand {
                                 content,
                             });
                         }
+                        return EResultTypes.GENERATE_BAQEELA_SUCCESS;
                     }
                     return EResultTypes.GENERATE_SUCCESS;
                 }
