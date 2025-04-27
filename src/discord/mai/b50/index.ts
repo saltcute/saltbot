@@ -206,7 +206,7 @@ export class Best50ChartCommand {
                             if (
                                 [...score.new, ...score.old].findIndex(
                                     (v) => v.chart.name == "Baqeela"
-                                )
+                                ) != -1
                             ) {
                                 useBrainrot = true;
                             }
