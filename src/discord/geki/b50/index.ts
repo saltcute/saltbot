@@ -7,8 +7,11 @@ import { EResultTypes } from "@/util/telemetry/type";
 
 const kamai = new MaiDraw.Geki.Best50.KamaiTachi();
 export class Best50ChartCommand {
-    private static readonly AVAILABLE_VERSION_THEME = ["jp-refresh"];
-    private static readonly DEFAULT_VERSION = "jp-brightmemoryact2";
+    private static readonly AVAILABLE_VERSION_THEME = [
+        "jp-refresh",
+        "jp-brightmemory",
+    ];
+    private static readonly DEFAULT_VERSION = "jp-brightmemoryact3";
     private static readonly DEFAULT_THEME = "jp-refresh-landscape";
     private static readonly DEFAULT_USE_TRACKER_PROFILE_PICTURE = true;
     private static readonly DEFAULT_RATING_ALOGRITHM = "refresh";
@@ -44,10 +47,14 @@ export class Best50ChartCommand {
                 const version =
                     interaction.options.getString("version", false) ||
                     this.DEFAULT_VERSION;
+                const themeVersion = version.includes("act")
+                    ? version.replace(/act[1-3]/, "")
+                    : version;
                 const theme =
                     interaction.options.getString("theme", false) ||
-                    (version && this.AVAILABLE_VERSION_THEME.includes(version)
-                        ? `${version}-landscape`
+                    (themeVersion &&
+                    this.AVAILABLE_VERSION_THEME.includes(themeVersion)
+                        ? `${themeVersion}-landscape`
                         : this.DEFAULT_THEME);
                 const type =
                     interaction.options.getString("type", false) == "classic"
@@ -265,6 +272,14 @@ export class Best50ChartCommand {
                 "zh-TW": "オンゲキ Re:Fresh（日本），橫向",
             },
             value: "jp-refresh-landscape",
+        },
+        {
+            name: "オンゲキ bright MEMORY (Japan), landscape",
+            name_localizations: {
+                "zh-CN": "オンゲキ bright MEMORY（日服），横向",
+                "zh-TW": "オンゲキ bright MEMORY（日本），橫向",
+            },
+            value: "jp-brightmemory-landscape",
         },
     ];
 
