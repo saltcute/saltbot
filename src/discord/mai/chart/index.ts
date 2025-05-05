@@ -120,7 +120,7 @@ ${[
                                 fields: [
                                     {
                                         name: "Difficulty",
-                                        value: `-# Data since DX and until PRiSM.\n-# Information of FESTiVAL PLUS and PRiSM is not complete.\n\`\`\`\n${charts
+                                        value: `-# Data since DX and until PRiSM PLUS.\n-# Information of FESTiVAL PLUS and PRiSM is not complete.\n\`\`\`\n${charts
                                             .map((v) => {
                                                 const events = v.events.filter(
                                                     (v) =>
