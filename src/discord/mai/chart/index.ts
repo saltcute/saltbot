@@ -2,9 +2,12 @@ import upath from "upath";
 import fs from "fs";
 import { ApplicationCommandOption, Events } from "discord.js";
 import * as fuzzySearch from "@m31coding/fuzzy-search";
+import { client as kasumi } from "@/kook/init/client";
 import { client } from "@/discord/client";
 import { EResultTypes } from "@/util/telemetry/type";
 import { Telemetry } from "@/util/telemetry";
+import { Maimai } from "./type";
+import _ from "lodash";
 
 const Kuroshiro = require("kuroshiro").default;
 const KuromojiAnalyzer = require("kuroshiro-analyzer-kuromoji");
@@ -15,22 +18,9 @@ const searcher = fuzzySearch.SearcherFactory.createDefaultSearcher<
     number
 >();
 
-interface Chart {
-    id: number;
-    name: string;
-    level: number;
-    difficulty: number;
-}
-
 export class ChartQueryCommand {
-    static readonly DATABASE_PATH = upath.join(
-        __dirname,
-        "..",
-        "..",
-        "..",
-        "..",
-        "..",
-        "maimai-songs-database"
+    static readonly DATABASE_PATH = kasumi.config.getSync(
+        "maimai::config.localDatabasePath"
     );
     static readonly CHART_PATH = upath.join(
         this.DATABASE_PATH,
@@ -95,38 +85,110 @@ export class ChartQueryCommand {
                     return EResultTypes.IGNORED;
 
                 await interaction.deferReply();
-    
-                const song = interaction.options.getInteger("song", true)
+
+                const song = interaction.options.getInteger("song", true);
                 let charts = this.getChartsBySongId(song);
-                if(charts == null) {
+                if (charts == null) {
                     interaction.editReply(`No charts are found!`);
                     return EResultTypes.INVALID_INPUT;
                 }
-                charts = charts.sort(
-                    (a, b) => a.difficulty - b.difficulty
-                );
-                await interaction.editReply(
-                    `**${charts[0].name}**\n\n${charts
-                        .map((v) => {
-                            return `${(() => {
-                                switch (v.difficulty) {
-                                    case 0:
-                                        return "Basic";
-                                    case 1:
-                                        return "Advanced";
-                                    case 2:
-                                        return "Expert";
-                                    case 3:
-                                        return "Master";
-                                    case 4:
-                                        return "Re:Master";
-                                    case 5:
-                                        return "UTAGE";
-                                }
-                            })()} Lv ${v.level}`;
-                        })
-                        .join("\n")}`
-                );
+                charts = charts.sort((a, b) => a.difficulty - b.difficulty);
+                const expert = charts[Maimai.EDifficulty.EXPERT] as
+                        | Maimai.IChart
+                        | undefined,
+                    master = charts[Maimai.EDifficulty.MASTER] as
+                        | Maimai.IChart
+                        | undefined,
+                    remaster = charts[Maimai.EDifficulty.REMASTER] as
+                        | Maimai.IChart
+                        | undefined;
+                if (master)
+                    await interaction.editReply({
+                        content: `Details of chart ID ${song}`,
+                        embeds: [
+                            {
+                                title: `${master.name}`,
+                                description: `By **${master.artist}**
+BPM: ${master.bpm}
+-# Designed by
+${[
+    ...(expert ? [`-# EXP: ${expert.designer.name}`] : []),
+    ...(master ? [`-# MAS: ${master.designer.name}`] : []),
+    ...(remaster ? [`-# REM: ${remaster.designer.name}`] : []),
+].join("\n")}`,
+                                // color: 2326507,
+                                fields: [
+                                    {
+                                        name: "Difficulty",
+                                        value: `-# Data since DX and until PRiSM.\n-# Information of FESTiVAL PLUS and PRiSM is not complete.\n\`\`\`\n${charts
+                                            .map((v) => {
+                                                const events = v.events.filter(
+                                                    (v) =>
+                                                        v.type == "existence" &&
+                                                        v.version.region == "DX"
+                                                ) as Maimai.Events.Existence[];
+                                                return `${(() => {
+                                                    switch (v.difficulty) {
+                                                        case 0:
+                                                            return "Basic       ";
+                                                        case 1:
+                                                            return "Advanced    ";
+                                                        case 2:
+                                                            return "Expert      ";
+                                                        case 3:
+                                                            return "Master      ";
+                                                        case 4:
+                                                            return "Re:Master   ";
+                                                        case 5:
+                                                            return "UTAGE       ";
+                                                    }
+                                                })()}Lv${_.uniq(
+                                                    events.map((v) => {
+                                                        return ` ${v.data.level
+                                                            .toFixed(1)
+                                                            .padStart(
+                                                                4,
+                                                                " "
+                                                            )} `;
+                                                    })
+                                                ).join("→")}`;
+                                            })
+                                            .join("\n")}\n\`\`\``,
+                                        inline: false,
+                                    },
+                                    {
+                                        name: "Notes",
+                                        value: `\`\`\`
+                Master${remaster ? `     Re:Master` : ""}
+Tap              ${master.meta.notes.tap.toString().padStart(3, " ")}${remaster ? `           ${remaster.meta.notes.tap.toString().padStart(3, " ")}` : ""}
+Hold             ${master.meta.notes.hold.toString().padStart(3, " ")}${remaster ? `           ${remaster.meta.notes.hold.toString().padStart(3, " ")}` : ""}
+Slide            ${master.meta.notes.slide.toString().padStart(3, " ")}${remaster ? `           ${remaster.meta.notes.slide.toString().padStart(3, " ")}` : ""}
+Touch            ${master.meta.notes.touch.toString().padStart(3, " ")}${remaster ? `           ${remaster.meta.notes.touch.toString().padStart(3, " ")}` : ""}
+Break            ${master.meta.notes.break.toString().padStart(3, " ")}${remaster ? `           ${remaster.meta.notes.break.toString().padStart(3, " ")}` : ""}
+
+Max DX Score    ${master.meta.maxDXScore.toString().padStart(4, " ")}${remaster ? `          ${remaster.meta.maxDXScore.toString().padStart(4, " ")}` : ""}
+\`\`\``,
+                                    },
+                                    {
+                                        name: "Other",
+                                        value: [
+                                            ...(master.addVersion.DX
+                                                ? [
+                                                      `- This chart first appeared in **${master.addVersion.DX?.name}**`,
+                                                  ]
+                                                : []),
+                                            ...(remaster?.events[0]
+                                                ? [
+                                                      `- The Re:Master chart was first seen in **${remaster.events.filter((v) => v.version.region == "DX")[0].version.name}**`,
+                                                  ]
+                                                : []),
+                                        ].join("\n"),
+                                    },
+                                ],
+                            },
+                        ],
+                        components: [],
+                    });
                 return EResultTypes.SUCCESS;
             })
         );
@@ -139,7 +201,7 @@ export class ChartQueryCommand {
         );
         if (fs.existsSync(targetPath)) {
             const chartFiles = fs.readdirSync(targetPath);
-            const charts: Chart[] = [];
+            const charts: Maimai.IChart[] = [];
             for (const chart of chartFiles) {
                 charts.push(require(upath.join(targetPath, chart)));
             }
