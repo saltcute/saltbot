@@ -220,7 +220,7 @@ Max DX Score    ${master.meta.maxDXScore.toString().padStart(4, " ")}${remaster 
                                                 )[0]?.version.name;
                                             if (master.addVersion.DX)
                                                 lines.push(
-                                                    `- 🇯🇵 this song is added in **${master.addVersion.DX?.name}**`
+                                                    `- 🇯🇵 this song was added in **${master.addVersion.DX?.name}**`
                                                 );
                                             if (REM_DX)
                                                 lines.push(
@@ -228,7 +228,7 @@ Max DX Score    ${master.meta.maxDXScore.toString().padStart(4, " ")}${remaster 
                                                 );
                                             if (master.addVersion.EX)
                                                 lines.push(
-                                                    `- 🌏 this song is added in **${master.addVersion.EX?.name}**`
+                                                    `- 🌏 this song was added in **${master.addVersion.EX?.name}**`
                                                 );
                                             if (REM_EX)
                                                 lines.push(
@@ -236,7 +236,7 @@ Max DX Score    ${master.meta.maxDXScore.toString().padStart(4, " ")}${remaster 
                                                 );
                                             if (master.addVersion.CN)
                                                 lines.push(
-                                                    `- 🇨🇳 this song is added in **${master.addVersion.CN?.name}**`
+                                                    `- 🇨🇳 this song was added in **${master.addVersion.CN?.name}**`
                                                 );
                                             if (REM_CN)
                                                 lines.push(
