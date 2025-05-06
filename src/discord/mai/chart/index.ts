@@ -102,12 +102,42 @@ export class ChartQueryCommand {
                     remaster = charts[Maimai.EDifficulty.REMASTER] as
                         | Maimai.IChart
                         | undefined;
-                if (master)
+                if (master) {
+                    const EXIST_DX = master.events.find(
+                        (v) =>
+                            v.type == "existence" &&
+                            v.version.region == "DX" &&
+                            v.version.gameVersion.minor >= 55
+                    )
+                        ? "🇯🇵"
+                        : "";
+                    const EXIST_EX = master.events.find(
+                        (v) =>
+                            v.type == "existence" &&
+                            v.version.region == "EX" &&
+                            v.version.gameVersion.minor >= 50
+                    )
+                        ? "🌏"
+                        : "";
+                    const EXIST_CN = master.events.find(
+                        (v) =>
+                            v.type == "existence" &&
+                            v.version.region == "CN" &&
+                            v.version.gameVersion.minor >= 40
+                    )
+                        ? "🇨🇳"
+                        : "";
+
                     await interaction.editReply({
                         content: `Details of chart ID ${song}`,
                         embeds: [
                             {
-                                title: `${master.name}`,
+                                title: [
+                                    master.name,
+                                    EXIST_DX,
+                                    EXIST_EX,
+                                    EXIST_CN,
+                                ].join(" "),
                                 description: `By **${master.artist}**
 BPM: ${master.bpm}
 -# Designed by
@@ -120,7 +150,7 @@ ${[
                                 fields: [
                                     {
                                         name: "Difficulty",
-                                        value: `-# Data since DX and until PRiSM PLUS.\n-# Information of FESTiVAL PLUS and PRiSM is not complete.\n\`\`\`\n${charts
+                                        value: `\`\`\`\n${charts
                                             .map((v) => {
                                                 const events = v.events.filter(
                                                     (v) =>
@@ -171,25 +201,66 @@ Max DX Score    ${master.meta.maxDXScore.toString().padStart(4, " ")}${remaster 
                                     },
                                     {
                                         name: "Other",
-                                        value: [
-                                            ...(master.addVersion.DX
-                                                ? [
-                                                      `- This chart first appeared in **${master.addVersion.DX?.name}**`,
-                                                  ]
-                                                : []),
-                                            ...(remaster?.events[0]
-                                                ? [
-                                                      `- The Re:Master chart was first seen in **${remaster.events.filter((v) => v.version.region == "DX")[0].version.name}**`,
-                                                  ]
-                                                : []),
-                                        ].join("\n"),
+                                        value: (() => {
+                                            const lines = [];
+                                            const REM_DX =
+                                                remaster?.events.filter(
+                                                    (v) =>
+                                                        v.version.region == "DX"
+                                                )[0]?.version.name;
+                                            const REM_EX =
+                                                remaster?.events.filter(
+                                                    (v) =>
+                                                        v.version.region == "EX"
+                                                )[0]?.version.name;
+                                            const REM_CN =
+                                                remaster?.events.filter(
+                                                    (v) =>
+                                                        v.version.region == "CN"
+                                                )[0]?.version.name;
+                                            if (master.addVersion.DX)
+                                                lines.push(
+                                                    `- 🇯🇵 this song is added in **${master.addVersion.DX?.name}**`
+                                                );
+                                            if (REM_DX)
+                                                lines.push(
+                                                    `- 🇯🇵 a Re:Master chart was first seen in **${REM_DX}**`
+                                                );
+                                            if (master.addVersion.EX)
+                                                lines.push(
+                                                    `- 🌏 this song is added in **${master.addVersion.EX?.name}**`
+                                                );
+                                            if (REM_EX)
+                                                lines.push(
+                                                    `- 🌏 a Re:Master chart was first seen in **${REM_EX}**`
+                                                );
+                                            if (master.addVersion.CN)
+                                                lines.push(
+                                                    `- 🇨🇳 this song is added in **${master.addVersion.CN?.name}**`
+                                                );
+                                            if (REM_CN)
+                                                lines.push(
+                                                    `- 🇨🇳 a Re:Master chart was first seen in **${REM_CN}**`
+                                                );
+                                            lines.push(
+                                                ...[
+                                                    "-# Data from DX to PRiSM PLUS, except FESTiVAL PLUS and PRiSM.",
+                                                    "-# Data of International Ver. or 舞萌DX may be unreliable.",
+                                                    "-# No data from versions before DX is included.",
+                                                ]
+                                            );
+                                            return lines.join("\n");
+                                        })(),
                                     },
                                 ],
                             },
                         ],
                         components: [],
                     });
-                return EResultTypes.SUCCESS;
+                    return EResultTypes.SUCCESS;
+                } else {
+                    return EResultTypes.INVALID_INPUT;
+                }
             })
         );
     }
