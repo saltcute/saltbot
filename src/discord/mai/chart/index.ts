@@ -246,7 +246,6 @@ Max DX Score    ${master.meta.maxDXScore.toString().padStart(4, " ")}${remaster 
                                                 ...[
                                                     "-# Data from DX to PRiSM PLUS, except FESTiVAL PLUS and PRiSM.",
                                                     "-# Data of International Ver. or 舞萌DX may be unreliable.",
-                                                    "-# No data from versions before DX is included.",
                                                 ]
                                             );
                                             return lines.join("\n");
