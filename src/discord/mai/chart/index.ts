@@ -45,7 +45,7 @@ export class ChartQueryCommand {
             searcher.indexEntities(
                 songs,
                 (v) => v.id,
-                (v) => [v.name, v.nameRomaji]
+                (v) => [v.id.toString(), v.name, v.nameRomaji]
             );
         });
         client.on(Events.InteractionCreate, async (interaction) => {
