@@ -1,0 +1,3 @@
+[submodule "src/discord/mai/chart/GCM-bot"]
+	path = src/discord/mai/chart/GCM-bot
+	url = https://github.com/lomotos10/GCM-bot/

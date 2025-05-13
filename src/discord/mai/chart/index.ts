@@ -5,7 +5,6 @@ import {
     AttachmentBuilder,
     Events,
 } from "discord.js";
-import * as fuzzySearch from "@m31coding/fuzzy-search";
 import { client as kasumi } from "@/kook/init/client";
 import { client } from "@/discord/client";
 import { EResultTypes } from "@/util/telemetry/type";
@@ -13,15 +12,13 @@ import { Telemetry } from "@/util/telemetry";
 import { Maimai } from "./type";
 import _ from "lodash";
 import { MaiDraw } from "maidraw";
+import axios from "axios";
 
-const Kuroshiro = require("kuroshiro").default;
-const KuromojiAnalyzer = require("kuroshiro-analyzer-kuromoji");
-const kuroshiro = new Kuroshiro();
+// @ts-ignore
+import Fuse from "fuse.js";
 
-const searcher = fuzzySearch.SearcherFactory.createDefaultSearcher<
-    { id: number; name: string; nameRomaji: string },
-    number
->();
+import { Cache } from "@/util/cache";
+import TSV from "tsv";
 
 export class ChartQueryCommand {
     static readonly DATABASE_PATH = kasumi.config.getSync(
@@ -34,25 +31,50 @@ export class ChartQueryCommand {
         "charts"
     );
 
+    static fuse: Fuse<{ id: string; name: string; nameRomaji: string }>;
+
     static {
-        kuroshiro.init(new KuromojiAnalyzer()).then(async () => {
+        (async () => {
+            const Kuroshiro = require("kuroshiro").default;
+            const KuromojiAnalyzer = require("kuroshiro-analyzer-kuromoji");
+            const kuroshiro = new Kuroshiro();
+
+            await kuroshiro.init(new KuromojiAnalyzer());
             const songs = await Promise.all(
-                this.getAllSongs().map(async (v) => {
-                    return {
-                        id: v.id,
-                        name: v.name,
-                        nameRomaji: Kuroshiro.Util.isJapanese(v.name)
-                            ? await kuroshiro.convert(v.name, { to: "romaji" })
-                            : v.name,
-                    };
-                })
+                ChartQueryCommand.getAllSongs()
+                    .filter((v) => v.id < 100000) // Remove UTAGE
+                    .map(async (v) => {
+                        return {
+                            id: v.id.toString(),
+                            name: v.name,
+                            cleanName: v.name
+                                .replace(/[\p{P}\p{S}]/gu, "")
+                                .replace(/  +/g, " "),
+                            alias: [
+                                ...(await ChartQueryCommand.OtherSongNameAlias.getAliasBySongName(
+                                    v.name
+                                )),
+                                ...(await ChartQueryCommand.ChineseSongNameAlias.getAliasBySongId(
+                                    v.id
+                                )),
+                            ],
+                            nameRomaji: Kuroshiro.Util.isJapanese(v.name)
+                                ? await kuroshiro.convert(v.name, {
+                                      to: "romaji",
+                                  })
+                                : v.name,
+                        };
+                    })
             );
-            searcher.indexEntities(
-                songs,
-                (v) => v.id,
-                (v) => [v.id.toString(), v.name, v.nameRomaji]
-            );
-        });
+            this.fuse = new Fuse(songs, {
+                keys: ["id", "name", "nameRomaji", "cleanName", "alias"],
+                includeScore: true,
+                ignoreLocation: true,
+                ignoreDiacritics: true,
+                useExtendedSearch: true,
+                ignoreFieldNorm: true,
+            });
+        })();
         client.on(Events.InteractionCreate, async (interaction) => {
             if (!interaction.isAutocomplete()) return;
             const focusedValue = interaction.options.getFocused();
@@ -60,23 +82,22 @@ export class ChartQueryCommand {
                 interaction.commandName == "mai" &&
                 interaction.options.getSubcommand() == "chart"
             ) {
-                if (focusedValue)
-                    interaction.respond(
-                        searcher
-                            .getMatches(new fuzzySearch.Query(focusedValue))
-                            .matches.map((v) => {
-                                return {
-                                    name:
-                                        v.entity.name +
-                                        (v.entity.id > 10000 &&
-                                        v.entity.id < 100000
-                                            ? " DX"
-                                            : ""),
-                                    value: v.entity.id,
-                                };
-                            })
-                    );
-                else interaction.respond([]);
+                if (this.fuse && focusedValue) {
+                    const result = this.fuse
+                        .search(focusedValue)
+                        .filter((v) => (v.score ? v.score < 0.1 : false))
+                        .map((v) => {
+                            const id = parseInt(v.item.id);
+                            return {
+                                name:
+                                    v.item.name +
+                                    (id > 10000 && id < 100000 ? " DX" : ""),
+                                value: id,
+                            };
+                        })
+                        .slice(0, 25);
+                    await interaction.respond(result);
+                } else await interaction.respond([]);
             }
         });
         client.on(
@@ -459,7 +480,7 @@ Max DX Score    ${master.meta.maxDXScore.toString().padStart(4, " ")}${remaster 
 
     static getAllSongs() {
         const chartFolders = fs.readdirSync(this.CHART_PATH);
-        const songs: { id: number; name: string; level: 5 }[] = [];
+        const songs: { id: number; name: string; level: number }[] = [];
         for (const folder of chartFolders) {
             for (let i = 0; i <= 5; ++i) {
                 if (
@@ -554,5 +575,86 @@ Max DX Score    ${master.meta.maxDXScore.toString().padStart(4, " ")}${remaster 
                 },
             ];
         } else return [];
+    }
+}
+export namespace ChartQueryCommand {
+    export const cache = new Cache();
+    export class ChineseSongNameAlias {
+        static readonly ENDPOINT =
+            "https://www.yuzuchan.moe/api/maimaidx/maimaidxalias";
+        private static async get(endpoint: string, data?: any, options?: any) {
+            const cached = await ChartQueryCommand.cache.get(endpoint);
+            if (cached) {
+                return cached;
+            }
+            const response = await axios
+                .get(endpoint, { ...options, data, timeout: 2000 })
+                .catch(() => null);
+            if (!response) {
+                return null;
+            }
+            await ChartQueryCommand.cache.put(
+                endpoint,
+                response.data,
+                1000 * 60 * 60
+            );
+            return response.data;
+        }
+        static async getAllAlias() {
+            const res = await this.get(this.ENDPOINT);
+            if (!res) return [];
+            const contents: {
+                SongID: number;
+                Name: string;
+                Alias: string[];
+            }[] = res.content;
+            return contents;
+        }
+        static async getAliasBySongId(id: number) {
+            const alias = await this.getAllAlias();
+            const song = alias.find((v) => v.SongID == id);
+            if (song) {
+                return song.Alias;
+            }
+            return [];
+        }
+    }
+    export class OtherSongNameAlias {
+        private static readonly CACHE_KEY = "GCMBOT_ALIAS";
+        static path = upath.join(__dirname, "GCM-bot", "data", "aliases");
+        static async getAllAlias() {
+            const cached = await ChartQueryCommand.cache.get(this.CACHE_KEY);
+            if (cached) return cached;
+            const contents: { [k: string]: string[] } = {};
+            for (const locale of ["en", "ko", "ja"]) {
+                if (
+                    fs.existsSync(upath.join(this.path, locale, "maimai.tsv"))
+                ) {
+                    const tsv = fs.readFileSync(
+                        upath.join(this.path, locale, "maimai.tsv"),
+                        { encoding: "utf8" }
+                    );
+                    const records: string[][] = new TSV.Parser("\t", {
+                        header: false,
+                    }).parse(tsv);
+                    records.forEach((record) => {
+                        const id = record.shift();
+                        if (id) {
+                            if (!contents[id]) contents[id] = [];
+                            contents[id].push(...record);
+                        }
+                    });
+                }
+            }
+            ChartQueryCommand.cache.put(
+                this.CACHE_KEY,
+                contents,
+                1000 * 60 * 60
+            );
+            return contents;
+        }
+        static async getAliasBySongName(name: string) {
+            return (await this.getAllAlias())[name] || [];
+        }
     }
 }
