@@ -473,7 +473,9 @@ Max DX Score    ${master.meta.maxDXScore.toString().padStart(4, " ")}${remaster 
             const chartFiles = fs.readdirSync(targetPath);
             const charts: Maimai.IChart[] = [];
             for (const chart of chartFiles) {
-                charts.push(require(upath.join(targetPath, chart)));
+                try {
+                    charts.push(require(upath.join(targetPath, chart)));
+                } catch {}
             }
             return charts;
         }
