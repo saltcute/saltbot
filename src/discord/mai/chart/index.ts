@@ -125,6 +125,13 @@ export class ChartQueryCommand {
                         );
                         if (dbUsername) username = dbUsername;
                     }
+                    const chart = this.getChartsBySongId(song);
+                    if (chart == null) {
+                        await interaction.editReply({
+                            content: `Failed to find a chart with ID ${song}.`,
+                        });
+                        return EResultTypes.INVALID_INPUT;
+                    }
                     let result;
                     if (source && username) {
                         result = await MaiDraw.Maimai.Chart.drawWithScoreSource(
