@@ -32,7 +32,7 @@ export class ChartQueryCommand {
     );
 
     static fuse: Fuse<{ id: string; name: string; nameRomaji: string }>;
-
+    static searchDatabaseLock = true;
     static {
         (async () => {
             const Kuroshiro = require("kuroshiro").default;
@@ -74,6 +74,8 @@ export class ChartQueryCommand {
                 useExtendedSearch: true,
                 ignoreFieldNorm: true,
             });
+            kasumi.logger.info(`Fuzzy search database loading finished.`);
+            this.searchDatabaseLock = false;
         })();
         client.on(Events.InteractionCreate, async (interaction) => {
             if (!interaction.isAutocomplete()) return;
@@ -82,7 +84,7 @@ export class ChartQueryCommand {
                 interaction.commandName == "mai" &&
                 interaction.options.getSubcommand() == "chart"
             ) {
-                if (this.fuse && focusedValue) {
+                if (!this.searchDatabaseLock && focusedValue) {
                     const result = this.fuse
                         .search(focusedValue)
                         .filter((v) => (v.score ? v.score < 0.1 : false))
