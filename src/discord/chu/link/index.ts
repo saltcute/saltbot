@@ -59,9 +59,9 @@ export class LinkUserCommand {
 
         client.on(Events.InteractionCreate, async (interaction) => {
             if (!interaction.isButton()) return;
-            if (interaction.customId.startsWith("maimai::tracker.link.")) {
+            if (interaction.customId.startsWith("chuni::tracker.link.")) {
                 const action = interaction.customId.replace(
-                    "maimai::tracker.link.",
+                    "chuni::tracker.link.",
                     ""
                 );
                 switch (true) {
