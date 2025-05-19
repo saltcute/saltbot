@@ -1,4 +1,5 @@
 import { Best50ChartCommand } from "./b50";
+import { LinkUserCommand } from "./link";
 
 export const chuCommand = {
     type: 1,
@@ -8,5 +9,8 @@ export const chuCommand = {
         "zh-CN": "中二节奏小工具！",
         "zh-TW": "CHUNITHM 小工具！",
     },
-    options: [...Best50ChartCommand.getCommand()],
+    options: [
+        ...Best50ChartCommand.getCommand(),
+        ...LinkUserCommand.getCommand(),
+    ],
 };

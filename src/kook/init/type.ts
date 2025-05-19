@@ -10,9 +10,9 @@ export interface CustomStorage {
     "discord::auth.token": string;
 
     [
-        k: `salt::connection.discord.${"kamai" | "divingfish" | "lxns"}.${string}`
+        k: `salt::connection.discord.${"kamai" | "divingfish" | "lxns" | "lxns-chuni"}.${string}`
     ]: string | undefined;
     [
-        k: `salt::connection.discord.ignore.${"kamai" | "divingfish" | "lxns"}.${string}`
+        k: `salt::connection.discord.ignore.${"kamai" | "divingfish" | "lxns" | "lxns-chuni"}.${string}`
     ]: boolean | undefined;
 }
