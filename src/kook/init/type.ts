@@ -1,3 +1,5 @@
+export type Trackers = "kamai" | "divingfish" | "lxns" | "lxns-chuni" | "maishift";
+
 export interface CustomStorage {
     // add your custom storage properties here
     "maimai::lxns.token": string;
@@ -10,9 +12,9 @@ export interface CustomStorage {
     "discord::auth.token": string;
 
     [
-        k: `salt::connection.discord.${"kamai" | "divingfish" | "lxns" | "lxns-chuni"}.${string}`
+        k: `salt::connection.discord.${Trackers}.${string}`
     ]: string | undefined;
     [
-        k: `salt::connection.discord.ignore.${"kamai" | "divingfish" | "lxns" | "lxns-chuni"}.${string}`
+        k: `salt::connection.discord.ignore.${Trackers}.${string}`
     ]: boolean | undefined;
 }

@@ -37,11 +37,19 @@ export class LinkUserCommand {
                         );
                         break;
                     }
+                    case "maishift": {
+                        username = interaction.options.getString(
+                            "username",
+                            true
+                        );
+                        break;
+                    }
                 }
                 switch (tracker) {
                     case "kamai":
                     case "divingfish":
                     case "lxns":
+                    case "maishift":
                         kasumi.config.set(
                             `salt::connection.discord.${tracker}.${interaction.user.id}`,
                             username
@@ -87,7 +95,8 @@ export class LinkUserCommand {
                                 !(
                                     tracker == "kamai" ||
                                     tracker == "divingfish" ||
-                                    tracker == "lxns"
+                                    tracker == "lxns" ||
+                                    tracker == "maishift"
                                 )
                             ) {
                                 interaction.reply({
@@ -132,7 +141,8 @@ export class LinkUserCommand {
                                 !(
                                     tracker == "kamai" ||
                                     tracker == "divingfish" ||
-                                    tracker == "lxns"
+                                    tracker == "lxns" ||
+                                    tracker == "maishift"
                                 )
                             ) {
                                 interaction.reply({
@@ -248,6 +258,32 @@ export class LinkUserCommand {
                                         "使用你用来登录水鱼查分器的用户名。",
                                     "zh-TW":
                                         "使用您用來登入 DivingFish 的使用者名稱。",
+                                },
+                                required: true,
+                            },
+                        ],
+                    },
+                    {
+                        type: 1,
+                        name: "maishift",
+                        description: "Link your Maishift account.",
+                        description_localizations: {
+                            "zh-CN": "绑定你的 Maishift 账号。",
+                            "zh-TW": "連結您的 Maishift 使用者資料。",
+                        },
+                        options: [
+                            {
+                                type: 3,
+                                name: "username",
+                                name_localizations: {
+                                    "zh-CN": "用户名",
+                                    "zh-TW": "使用者名稱",
+                                },
+                                description: "Enter your username on Maishift.",
+                                description_localizations: {
+                                    "zh-CN": "输入您在 Maishift 上的用户名。",
+                                    "zh-TW":
+                                        "輸入您在 Maishift 上的使用者名稱。",
                                 },
                                 required: true,
                             },

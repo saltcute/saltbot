@@ -9,6 +9,7 @@ const lxns = new MaiDraw.Maimai.Best50.LXNS({
     auth: kasumi.config.getSync("maimai::lxns.token"),
 });
 const kamai = new MaiDraw.Maimai.Best50.KamaiTachi();
+const maishift = new MaiDraw.Maimai.Best50.Maishift();
 const divingfish = new MaiDraw.Maimai.Best50.DivingFish({
     auth: kasumi.config.getSync("maimai::divingFish.token"),
 });
@@ -76,7 +77,8 @@ export class Best50ChartCommand {
                     !(
                         tracker == "kamai" ||
                         tracker == "divingfish" ||
-                        tracker == "lxns"
+                        tracker == "lxns" ||
+                        tracker == "maishift"
                     )
                 ) {
                     await interaction.editReply({
@@ -96,6 +98,10 @@ export class Best50ChartCommand {
                     }
                     case "lxns": {
                         username = interaction.options.getString("friendcode");
+                        break;
+                    }
+                    case "maishift": {
+                        username = interaction.options.getString("username");
                         break;
                     }
                 }
@@ -240,6 +246,20 @@ export class Best50ChartCommand {
                         result =
                             await MaiDraw.Maimai.Best50.drawWithScoreSource(
                                 lxns,
+                                username,
+                                {
+                                    theme,
+                                    profilePicture: useProfilePicture
+                                        ? undefined
+                                        : null,
+                                }
+                            );
+                        break;
+                    }
+                    case "maishift": {
+                        result =
+                            await MaiDraw.Maimai.Best50.drawWithScoreSource(
+                                maishift,
                                 username,
                                 {
                                     theme,
@@ -827,6 +847,62 @@ export class Best50ChartCommand {
                               ]
                             : [];
                     })(),
+                    {
+                        type: 1,
+                        name: "maishift",
+                        description: "Get best 50 scores from Maishift.",
+                        description_localizations: {
+                            "zh-CN": "从 Maishift 获取 b50 信息。",
+                            "zh-TW": "從 Maishift 獲取 Best 50 資料。",
+                        },
+                        options: [
+                            {
+                                type: 3,
+                                name: "username",
+                                name_localizations: {
+                                    "zh-CN": "用户名",
+                                    "zh-TW": "使用者名稱",
+                                },
+                                description: "Enter your username on Maishift.",
+                                description_localizations: {
+                                    "zh-CN": "输入您在 Maishift 上的用户名。",
+                                    "zh-TW":
+                                        "輸入您在 Maishift 上的使用者名稱。",
+                                },
+                            },
+                            {
+                                type: 3,
+                                name: "theme",
+                                name_localizations: {
+                                    "zh-CN": "主题",
+                                    "zh-TW": "主題",
+                                },
+                                description:
+                                    "Choose from a variety of themes for your Best 50 chart.",
+                                description_localizations: {
+                                    "zh-CN": "选择 b50 图片的主题。",
+                                    "zh-TW": "選擇 Best 50 圖像的主題。",
+                                },
+                                choices: this.themes,
+                            },
+                            {
+                                type: 5,
+                                name: "use_profile_picture",
+                                name_localizations: {
+                                    "zh-CN": "使用头像",
+                                    "zh-TW": "使用個人資料圖像",
+                                },
+                                description:
+                                    "Use your profile picture from Maishift.",
+                                description_localizations: {
+                                    "zh-CN": "使用你在 Maishift 上的头像。",
+                                    "zh-TW":
+                                        "使用您在 Maishift 上的個人資料圖像。",
+                                },
+                                choices: this.versions,
+                            },
+                        ],
+                    },
                 ],
             },
         ];
