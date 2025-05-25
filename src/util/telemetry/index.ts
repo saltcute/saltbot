@@ -1,6 +1,6 @@
 import { client as kasumi } from "@/kook/init/client";
 import { CacheType, Interaction } from "discord.js";
-import { Collection, MongoClient, MongoDBCollectionNamespace } from "mongodb";
+import { Collection, MongoClient } from "mongodb";
 import { EResultTypes } from "./type";
 
 export class Telemetry {

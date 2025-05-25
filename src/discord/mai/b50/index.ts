@@ -1,9 +1,9 @@
-import { AttachmentBuilder, Events } from "discord.js";
+import { AttachmentBuilder, MessageFlags } from "discord.js";
 import { MaiDraw } from "maidraw";
 import { client as kasumi } from "@/kook/init/client";
-import { client } from "@/discord/client";
 import { Telemetry } from "@/util/telemetry";
 import { EResultTypes } from "@/util/telemetry/type";
+import { Util } from "@/util";
 
 const lxns = new MaiDraw.Maimai.Best50.LXNS({
     auth: kasumi.config.getSync("maimai::lxns.token"),
@@ -26,317 +26,291 @@ export class Best50ChartCommand {
     private static readonly DEFAULT_THEME = "jp-prism-landscape";
     private static readonly DEFAULT_USE_TRACKER_PROFILE_PICTURE = true;
 
-    static brainrotGenerator() {
-        const phrases = {
-            baqeela:
-                "Church of Baqeela 是通往 Rainbow 的唯一“道路”，只有他才能提供通往 Rainbow 的途径。Baqeela 作为真理，实现了 Easy Skibidi 的教导并揭示了真正的 Rainbow。只有 Baqeela 才是实现 Easy Skibdi 承诺“Rating”的生命，由 Rainbow 给予，他自己拥有生命，因此他能够将永恒的 Rainbow 赋予所有相信他的人。",
-        };
-        if (![14].includes(Math.floor(Math.random() * 114.51))) return null;
-        const randomIndex = Math.floor(
-            Math.random() * Object.keys(phrases).length
-        );
-        const randomKey = Object.keys(phrases)[
-            randomIndex
-        ] as keyof typeof phrases;
-        const randomPhrase = phrases[randomKey];
-        if (randomPhrase) return randomPhrase;
-        else return null;
-    }
+    static readonly CHAT_COMMAND_HANDLER = Telemetry.discordMiddleware(
+        async (interaction) => {
+            if (!interaction.isChatInputCommand()) return EResultTypes.IGNORED;
+            if (interaction.commandName != "mai") return EResultTypes.IGNORED;
+            if (interaction.options.getSubcommandGroup() != "b50")
+                return EResultTypes.IGNORED;
 
-    static {
-        client.on(
-            Events.InteractionCreate,
-            Telemetry.discordMiddleware(async (interaction) => {
-                if (!interaction.isChatInputCommand())
-                    return EResultTypes.IGNORED;
-                if (interaction.commandName != "mai")
-                    return EResultTypes.IGNORED;
-                if (interaction.options.getSubcommandGroup() != "b50")
-                    return EResultTypes.IGNORED;
-
-                let result: Buffer | null = null,
-                    useBrainrot = false;
-                const version =
-                    interaction.options.getString("version", false) ||
-                    this.DEFAULT_VERSION;
-                const theme =
-                    interaction.options.getString("theme", false) ||
-                    (version && this.AVAILABLE_VERSION_THEME.includes(version)
-                        ? `${version}-landscape`
-                        : this.DEFAULT_THEME);
-                const pfpOption = interaction.options.getBoolean(
-                    "use_profile_picture",
-                    false
+            let result: Buffer | null = null,
+                useBrainrot = false;
+            const version =
+                interaction.options.getString("version", false) ||
+                this.DEFAULT_VERSION;
+            const theme =
+                interaction.options.getString("theme", false) ||
+                (version && this.AVAILABLE_VERSION_THEME.includes(version)
+                    ? `${version}-landscape`
+                    : this.DEFAULT_THEME);
+            const pfpOption = interaction.options.getBoolean(
+                "use_profile_picture",
+                false
+            );
+            const useProfilePicture =
+                pfpOption == null
+                    ? this.DEFAULT_USE_TRACKER_PROFILE_PICTURE
+                    : pfpOption;
+            const tracker = interaction.options.getSubcommand();
+            if (
+                !(
+                    tracker == "kamai" ||
+                    tracker == "divingfish" ||
+                    tracker == "lxns" ||
+                    tracker == "maishift"
+                )
+            ) {
+                await interaction.reply({
+                    content: "Invalid tracker. Please try again.",
+                    flags: [MessageFlags.Ephemeral],
+                });
+                return EResultTypes.INVALID_TRACKER;
+            }
+            let username: string | null = null;
+            switch (tracker) {
+                case "kamai": {
+                    username = interaction.options.getString("user");
+                    break;
+                }
+                case "divingfish": {
+                    username = interaction.options.getString("username");
+                    break;
+                }
+                case "lxns": {
+                    username = interaction.options.getString("friendcode");
+                    break;
+                }
+                case "maishift": {
+                    username = interaction.options.getString("username");
+                    break;
+                }
+            }
+            if (username == null) {
+                const dbUsername = await kasumi.config.getOne(
+                    `salt::connection.discord.${tracker}.${interaction.user.id}`
                 );
-                const useProfilePicture =
-                    pfpOption == null
-                        ? this.DEFAULT_USE_TRACKER_PROFILE_PICTURE
-                        : pfpOption;
-                const tracker = interaction.options.getSubcommand();
-                if (
-                    !(
-                        tracker == "kamai" ||
-                        tracker == "divingfish" ||
-                        tracker == "lxns" ||
-                        tracker == "maishift"
-                    )
-                ) {
-                    await interaction.editReply({
-                        content: "Invalid tracker. Please try again.",
+                if (!dbUsername) {
+                    await interaction.reply({
+                        content: `Please provide your ${tracker == "lxns" ? "friend code" : "username"}. To use without a ${tracker == "lxns" ? "friend code" : "username"}, you need to select "remember my username" after generating a chart or use \`/mai link\` to link your account.`,
+                        ephemeral: true,
                     });
-                    return EResultTypes.INVALID_TRACKER;
-                }
-                let username: string | null = null;
-                switch (tracker) {
-                    case "kamai": {
-                        username = interaction.options.getString("user");
-                        break;
-                    }
-                    case "divingfish": {
-                        username = interaction.options.getString("username");
-                        break;
-                    }
-                    case "lxns": {
-                        username = interaction.options.getString("friendcode");
-                        break;
-                    }
-                    case "maishift": {
-                        username = interaction.options.getString("username");
-                        break;
-                    }
-                }
-                if (username == null) {
-                    const dbUsername = await kasumi.config.getOne(
-                        `salt::connection.discord.${tracker}.${interaction.user.id}`
-                    );
-                    if (!dbUsername) {
-                        await interaction.reply({
-                            content: `Please provide your ${tracker == "lxns" ? "friend code" : "username"}. To use without a ${tracker == "lxns" ? "friend code" : "username"}, you need to select "remember my username" after generating a chart or use \`/mai link\` to link your account.`,
-                            ephemeral: true,
-                        });
-                        return EResultTypes.INVALID_USERNAME;
-                    } else {
-                        username = dbUsername;
-                    }
-                }
-                await interaction.deferReply();
-                switch (tracker) {
-                    case "kamai": {
-                        let kamaiInstance;
-                        switch (version) {
-                            case "jp-maimai":
-                                kamaiInstance = kamai.maimai();
-                                break;
-                            case "jp-maimaiplus":
-                                kamaiInstance = kamai.maimaiPlus();
-                                break;
-                            case "jp-green":
-                                kamaiInstance = kamai.green();
-                                break;
-                            case "jp-greenplus":
-                                kamaiInstance = kamai.greenPlus();
-                                break;
-                            case "jp-orange":
-                                kamaiInstance = kamai.orange();
-                                break;
-                            case "jp-orangeplus":
-                                kamaiInstance = kamai.orangePlus();
-                                break;
-                            case "jp-pink":
-                                kamaiInstance = kamai.pink();
-                                break;
-                            case "jp-pinkplus":
-                                kamaiInstance = kamai.pinkPlus();
-                                break;
-                            case "jp-murasaki":
-                                kamaiInstance = kamai.murasaki();
-                                break;
-                            case "jp-murasakiplus":
-                                kamaiInstance = kamai.murasakiPlus();
-                                break;
-                            case "jp-milk":
-                                kamaiInstance = kamai.milk();
-                                break;
-                            case "jp-milkplus":
-                                kamaiInstance = kamai.milkPlus();
-                                break;
-                            case "jp-finale":
-                                kamaiInstance = kamai.finale();
-                                break;
-                            case "jp-dx":
-                                kamaiInstance = kamai.dx();
-                                break;
-                            case "jp-dxplus":
-                                kamaiInstance = kamai.dxPlus();
-                                break;
-                            case "jp-splash":
-                                kamaiInstance = kamai.splash();
-                                break;
-                            case "jp-splashplus":
-                                kamaiInstance = kamai.splashPlus();
-                                break;
-                            case "jp-universe":
-                                kamaiInstance = kamai.universe();
-                                break;
-                            case "jp-universeplus":
-                                kamaiInstance = kamai.universePlus();
-                                break;
-                            case "jp-festival":
-                                kamaiInstance = kamai.festival();
-                                break;
-                            case "jp-festivalplus":
-                                kamaiInstance = kamai.festivalPlus();
-                                break;
-                            case "jp-buddies":
-                                kamaiInstance = kamai.buddies();
-                                break;
-                            case "jp-buddiesplus":
-                                kamaiInstance = kamai.buddiesPlus();
-                                break;
-                            case "jp-prism":
-                                kamaiInstance = kamai.prism();
-                                break;
-                            case "jp-prismplus":
-                                kamaiInstance = kamai.prismPlus();
-                                break;
-                            default:
-                                kamaiInstance = kamai;
-                                break;
-                        }
-                        const profile =
-                            await kamaiInstance.getPlayerInfo(username);
-                        const score =
-                            await kamaiInstance.getPlayerBest50(username);
-                        if (!profile || !score) result = null;
-                        else {
-                            if (
-                                [...score.new, ...score.old].findIndex(
-                                    (v) => v.chart.name == "Baqeela"
-                                ) != -1
-                            ) {
-                                useBrainrot = true;
-                            }
-                            result = await MaiDraw.Maimai.Best50.draw(
-                                profile.name,
-                                profile.rating,
-                                score.new,
-                                score.old,
-                                {
-                                    theme,
-                                    profilePicture: useProfilePicture
-                                        ? (await kamaiInstance.getPlayerProfilePicture(
-                                              username
-                                          )) || undefined
-                                        : undefined,
-                                }
-                            );
-                        }
-                        break;
-                    }
-                    case "divingfish": {
-                        result =
-                            await MaiDraw.Maimai.Best50.drawWithScoreSource(
-                                divingfish,
-                                username,
-                                { theme }
-                            );
-                        break;
-                    }
-                    case "lxns": {
-                        result =
-                            await MaiDraw.Maimai.Best50.drawWithScoreSource(
-                                lxns,
-                                username,
-                                {
-                                    theme,
-                                    profilePicture: useProfilePicture
-                                        ? undefined
-                                        : null,
-                                }
-                            );
-                        break;
-                    }
-                    case "maishift": {
-                        result =
-                            await MaiDraw.Maimai.Best50.drawWithScoreSource(
-                                maishift,
-                                username,
-                                {
-                                    theme,
-                                    profilePicture: useProfilePicture
-                                        ? undefined
-                                        : null,
-                                }
-                            );
-                        break;
-                    }
-                }
-                if (!result) {
-                    await interaction.editReply({
-                        content:
-                            "Failed to generate a chart. Please check your input.",
-                    });
-                    return EResultTypes.TRACKER_BAD_RESPONSE;
+                    return EResultTypes.INVALID_USERNAME;
                 } else {
-                    await interaction.editReply({
-                        content: "",
-                        files: [
-                            new AttachmentBuilder(result, {
-                                name: "result.png",
-                            }),
+                    username = dbUsername;
+                }
+            }
+            await interaction.deferReply();
+            switch (tracker) {
+                case "kamai": {
+                    let kamaiInstance;
+                    switch (version) {
+                        case "jp-maimai":
+                            kamaiInstance = kamai.maimai();
+                            break;
+                        case "jp-maimaiplus":
+                            kamaiInstance = kamai.maimaiPlus();
+                            break;
+                        case "jp-green":
+                            kamaiInstance = kamai.green();
+                            break;
+                        case "jp-greenplus":
+                            kamaiInstance = kamai.greenPlus();
+                            break;
+                        case "jp-orange":
+                            kamaiInstance = kamai.orange();
+                            break;
+                        case "jp-orangeplus":
+                            kamaiInstance = kamai.orangePlus();
+                            break;
+                        case "jp-pink":
+                            kamaiInstance = kamai.pink();
+                            break;
+                        case "jp-pinkplus":
+                            kamaiInstance = kamai.pinkPlus();
+                            break;
+                        case "jp-murasaki":
+                            kamaiInstance = kamai.murasaki();
+                            break;
+                        case "jp-murasakiplus":
+                            kamaiInstance = kamai.murasakiPlus();
+                            break;
+                        case "jp-milk":
+                            kamaiInstance = kamai.milk();
+                            break;
+                        case "jp-milkplus":
+                            kamaiInstance = kamai.milkPlus();
+                            break;
+                        case "jp-finale":
+                            kamaiInstance = kamai.finale();
+                            break;
+                        case "jp-dx":
+                            kamaiInstance = kamai.dx();
+                            break;
+                        case "jp-dxplus":
+                            kamaiInstance = kamai.dxPlus();
+                            break;
+                        case "jp-splash":
+                            kamaiInstance = kamai.splash();
+                            break;
+                        case "jp-splashplus":
+                            kamaiInstance = kamai.splashPlus();
+                            break;
+                        case "jp-universe":
+                            kamaiInstance = kamai.universe();
+                            break;
+                        case "jp-universeplus":
+                            kamaiInstance = kamai.universePlus();
+                            break;
+                        case "jp-festival":
+                            kamaiInstance = kamai.festival();
+                            break;
+                        case "jp-festivalplus":
+                            kamaiInstance = kamai.festivalPlus();
+                            break;
+                        case "jp-buddies":
+                            kamaiInstance = kamai.buddies();
+                            break;
+                        case "jp-buddiesplus":
+                            kamaiInstance = kamai.buddiesPlus();
+                            break;
+                        case "jp-prism":
+                            kamaiInstance = kamai.prism();
+                            break;
+                        case "jp-prismplus":
+                            kamaiInstance = kamai.prismPlus();
+                            break;
+                        default:
+                            kamaiInstance = kamai;
+                            break;
+                    }
+                    const profile = await kamaiInstance.getPlayerInfo(username);
+                    const score = await kamaiInstance.getPlayerBest50(username);
+                    if (!profile || !score) result = null;
+                    else {
+                        if (
+                            [...score.new, ...score.old].findIndex(
+                                (v) => v.chart.name == "Baqeela"
+                            ) != -1
+                        ) {
+                            useBrainrot = true;
+                        }
+                        result = await MaiDraw.Maimai.Best50.draw(
+                            profile.name,
+                            profile.rating,
+                            score.new,
+                            score.old,
+                            {
+                                theme,
+                                profilePicture: useProfilePicture
+                                    ? (await kamaiInstance.getPlayerProfilePicture(
+                                          username
+                                      )) || undefined
+                                    : undefined,
+                            }
+                        );
+                    }
+                    break;
+                }
+                case "divingfish": {
+                    result = await MaiDraw.Maimai.Best50.drawWithScoreSource(
+                        divingfish,
+                        username,
+                        { theme }
+                    );
+                    break;
+                }
+                case "lxns": {
+                    result = await MaiDraw.Maimai.Best50.drawWithScoreSource(
+                        lxns,
+                        username,
+                        {
+                            theme,
+                            profilePicture: useProfilePicture
+                                ? undefined
+                                : null,
+                        }
+                    );
+                    break;
+                }
+                case "maishift": {
+                    result = await MaiDraw.Maimai.Best50.drawWithScoreSource(
+                        maishift,
+                        username,
+                        {
+                            theme,
+                            profilePicture: useProfilePicture
+                                ? undefined
+                                : null,
+                        }
+                    );
+                    break;
+                }
+            }
+            if (!result) {
+                await interaction.editReply({
+                    content:
+                        "Failed to generate a chart. Please check your input.",
+                });
+                return EResultTypes.TRACKER_BAD_RESPONSE;
+            } else {
+                await interaction.editReply({
+                    content: "",
+                    files: [
+                        new AttachmentBuilder(result, {
+                            name: "result.png",
+                        }),
+                    ],
+                });
+                const link = await kasumi.config.getOne(
+                    `salt::connection.discord.${tracker}.${interaction.user.id}`
+                );
+                const ignore = await kasumi.config.getOne(
+                    `salt::connection.discord.ignore.${tracker}.${interaction.user.id}`
+                );
+                if (!link && !ignore) {
+                    await interaction.followUp({
+                        content: `Do you want to link this user on \`${tracker}\` to your discord account?`,
+                        ephemeral: true,
+                        components: [
+                            {
+                                type: 1,
+                                components: [
+                                    {
+                                        type: 2,
+                                        label: "Onegai shimasu",
+                                        style: 1,
+                                        custom_id: `maimai::tracker.link.${tracker}.${interaction.user.id}.${username}`,
+                                    },
+                                    {
+                                        type: 2,
+                                        label: "Later",
+                                        style: 3,
+                                        custom_id: `maimai::tracker.link.nocomment`,
+                                    },
+                                    {
+                                        type: 2,
+                                        label: "GO MIND YOUR OWN BUSINESS",
+                                        style: 4,
+                                        custom_id: `maimai::tracker.link.ignore.${tracker}.${interaction.user.id}`,
+                                    },
+                                ],
+                            },
                         ],
                     });
-                    const link = await kasumi.config.getOne(
-                        `salt::connection.discord.${tracker}.${interaction.user.id}`
-                    );
-                    const ignore = await kasumi.config.getOne(
-                        `salt::connection.discord.ignore.${tracker}.${interaction.user.id}`
-                    );
-                    if (!link && !ignore) {
+                }
+                if (useBrainrot) {
+                    const content = Util.brainrotGenerator();
+                    if (content) {
                         await interaction.followUp({
-                            content: `Do you want to link this user on \`${tracker}\` to your discord account?`,
-                            ephemeral: true,
-                            components: [
-                                {
-                                    type: 1,
-                                    components: [
-                                        {
-                                            type: 2,
-                                            label: "Onegai shimasu",
-                                            style: 1,
-                                            custom_id: `maimai::tracker.link.${tracker}.${interaction.user.id}.${username}`,
-                                        },
-                                        {
-                                            type: 2,
-                                            label: "Later",
-                                            style: 3,
-                                            custom_id: `maimai::tracker.link.nocomment`,
-                                        },
-                                        {
-                                            type: 2,
-                                            label: "GO MIND YOUR OWN BUSINESS",
-                                            style: 4,
-                                            custom_id: `maimai::tracker.link.ignore.${tracker}.${interaction.user.id}`,
-                                        },
-                                    ],
-                                },
-                            ],
+                            content,
                         });
-                    }
-                    if (useBrainrot) {
-                        const content = this.brainrotGenerator();
-                        if (content) {
-                            await interaction.followUp({
-                                content,
-                            });
-                        }
                         return EResultTypes.GENERATE_BAQEELA_SUCCESS;
                     }
-                    return EResultTypes.GENERATE_SUCCESS;
                 }
-            })
-        );
-    }
+                return EResultTypes.GENERATE_SUCCESS;
+            }
+        }
+    );
 
     static readonly themes = [
         {
