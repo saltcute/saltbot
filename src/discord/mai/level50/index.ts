@@ -744,79 +744,79 @@ export class Level50ChartCommand {
         },
         {
             name: "13",
-            value: "13",
+            value: 13,
         },
         {
             name: "12+",
-            value: "12.7",
+            value: 12.7,
         },
         {
             name: "12",
-            value: "12",
+            value: 12,
         },
         {
             name: "11+",
-            value: "11.7",
+            value: 11.7,
         },
         {
             name: "11",
-            value: "11",
+            value: 11,
         },
         {
             name: "10+",
-            value: "10.7",
+            value: 10.7,
         },
         {
             name: "10",
-            value: "10",
+            value: 10,
         },
         {
             name: "9+",
-            value: "9.7",
+            value: 9.7,
         },
         {
             name: "9",
-            value: "9",
+            value: 9,
         },
         {
             name: "8+",
-            value: "8.7",
+            value: 8.7,
         },
         {
             name: "8",
-            value: "8",
+            value: 8,
         },
         {
             name: "7+",
-            value: "7.7",
+            value: 7.7,
         },
         {
             name: "7",
-            value: "7",
+            value: 7,
         },
         {
             name: "6",
-            value: "6",
+            value: 6,
         },
         {
             name: "5",
-            value: "5",
+            value: 5,
         },
         {
             name: "4",
-            value: "4",
+            value: 4,
         },
         {
             name: "3",
-            value: "3",
+            value: 3,
         },
         {
             name: "2",
-            value: "2",
+            value: 2,
         },
         {
             name: "1",
-            value: "1",
+            value: 1,
         },
     ];
 
@@ -882,7 +882,7 @@ export class Level50ChartCommand {
                                     "zh-TW": "分頁",
                                 },
                                 description:
-                                    "The page for the Level 50 chart. (50 scores per page)",
+                                    "The page number for the Level 50 chart. (50 scores per page)",
                                 description_localizations: {
                                     "zh-CN":
                                         "选择生成 L50 图片的页码。（每页 50 个）",
