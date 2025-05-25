@@ -72,7 +72,7 @@ export class LinkUserCommand {
                     if (tracker && userId) {
                         if (!interaction.user.id) return;
                         if (userId !== interaction.user.id) {
-                            interaction.reply({
+                            await interaction.reply({
                                 content: "Bruh you shouldn't be seeing this.",
                                 ephemeral: true,
                             });
@@ -86,7 +86,7 @@ export class LinkUserCommand {
                                 tracker == "maishift"
                             )
                         ) {
-                            interaction.reply({
+                            await interaction.reply({
                                 content:
                                     "This shouldn't happen but I don't see the tracker you are using. Please try again.",
                                 ephemeral: true,
@@ -109,14 +109,14 @@ export class LinkUserCommand {
                     if (tracker && userId && username) {
                         if (!interaction.user.id) return;
                         if (userId !== interaction.user.id) {
-                            interaction.reply({
+                            await interaction.reply({
                                 content: "Bruh you shouldn't be seeing this.",
                                 ephemeral: true,
                             });
                             return;
                         }
                         if (!username) {
-                            interaction.reply({
+                            await interaction.reply({
                                 content:
                                     "This shouldn't happen but I don't see a username. Please try again.",
                                 ephemeral: true,
@@ -131,7 +131,7 @@ export class LinkUserCommand {
                                 tracker == "maishift"
                             )
                         ) {
-                            interaction.reply({
+                            await interaction.reply({
                                 content:
                                     "This shouldn't happen but I don't see the tracker you are using. Please try again.",
                                 ephemeral: true,

@@ -355,7 +355,6 @@ export class Level50ChartCommand {
                         .split(",");
                 const level = parseFloat(levelRaw),
                     page = parseInt(pageRaw);
-                console.log(interaction.message.id, interaction.customId);
                 if (
                     tracker == "kamai" &&
                     username &&
@@ -388,34 +387,36 @@ export class Level50ChartCommand {
                             break;
                     }
                     if (result) {
-                        await interaction.update({
-                            content: `Showing results ${(page - 1) * 50 + 1} to ${page * 50}`,
-                            files: [
-                                new AttachmentBuilder(result, {
-                                    name: "result.png",
-                                }),
-                            ],
-                            components: [
-                                {
-                                    type: 1,
-                                    components: [
-                                        {
-                                            type: ComponentType.Button,
-                                            label: "Previous Page",
-                                            style: ButtonStyle.Primary,
-                                            custom_id: `maimai::level50.page.${tracker},${username},${theme},${level},${page <= 1 ? 1 : page - 1}`,
-                                            disabled: page <= 1,
-                                        },
-                                        {
-                                            type: ComponentType.Button,
-                                            label: "Next Page",
-                                            style: ButtonStyle.Primary,
-                                            custom_id: `maimai::level50.page.${tracker},${username},${theme},${level},${page + 1}`,
-                                        },
-                                    ],
-                                },
-                            ],
-                        });
+                        await interaction
+                            .update({
+                                content: `Showing results ${(page - 1) * 50 + 1} to ${page * 50}`,
+                                files: [
+                                    new AttachmentBuilder(result, {
+                                        name: "result.png",
+                                    }),
+                                ],
+                                components: [
+                                    {
+                                        type: 1,
+                                        components: [
+                                            {
+                                                type: ComponentType.Button,
+                                                label: "Previous Page",
+                                                style: ButtonStyle.Primary,
+                                                custom_id: `maimai::level50.page.${tracker},${username},${theme},${level},${page <= 1 ? 1 : page - 1}`,
+                                                disabled: page <= 1,
+                                            },
+                                            {
+                                                type: ComponentType.Button,
+                                                label: "Next Page",
+                                                style: ButtonStyle.Primary,
+                                                custom_id: `maimai::level50.page.${tracker},${username},${theme},${level},${page + 1}`,
+                                            },
+                                        ],
+                                    },
+                                ],
+                            })
+                            .catch(() => {});
                     }
                 }
             }
@@ -875,7 +876,7 @@ export class Level50ChartCommand {
                                 },
                             },
                             {
-                                type: ApplicationCommandOptionType.Number,
+                                type: ApplicationCommandOptionType.Integer,
                                 name: "page",
                                 name_localizations: {
                                     "zh-CN": "分页",
