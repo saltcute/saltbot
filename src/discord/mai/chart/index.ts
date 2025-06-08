@@ -32,6 +32,11 @@ export class ChartQueryCommand {
         "charts"
     );
 
+    static getChoices<T>(payload: any, choices: T[], defaults: T): T {
+        if (choices.includes(payload)) return payload;
+        else return defaults;
+    }
+
     static readonly CHAT_COMMAND_HANDLER = Telemetry.discordMiddleware(
         async (interaction) => {
             if (!interaction.isChatInputCommand()) return EResultTypes.IGNORED;
@@ -48,6 +53,11 @@ export class ChartQueryCommand {
             const song = interaction.options.getInteger("song", true);
             const tracker = (interaction.options.getString("source", false) ||
                 "kamai") as "kamai" | "lxns" | "divingfish" | "none" | null;
+            const region = this.getChoices<"DX" | "EX" | "CN">(
+                interaction.options.getString("region", false),
+                ["DX", "EX", "CN"],
+                "DX"
+            );
             const useClassic = interaction.options.getBoolean(
                 "use_classic",
                 false
@@ -80,14 +90,20 @@ export class ChartQueryCommand {
                     result = await MaiDraw.Maimai.Chart.drawWithScoreSource(
                         source,
                         username,
-                        song
+                        song,
+                        {
+                            region,
+                        }
                     );
                 } else {
                     result = await MaiDraw.Maimai.Chart.draw(
                         "maimai",
                         0,
                         song,
-                        []
+                        [],
+                        {
+                            region,
+                        }
                     );
                 }
                 if (result instanceof Buffer) {
@@ -504,6 +520,46 @@ Max DX Score    ${master.meta.maxDXScore.toString().padStart(4, " ")}${remaster 
                             },
                             required: true,
                             autocomplete: true,
+                        },
+                        {
+                            type: 3,
+                            name: "region",
+                            nameLocalizations: {
+                                "zh-CN": "地区",
+                                "zh-TW": "地區",
+                            },
+                            description:
+                                "Specify the region of the chart. (Defaults to Japan)",
+                            descriptionLocalizations: {
+                                "zh-CN": "选择谱面详情的地区版本。",
+                                "zh-TW": "選擇譜面資料的地區版本。",
+                            },
+                            choices: [
+                                {
+                                    name: "Japan",
+                                    nameLocalizations: {
+                                        "zh-CN": "日服",
+                                        "zh-TW": "日本",
+                                    },
+                                    value: "DX",
+                                },
+                                {
+                                    name: "International",
+                                    nameLocalizations: {
+                                        "zh-CN": "国际服",
+                                        "zh-TW": "國際",
+                                    },
+                                    value: "EX",
+                                },
+                                {
+                                    name: "China",
+                                    nameLocalizations: {
+                                        "zh-CN": "中国",
+                                        "zh-TW": "中國",
+                                    },
+                                    value: "CN",
+                                },
+                            ],
                         },
                         {
                             type: 3,
