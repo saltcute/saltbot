@@ -409,6 +409,22 @@ export class Best50ChartCommand {
             },
             value: "cn-2024-portrait",
         },
+        {
+            name: "舞萌DX 2025 (China), landscape",
+            name_localizations: {
+                "zh-CN": "舞萌DX 2025（国服），横向",
+                "zh-TW": "舞萌DX 2025（中國），橫向",
+            },
+            value: "cn-2025-landscape",
+        },
+        {
+            name: "舞萌DX 2025 (China), portrait",
+            name_localizations: {
+                "zh-CN": "舞萌DX 2025（国服），纵向",
+                "zh-TW": "舞萌DX 2025（中國），縱向",
+            },
+            value: "cn-2025-portrait",
+        },
     ];
 
     static readonly versions = [
