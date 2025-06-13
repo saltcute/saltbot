@@ -23,7 +23,16 @@ export class Best50ChartCommand {
         "jp-prismplus",
     ];
     private static readonly DEFAULT_VERSION = "jp-prism";
+    /**
+     * @deprecated
+     */
     private static readonly DEFAULT_THEME = "jp-prism-landscape";
+    private static readonly DEFAULT_THEME_BY_TRACKER = {
+        kamai: "jp-prism-landscape",
+        lxns: "cn-2025-landscape",
+        divingfish: "cn-2025-landscape",
+        maishift: "jp-prism-landscape",
+    };
     private static readonly DEFAULT_USE_TRACKER_PROFILE_PICTURE = true;
 
     static readonly CHAT_COMMAND_HANDLER = Telemetry.discordMiddleware(
@@ -35,22 +44,7 @@ export class Best50ChartCommand {
 
             let result: Buffer | null = null,
                 useBrainrot = false;
-            const version =
-                interaction.options.getString("version", false) ||
-                this.DEFAULT_VERSION;
-            const theme =
-                interaction.options.getString("theme", false) ||
-                (version && this.AVAILABLE_VERSION_THEME.includes(version)
-                    ? `${version}-landscape`
-                    : this.DEFAULT_THEME);
-            const pfpOption = interaction.options.getBoolean(
-                "use_profile_picture",
-                false
-            );
-            const useProfilePicture =
-                pfpOption == null
-                    ? this.DEFAULT_USE_TRACKER_PROFILE_PICTURE
-                    : pfpOption;
+
             const tracker = interaction.options.getSubcommand();
             if (
                 !(
@@ -66,6 +60,22 @@ export class Best50ChartCommand {
                 });
                 return EResultTypes.INVALID_TRACKER;
             }
+            const version =
+                interaction.options.getString("version", false) ||
+                this.DEFAULT_VERSION;
+            const theme =
+                interaction.options.getString("theme", false) ||
+                (version && this.AVAILABLE_VERSION_THEME.includes(version)
+                    ? `${version}-landscape`
+                    : this.DEFAULT_THEME_BY_TRACKER[tracker]);
+            const pfpOption = interaction.options.getBoolean(
+                "use_profile_picture",
+                false
+            );
+            const useProfilePicture =
+                pfpOption == null
+                    ? this.DEFAULT_USE_TRACKER_PROFILE_PICTURE
+                    : pfpOption;
             let username: string | null = null;
             switch (tracker) {
                 case "kamai": {
