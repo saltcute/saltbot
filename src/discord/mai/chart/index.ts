@@ -51,21 +51,27 @@ export class ChartQueryCommand {
                 CN_LATEST = 40;
 
             const song = interaction.options.getInteger("song", true);
-            const tracker = this.getChoices<"kamai" | "lxns" | "divingfish" | "none">(
-                interaction.options.getString("region", false),
+            const tracker = this.getChoices<
+                "kamai" | "lxns" | "divingfish" | "none"
+            >(
+                interaction.options.getString("source", false),
                 ["kamai", "lxns", "none"],
                 "kamai"
             );
             const region = this.getChoices<"DX" | "EX" | "CN">(
                 interaction.options.getString("region", false),
                 ["DX", "EX", "CN"],
-                "DX"
+                (() => {
+                    switch (tracker) {
+                        case "lxns":
+                            return "CN";
+                        case "kamai":
+                        case "none":
+                        default:
+                            return "DX";
+                    }
+                })()
             );
-            const useClassic = interaction.options.getBoolean(
-                "use_classic",
-                false
-            );
-            if (!useClassic) {
                 let source;
                 switch (tracker) {
                     case "kamai":
@@ -586,11 +592,14 @@ Max DX Score    ${master.meta.maxDXScore.toString().padStart(4, " ")}${remaster 
                             },
                             choices: [
                                 { name: "Kamaitachi", value: "kamai" },
-                                { name: "LXNS", value: "lxns",
+                                {
+                                    name: "LXNS",
+                                    value: "lxns",
                                     nameLocalizations: {
                                         "zh-CN": "落雪查分器",
                                         "zh-TW": "LXNS",
-                                    }, },
+                                    },
+                                },
                                 {
                                     name: "None",
                                     nameLocalizations: {
