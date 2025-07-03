@@ -51,8 +51,11 @@ export class ChartQueryCommand {
                 CN_LATEST = 40;
 
             const song = interaction.options.getInteger("song", true);
-            const tracker = (interaction.options.getString("source", false) ||
-                "kamai") as "kamai" | "lxns" | "divingfish" | "none" | null;
+            const tracker = this.getChoices<"kamai" | "lxns" | "divingfish" | "none">(
+                interaction.options.getString("region", false),
+                ["kamai", "lxns", "none"],
+                "kamai"
+            );
             const region = this.getChoices<"DX" | "EX" | "CN">(
                 interaction.options.getString("region", false),
                 ["DX", "EX", "CN"],
@@ -68,11 +71,16 @@ export class ChartQueryCommand {
                     case "kamai":
                         source = new MaiDraw.Maimai.Best50.KamaiTachi();
                         break;
+                    case "lxns":
+                        source = new MaiDraw.Maimai.Best50.LXNS({
+                            auth: kasumi.config.getSync("maimai::lxns.token"),
+                        });
+                        break;
                     case "none":
                         source = null;
                 }
                 let username = "";
-                if (tracker && tracker != "none") {
+                if (tracker != "none") {
                     const dbUsername = await kasumi.config.getOne(
                         `salt::connection.discord.${tracker}.${interaction.user.id}`
                     );
@@ -578,6 +586,11 @@ Max DX Score    ${master.meta.maxDXScore.toString().padStart(4, " ")}${remaster 
                             },
                             choices: [
                                 { name: "Kamaitachi", value: "kamai" },
+                                { name: "LXNS", value: "lxns",
+                                    nameLocalizations: {
+                                        "zh-CN": "落雪查分器",
+                                        "zh-TW": "LXNS",
+                                    }, },
                                 {
                                     name: "None",
                                     nameLocalizations: {

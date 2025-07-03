@@ -82,10 +82,12 @@ export class Telemetry {
                                 }
                                 return commands;
                             })(),
-                            args: interaction.options.data.map((v) => ({
-                                name: v.name,
-                                value: v.value?.toString() || "",
-                            })),
+                            args: interaction.isChatInputCommand()
+                                ? interaction.options.data.map((v) => ({
+                                      name: v.name,
+                                      value: v.value?.toString() || "",
+                                  }))
+                                : [],
                             result,
                         });
                 } else handler(interaction);
