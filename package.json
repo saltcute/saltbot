@@ -36,7 +36,7 @@
     "kuroshiro": "^1.2.0",
     "kuroshiro-analyzer-kuromoji": "^1.1.0",
     "lodash": "^4.17.21",
-    "maidraw": "^0.8.4",
+    "maidraw": "^0.8.5",
     "memory-cache": "^0.2.0",
     "ts-node": "^10.9.1",
     "tsconfig-paths": "^4.1.2",
