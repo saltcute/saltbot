@@ -827,19 +827,19 @@ export class Level50ChartCommand {
                 type: 2,
                 name: "level50",
                 description:
-                    "Generate a nice little chart of your best 50 scores!",
+                    "Generate a chart of your best scores in a specific level.",
                 description_localizations: {
-                    "zh-CN": "生成 b50 图片！",
-                    "zh-TW": "生成 Best 50 圖像！",
+                    "zh-CN": "生成等级牌子图片。",
+                    "zh-TW": "生成等級最高分圖像。",
                 },
                 options: [
                     {
                         type: 1,
                         name: "kamai",
-                        description: "Get best 50 scores from Kamaitachi.",
+                        description: "Get Level 50 scores from Kamaitachi.",
                         description_localizations: {
-                            "zh-CN": "从 Kamaitachi 获取 b50 信息。",
-                            "zh-TW": "從 Kamaitachi 獲取 Best 50 資料。",
+                            "zh-CN": "从 Kamaitachi 获取 L50 信息。",
+                            "zh-TW": "從 Kamaitachi 獲取 Level 50 資料。",
                         },
                         options: [
                             {
@@ -899,10 +899,10 @@ export class Level50ChartCommand {
                                     "zh-TW": "主題",
                                 },
                                 description:
-                                    "Choose from a variety of themes for your Best 50 chart.",
+                                    "Choose from a variety of themes for your Level 50 chart.",
                                 description_localizations: {
-                                    "zh-CN": "选择 b50 图片的主题。",
-                                    "zh-TW": "選擇 Best 50 圖像的主題。",
+                                    "zh-CN": "选择 L50 图片的主题。",
+                                    "zh-TW": "選擇 Level 50 圖像的主題。",
                                 },
                                 choices: this.themes,
                             },

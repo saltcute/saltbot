@@ -554,7 +554,7 @@ Max DX Score    ${master.meta.maxDXScore.toString().padStart(4, " ")}${remaster 
                                 {
                                     name: "China",
                                     nameLocalizations: {
-                                        "zh-CN": "中国",
+                                        "zh-CN": "国服",
                                         "zh-TW": "中國",
                                     },
                                     value: "CN",
