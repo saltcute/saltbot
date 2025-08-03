@@ -647,102 +647,102 @@ export class Best50ChartCommand {
             },
             value: "jp-finale",
         },
-        {
-            name: "maimai MiLK PLUS (Japan)",
-            name_localizations: {
-                "zh-CN": "maimai MiLK PLUS（日服）",
-                "zh-TW": "maimai MiLK PLUS（日本）",
-            },
-            value: "jp-milkplus",
-        },
-        {
-            name: "maimai MiLK (Japan)",
-            name_localizations: {
-                "zh-CN": "maimai MiLK（日服）",
-                "zh-TW": "maimai MiLK（日本）",
-            },
-            value: "jp-milk",
-        },
-        {
-            name: "maimai MURASAKi PLUS (Japan)",
-            name_localizations: {
-                "zh-CN": "maimai MURASAKi PLUS（日服）",
-                "zh-TW": "maimai MURASAKi PLUS（日本）",
-            },
-            value: "jp-murasakiplus",
-        },
-        {
-            name: "maimai MURASAKi (Japan)",
-            name_localizations: {
-                "zh-CN": "maimai MURASAKi（日服）",
-                "zh-TW": "maimai MURASAKi（日本）",
-            },
-            value: "jp-murasaki",
-        },
-        {
-            name: "maimai PiNK PLUS (Japan)",
-            name_localizations: {
-                "zh-CN": "maimai PiNK PLUS（日服）",
-                "zh-TW": "maimai PiNK PLUS（日本）",
-            },
-            value: "jp-pinkplus",
-        },
-        {
-            name: "maimai PiNK (Japan)",
-            name_localizations: {
-                "zh-CN": "maimai PiNK（日服）",
-                "zh-TW": "maimai PiNK（日本）",
-            },
-            value: "jp-pink",
-        },
-        {
-            name: "maimai ORANGE PLUS (Japan)",
-            name_localizations: {
-                "zh-CN": "maimai ORANGE PLUS（日服）",
-                "zh-TW": "maimai ORANGE PLUS（日本）",
-            },
-            value: "jp-orangeplus",
-        },
-        {
-            name: "maimai ORANGE (Japan)",
-            name_localizations: {
-                "zh-CN": "maimai ORANGE（日服）",
-                "zh-TW": "maimai ORANGE（日本）",
-            },
-            value: "jp-orange",
-        },
-        {
-            name: "maimai GreeN PLUS (Japan)",
-            name_localizations: {
-                "zh-CN": "maimai GreeN PLUS（日服）",
-                "zh-TW": "maimai GreeN PLUS（日本）",
-            },
-            value: "jp-greenplus",
-        },
-        {
-            name: "maimai GreeN (Japan)",
-            name_localizations: {
-                "zh-CN": "maimai GreeN（日服）",
-                "zh-TW": "maimai GreeN（日本）",
-            },
-            value: "jp-green",
-        },
-        {
-            name: "maimai PLUS (Japan)",
-            name_localizations: {
-                "zh-CN": "maimai PLUS（日服）",
-                "zh-TW": "maimai PLUS（日本）",
-            },
-            value: "jp-maimaiplus",
-        },
-        {
-            name: "maimai (Japan)",
-            name_localizations: {
-                "zh-CN": "maimai（日服）",
-                "zh-TW": "maimai（日本）",
-            },
-            value: "jp-maimai",
-        },
+        // {
+        //     name: "maimai MiLK PLUS (Japan)",
+        //     name_localizations: {
+        //         "zh-CN": "maimai MiLK PLUS（日服）",
+        //         "zh-TW": "maimai MiLK PLUS（日本）",
+        //     },
+        //     value: "jp-milkplus",
+        // },
+        // {
+        //     name: "maimai MiLK (Japan)",
+        //     name_localizations: {
+        //         "zh-CN": "maimai MiLK（日服）",
+        //         "zh-TW": "maimai MiLK（日本）",
+        //     },
+        //     value: "jp-milk",
+        // },
+        // {
+        //     name: "maimai MURASAKi PLUS (Japan)",
+        //     name_localizations: {
+        //         "zh-CN": "maimai MURASAKi PLUS（日服）",
+        //         "zh-TW": "maimai MURASAKi PLUS（日本）",
+        //     },
+        //     value: "jp-murasakiplus",
+        // },
+        // {
+        //     name: "maimai MURASAKi (Japan)",
+        //     name_localizations: {
+        //         "zh-CN": "maimai MURASAKi（日服）",
+        //         "zh-TW": "maimai MURASAKi（日本）",
+        //     },
+        //     value: "jp-murasaki",
+        // },
+        // {
+        //     name: "maimai PiNK PLUS (Japan)",
+        //     name_localizations: {
+        //         "zh-CN": "maimai PiNK PLUS（日服）",
+        //         "zh-TW": "maimai PiNK PLUS（日本）",
+        //     },
+        //     value: "jp-pinkplus",
+        // },
+        // {
+        //     name: "maimai PiNK (Japan)",
+        //     name_localizations: {
+        //         "zh-CN": "maimai PiNK（日服）",
+        //         "zh-TW": "maimai PiNK（日本）",
+        //     },
+        //     value: "jp-pink",
+        // },
+        // {
+        //     name: "maimai ORANGE PLUS (Japan)",
+        //     name_localizations: {
+        //         "zh-CN": "maimai ORANGE PLUS（日服）",
+        //         "zh-TW": "maimai ORANGE PLUS（日本）",
+        //     },
+        //     value: "jp-orangeplus",
+        // },
+        // {
+        //     name: "maimai ORANGE (Japan)",
+        //     name_localizations: {
+        //         "zh-CN": "maimai ORANGE（日服）",
+        //         "zh-TW": "maimai ORANGE（日本）",
+        //     },
+        //     value: "jp-orange",
+        // },
+        // {
+        //     name: "maimai GreeN PLUS (Japan)",
+        //     name_localizations: {
+        //         "zh-CN": "maimai GreeN PLUS（日服）",
+        //         "zh-TW": "maimai GreeN PLUS（日本）",
+        //     },
+        //     value: "jp-greenplus",
+        // },
+        // {
+        //     name: "maimai GreeN (Japan)",
+        //     name_localizations: {
+        //         "zh-CN": "maimai GreeN（日服）",
+        //         "zh-TW": "maimai GreeN（日本）",
+        //     },
+        //     value: "jp-green",
+        // },
+        // {
+        //     name: "maimai PLUS (Japan)",
+        //     name_localizations: {
+        //         "zh-CN": "maimai PLUS（日服）",
+        //         "zh-TW": "maimai PLUS（日本）",
+        //     },
+        //     value: "jp-maimaiplus",
+        // },
+        // {
+        //     name: "maimai (Japan)",
+        //     name_localizations: {
+        //         "zh-CN": "maimai（日服）",
+        //         "zh-TW": "maimai（日本）",
+        //     },
+        //     value: "jp-maimai",
+        // },
     ];
 
     static getCommand() {
