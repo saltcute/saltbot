@@ -115,79 +115,136 @@ export class Best50ChartCommand {
                     let kamaiInstance;
                     switch (version) {
                         case "jp-maimai":
-                            kamaiInstance = kamai.maimai();
+                            kamaiInstance = kamai.versions().maimai();
+                            break;
+                        case "ex-maimai":
+                            kamaiInstance = kamai.versions().maimai();
                             break;
                         case "jp-maimaiplus":
-                            kamaiInstance = kamai.maimaiPlus();
+                            kamaiInstance = kamai.versions().maimaiPlus();
                             break;
                         case "jp-green":
-                            kamaiInstance = kamai.green();
+                            kamaiInstance = kamai.versions().green();
                             break;
                         case "jp-greenplus":
-                            kamaiInstance = kamai.greenPlus();
+                            kamaiInstance = kamai.versions().greenPlus();
                             break;
                         case "jp-orange":
-                            kamaiInstance = kamai.orange();
+                            kamaiInstance = kamai.versions().orange();
                             break;
                         case "jp-orangeplus":
-                            kamaiInstance = kamai.orangePlus();
+                            kamaiInstance = kamai.versions().orangePlus();
                             break;
                         case "jp-pink":
-                            kamaiInstance = kamai.pink();
+                            kamaiInstance = kamai.versions().pink();
                             break;
                         case "jp-pinkplus":
-                            kamaiInstance = kamai.pinkPlus();
+                            kamaiInstance = kamai.versions().pinkPlus();
                             break;
                         case "jp-murasaki":
-                            kamaiInstance = kamai.murasaki();
+                            kamaiInstance = kamai.versions().murasaki();
                             break;
                         case "jp-murasakiplus":
-                            kamaiInstance = kamai.murasakiPlus();
+                            kamaiInstance = kamai.versions().murasakiPlus();
                             break;
                         case "jp-milk":
-                            kamaiInstance = kamai.milk();
+                            kamaiInstance = kamai.versions().milk();
                             break;
                         case "jp-milkplus":
-                            kamaiInstance = kamai.milkPlus();
+                            kamaiInstance = kamai.versions().milkPlus();
                             break;
                         case "jp-finale":
-                            kamaiInstance = kamai.finale();
+                            kamaiInstance = kamai.versions().finale();
                             break;
                         case "jp-dx":
-                            kamaiInstance = kamai.dx();
+                            kamaiInstance = kamai.versions().dx();
+                            break;
+                        case "ex-dx":
+                            kamaiInstance = kamai.versions().dx("EX");
+                            break;
+                        case "cn-dx":
+                            kamaiInstance = kamai.versions().CN().DX();
                             break;
                         case "jp-dxplus":
-                            kamaiInstance = kamai.dxPlus();
+                            kamaiInstance = kamai.versions().dxPlus();
+                            break;
+                        case "ex-dxplus":
+                            kamaiInstance = kamai.versions().dxPlus("EX");
                             break;
                         case "jp-splash":
-                            kamaiInstance = kamai.splash();
+                            kamaiInstance = kamai.versions().splash();
+                            break;
+                        case "ex-splash":
+                            kamaiInstance = kamai.versions().splash("EX");
+                            break;
+                        case "cn-2021":
+                            kamaiInstance = kamai.versions().CN().DX2021();
                             break;
                         case "jp-splashplus":
-                            kamaiInstance = kamai.splashPlus();
+                            kamaiInstance = kamai.versions().splashPlus();
+                            break;
+                        case "ex-splashplus":
+                            kamaiInstance = kamai.versions().splashPlus("EX");
                             break;
                         case "jp-universe":
-                            kamaiInstance = kamai.universe();
+                            kamaiInstance = kamai.versions().universe();
+                            break;
+                        case "ex-universe":
+                            kamaiInstance = kamai.versions().universe("EX");
+                            break;
+                        case "cn-2022":
+                            kamaiInstance = kamai.versions().CN().DX2022();
                             break;
                         case "jp-universeplus":
-                            kamaiInstance = kamai.universePlus();
+                            kamaiInstance = kamai.versions().universePlus();
+                            break;
+                        case "ex-universeplus":
+                            kamaiInstance = kamai.versions().universePlus("EX");
                             break;
                         case "jp-festival":
-                            kamaiInstance = kamai.festival();
+                            kamaiInstance = kamai.versions().festival();
+                            break;
+                        case "ex-festival":
+                            kamaiInstance = kamai.versions().festival("EX");
+                            break;
+                        case "cn-2023":
+                            kamaiInstance = kamai.versions().CN().DX2023();
                             break;
                         case "jp-festivalplus":
-                            kamaiInstance = kamai.festivalPlus();
+                            kamaiInstance = kamai.versions().festivalPlus();
+                            break;
+                        case "ex-festivalplus":
+                            kamaiInstance = kamai.versions().festivalPlus("EX");
                             break;
                         case "jp-buddies":
-                            kamaiInstance = kamai.buddies();
+                            kamaiInstance = kamai.versions().buddies();
+                            break;
+                        case "ex-buddies":
+                            kamaiInstance = kamai.versions().buddies("EX");
+                            break;
+                        case "cn-2024":
+                            kamaiInstance = kamai.versions().CN().DX2024();
                             break;
                         case "jp-buddiesplus":
-                            kamaiInstance = kamai.buddiesPlus();
+                            kamaiInstance = kamai.versions().buddiesPlus();
+                            break;
+                        case "ex-buddiesplus":
+                            kamaiInstance = kamai.versions().buddiesPlus("EX");
                             break;
                         case "jp-prism":
-                            kamaiInstance = kamai.prism();
+                            kamaiInstance = kamai.versions().prism();
+                            break;
+                        case "ex-prism":
+                            kamaiInstance = kamai.versions().prism("EX");
+                            break;
+                        case "cn-2025":
+                            kamaiInstance = kamai.versions().CN().DX2025();
                             break;
                         case "jp-prismplus":
-                            kamaiInstance = kamai.prismPlus();
+                            kamaiInstance = kamai.versions().prismPlus();
+                            break;
+                        case "ex-prismplus":
+                            kamaiInstance = kamai.versions().prismPlus("EX");
                             break;
                         default:
                             kamaiInstance = kamai;
@@ -455,6 +512,14 @@ export class Best50ChartCommand {
             value: "jp-prism",
         },
         {
+            name: "舞萌DX 2025 (China)",
+            name_localizations: {
+                "zh-CN": "舞萌DX 2025（国服）",
+                "zh-TW": "舞萌DX 2025（中國）",
+            },
+            value: "cn-2025",
+        },
+        {
             name: "maimai でらっくす BUDDiES PLUS (Japan)",
             name_localizations: {
                 "zh-CN": "maimai でらっくす BUDDiES PLUS（日服）",
@@ -469,6 +534,14 @@ export class Best50ChartCommand {
                 "zh-TW": "maimai でらっくす BUDDiES （日本）",
             },
             value: "jp-buddies",
+        },
+        {
+            name: "舞萌DX 2024 (China)",
+            name_localizations: {
+                "zh-CN": "舞萌DX 2024（国服）",
+                "zh-TW": "舞萌DX 2024（中國）",
+            },
+            value: "cn-2024",
         },
         {
             name: "maimai でらっくす FESTiVAL PLUS (Japan)",
@@ -487,6 +560,14 @@ export class Best50ChartCommand {
             value: "jp-festival",
         },
         {
+            name: "舞萌DX 2023 (China)",
+            name_localizations: {
+                "zh-CN": "舞萌DX 2023（国服）",
+                "zh-TW": "舞萌DX 2023（中國）",
+            },
+            value: "cn-2023",
+        },
+        {
             name: "maimai でらっくす UNiVERSE PLUS (Japan)",
             name_localizations: {
                 "zh-CN": "maimai でらっくす UNiVERSE PLUS（日服）",
@@ -501,6 +582,14 @@ export class Best50ChartCommand {
                 "zh-TW": "maimai でらっくす UNiVERSE （日本）",
             },
             value: "jp-universe",
+        },
+        {
+            name: "舞萌DX 2022 (China)",
+            name_localizations: {
+                "zh-CN": "舞萌DX 2022（国服）",
+                "zh-TW": "舞萌DX 2022（中國）",
+            },
+            value: "cn-2022",
         },
         {
             name: "maimai でらっくす Splash PLUS (Japan)",
@@ -519,6 +608,14 @@ export class Best50ChartCommand {
             value: "jp-splash",
         },
         {
+            name: "舞萌DX 2021 (China)",
+            name_localizations: {
+                "zh-CN": "舞萌DX 2021（国服）",
+                "zh-TW": "舞萌DX 2021（中國）",
+            },
+            value: "cn-2021",
+        },
+        {
             name: "maimai でらっくす PLUS (Japan)",
             name_localizations: {
                 "zh-CN": "maimai でらっくす PLUS（日服）",
@@ -533,6 +630,14 @@ export class Best50ChartCommand {
                 "zh-TW": "maimai でらっくす（日本）",
             },
             value: "jp-dx",
+        },
+        {
+            name: "舞萌DX (China)",
+            name_localizations: {
+                "zh-CN": "舞萌DX（国服）",
+                "zh-TW": "舞萌DX（中國）",
+            },
+            value: "cn-dx",
         },
         {
             name: "maimai FiNALE (Japan)",
