@@ -1,160 +1,150 @@
 import { client } from "@/discord/client";
-import { Events } from "discord.js";
+import { Events, Interaction } from "discord.js";
 import { client as kasumi } from "@/kook/init/client";
 import { Telemetry } from "@/util/telemetry";
 import { EResultTypes } from "@/util/telemetry/type";
 
 export class LinkUserCommand {
-    static {
-        client.on(
-            Events.InteractionCreate,
-            Telemetry.discordMiddleware(async (interaction) => {
-                if (!interaction.isChatInputCommand())
-                    return EResultTypes.IGNORED;
-                if (interaction.commandName != "chu")
-                    return EResultTypes.IGNORED;
-                if (interaction.options.getSubcommandGroup() != "link")
-                    return EResultTypes.IGNORED;
+    static CHAT_COMMAND_HANDLER = Telemetry.discordMiddleware(
+        async (interaction) => {
+            if (!interaction.isChatInputCommand()) return EResultTypes.IGNORED;
+            if (interaction.commandName != "chu") return EResultTypes.IGNORED;
+            if (interaction.options.getSubcommandGroup() != "link")
+                return EResultTypes.IGNORED;
 
-                const tracker = interaction.options.getSubcommand();
-                let username;
-                switch (tracker) {
-                    case "kamai": {
-                        username = interaction.options.getString("user", true);
-                        break;
-                    }
-                    case "divingfish": {
-                        username = interaction.options.getString(
-                            "username",
-                            true
-                        );
-                        break;
-                    }
-                    case "lxns": {
-                        username = interaction.options.getString(
-                            "friendcode",
-                            true
-                        );
-                        break;
-                    }
+            const tracker = interaction.options.getSubcommand();
+            let username;
+            switch (tracker) {
+                case "kamai": {
+                    username = interaction.options.getString("user", true);
+                    break;
                 }
-                switch (tracker) {
-                    case "kamai":
-                    case "divingfish":
-                    case "lxns":
+                case "divingfish": {
+                    username = interaction.options.getString("username", true);
+                    break;
+                }
+                case "lxns": {
+                    username = interaction.options.getString(
+                        "friendcode",
+                        true
+                    );
+                    break;
+                }
+            }
+            switch (tracker) {
+                case "kamai":
+                case "divingfish":
+                case "lxns":
+                    kasumi.config.set(
+                        `salt::connection.discord.${tracker == "lxns" ? "lxns-chuni" : tracker}.${interaction.user.id}`,
+                        username
+                    );
+                    await interaction.reply({
+                        content: `I have linked your discord account to your \`${tracker}\` account \`${username}\`. You can now omit the username field next time you use \`/chu b50 ${tracker}\`.`,
+                        ephemeral: true,
+                    });
+                    break;
+            }
+
+            return EResultTypes.LINK_SUCCESS;
+        }
+    );
+
+    static async BUTTON_HANDLER(interaction: Interaction) {
+        if (!interaction.isButton()) return;
+        if (interaction.customId.startsWith("chuni::tracker.link.")) {
+            const action = interaction.customId.replace(
+                "chuni::tracker.link.",
+                ""
+            );
+            switch (true) {
+                case action == "nocomment":
+                    await interaction.update({
+                        content: "Okay, I will remind you the next time.",
+                        components: [],
+                    });
+                    break;
+                case action.startsWith("ignore"): {
+                    const [_, tracker, userId] = action.split(".");
+                    if (tracker && userId) {
+                        if (!interaction.user.id) return;
+                        if (userId !== interaction.user.id) {
+                            interaction.reply({
+                                content: "Bruh you shouldn't be seeing this.",
+                                ephemeral: true,
+                            });
+                            return;
+                        }
+                        if (
+                            !(
+                                tracker == "kamai" ||
+                                tracker == "divingfish" ||
+                                tracker == "lxns-chuni"
+                            )
+                        ) {
+                            interaction.reply({
+                                content:
+                                    "This shouldn't happen but I don't see the tracker you are using. Please try again.",
+                                ephemeral: true,
+                            });
+                            return;
+                        }
                         kasumi.config.set(
-                            `salt::connection.discord.${tracker == "lxns" ? "lxns-chuni" : tracker}.${interaction.user.id}`,
-                            username
+                            `salt::connection.discord.ignore.${tracker}.${userId}`,
+                            true
                         );
-                        await interaction.reply({
-                            content: `I have linked your discord account to your \`${tracker}\` account \`${username}\`. You can now omit the username field next time you use \`/chu b50 ${tracker}\`.`,
-                            ephemeral: true,
-                        });
-                        break;
-                }
-
-                return EResultTypes.LINK_SUCCESS;
-            })
-        );
-
-        client.on(Events.InteractionCreate, async (interaction) => {
-            if (!interaction.isButton()) return;
-            if (interaction.customId.startsWith("chuni::tracker.link.")) {
-                const action = interaction.customId.replace(
-                    "chuni::tracker.link.",
-                    ""
-                );
-                switch (true) {
-                    case action == "nocomment":
                         await interaction.update({
-                            content: "Okay, I will remind you the next time.",
+                            content: `Okay, I won't bother you again, but you can always use \`/mai link ${tracker}\` to link your account if you changed your mind.`,
                             components: [],
                         });
                         break;
-                    case action.startsWith("ignore"): {
-                        const [_, tracker, userId] = action.split(".");
-                        if (tracker && userId) {
-                            if (!interaction.user.id) return;
-                            if (userId !== interaction.user.id) {
-                                interaction.reply({
-                                    content:
-                                        "Bruh you shouldn't be seeing this.",
-                                    ephemeral: true,
-                                });
-                                return;
-                            }
-                            if (
-                                !(
-                                    tracker == "kamai" ||
-                                    tracker == "divingfish" ||
-                                    tracker == "lxns-chuni"
-                                )
-                            ) {
-                                interaction.reply({
-                                    content:
-                                        "This shouldn't happen but I don't see the tracker you are using. Please try again.",
-                                    ephemeral: true,
-                                });
-                                return;
-                            }
-                            kasumi.config.set(
-                                `salt::connection.discord.ignore.${tracker}.${userId}`,
-                                true
-                            );
-                            await interaction.update({
-                                content: `Okay, I won't bother you again, but you can always use \`/mai link ${tracker}\` to link your account if you changed your mind.`,
-                                components: [],
-                            });
-                            break;
-                        }
                     }
-                    default: {
-                        const [tracker, userId, username] = action.split(".");
-                        if (tracker && userId && username) {
-                            if (!interaction.user.id) return;
-                            if (userId !== interaction.user.id) {
-                                interaction.reply({
-                                    content:
-                                        "Bruh you shouldn't be seeing this.",
-                                    ephemeral: true,
-                                });
-                                return;
-                            }
-                            if (!username) {
-                                interaction.reply({
-                                    content:
-                                        "This shouldn't happen but I don't see a username. Please try again.",
-                                    ephemeral: true,
-                                });
-                                return;
-                            }
-                            if (
-                                !(
-                                    tracker == "kamai" ||
-                                    tracker == "divingfish" ||
-                                    tracker == "lxns-chuni"
-                                )
-                            ) {
-                                interaction.reply({
-                                    content:
-                                        "This shouldn't happen but I don't see the tracker you are using. Please try again.",
-                                    ephemeral: true,
-                                });
-                                return;
-                            }
-                            kasumi.config.set(
-                                `salt::connection.discord.${tracker}.${userId}`,
-                                username
-                            );
-                            await interaction.update({
-                                content: `I have linked your discord account to your \`${tracker}\` account \`${username}\`. You can now omit the username field next time you use the command.`,
-                                components: [],
+                }
+                default: {
+                    const [tracker, userId, username] = action.split(".");
+                    if (tracker && userId && username) {
+                        if (!interaction.user.id) return;
+                        if (userId !== interaction.user.id) {
+                            interaction.reply({
+                                content: "Bruh you shouldn't be seeing this.",
+                                ephemeral: true,
                             });
+                            return;
                         }
+                        if (!username) {
+                            interaction.reply({
+                                content:
+                                    "This shouldn't happen but I don't see a username. Please try again.",
+                                ephemeral: true,
+                            });
+                            return;
+                        }
+                        if (
+                            !(
+                                tracker == "kamai" ||
+                                tracker == "divingfish" ||
+                                tracker == "lxns-chuni"
+                            )
+                        ) {
+                            interaction.reply({
+                                content:
+                                    "This shouldn't happen but I don't see the tracker you are using. Please try again.",
+                                ephemeral: true,
+                            });
+                            return;
+                        }
+                        kasumi.config.set(
+                            `salt::connection.discord.${tracker}.${userId}`,
+                            username
+                        );
+                        await interaction.update({
+                            content: `I have linked your discord account to your \`${tracker}\` account \`${username}\`. You can now omit the username field next time you use the command.`,
+                            components: [],
+                        });
                     }
                 }
             }
-        });
+        }
     }
 
     static getCommand() {
