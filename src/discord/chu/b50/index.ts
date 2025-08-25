@@ -14,9 +14,19 @@ const lxns = new MaiDraw.Chuni.Best50.LXNS({
 });
 const kamai = new MaiDraw.Chuni.Best50.KamaiTachi();
 export class Best50ChartCommand {
-    private static readonly AVAILABLE_VERSION_THEME = ["jp-verse"];
-    private static readonly DEFAULT_VERSION = "jp-luminous";
-    private static readonly DEFAULT_THEME = "jp-verse-landscape";
+    private static readonly AVAILABLE_VERSION_THEME = [
+        "jp-verse",
+        "jp-luminousplus",
+        "jp-luminous",
+    ];
+    private static readonly DEFAULT_VERSION_BY_TRACKER = {
+        kamai: "jp-luminous",
+        "lxns-chuni": "cn-2025",
+    };
+    private static readonly DEFAULT_THEME_BY_TRACKER = {
+        kamai: "jp-luminous-landscape",
+        "lxns-chuni": "jp-luminous-landscape",
+    };
     private static readonly DEFAULT_USE_TRACKER_PROFILE_PICTURE = true;
     private static readonly DEFAULT_RATING_ALOGRITHM = "new";
 
@@ -52,14 +62,29 @@ export class Best50ChartCommand {
                 return EResultTypes.IGNORED;
 
             let result: Buffer | null = null;
+
+            const subCommand = interaction.options.getSubcommand();
+            const tracker = subCommand == "lxns" ? "lxns-chuni" : subCommand;
+            if (
+                !(
+                    tracker == "kamai" ||
+                    // tracker == "divingfish" ||
+                    tracker == "lxns-chuni"
+                )
+            ) {
+                await interaction.editReply({
+                    content: "Invalid tracker. Please try again.",
+                });
+                return EResultTypes.INVALID_TRACKER;
+            }
             const version =
                 interaction.options.getString("version", false) ||
-                this.DEFAULT_VERSION;
+                this.DEFAULT_VERSION_BY_TRACKER[tracker];
             const theme =
                 interaction.options.getString("theme", false) ||
                 (version && this.AVAILABLE_VERSION_THEME.includes(version)
                     ? `${version}-landscape`
-                    : this.DEFAULT_THEME);
+                    : this.DEFAULT_THEME_BY_TRACKER[tracker]);
             const type =
                 interaction.options.getString("type", false) == "recents"
                     ? "recents"
@@ -75,30 +100,16 @@ export class Best50ChartCommand {
                 pfpOption == null
                     ? this.DEFAULT_USE_TRACKER_PROFILE_PICTURE
                     : pfpOption;
-            const subCommand = interaction.options.getSubcommand();
-            const tracker = subCommand == "lxns" ? "lxns-chuni" : subCommand;
-            if (
-                !(
-                    tracker == "kamai" ||
-                    tracker == "divingfish" ||
-                    tracker == "lxns-chuni"
-                )
-            ) {
-                await interaction.editReply({
-                    content: "Invalid tracker. Please try again.",
-                });
-                return EResultTypes.INVALID_TRACKER;
-            }
             let username: string | null = null;
             switch (tracker) {
                 case "kamai": {
                     username = interaction.options.getString("user");
                     break;
                 }
-                case "divingfish": {
-                    // username = interaction.options.getString("username");
-                    break;
-                }
+                // case "divingfish": {
+                //     // username = interaction.options.getString("username");
+                //     break;
+                // }
                 case "lxns-chuni": {
                     username = interaction.options.getString("friendcode");
                     break;
@@ -209,15 +220,15 @@ export class Best50ChartCommand {
                     );
                     break;
                 }
-                case "divingfish": {
-                    // result =
-                    //     await MaiDraw.Chuni.Best50.drawWithScoreSource(
-                    //         divingfish,
-                    //         username,
-                    //         { theme }
-                    //     );
-                    break;
-                }
+                // case "divingfish": {
+                //     // result =
+                //     //     await MaiDraw.Chuni.Best50.drawWithScoreSource(
+                //     //         divingfish,
+                //     //         username,
+                //     //         { theme }
+                //     //     );
+                //     break;
+                // }
                 case "lxns-chuni": {
                     result = await MaiDraw.Chuni.Best50.drawWithScoreSource(
                         lxns,
@@ -310,6 +321,22 @@ export class Best50ChartCommand {
                 "zh-TW": "CHUNITHM VERSE（日本），橫向",
             },
             value: "jp-verse-landscape",
+        },
+        {
+            name: "CHUNITHM LUMINOUS PLUS (Japan), landscape",
+            name_localizations: {
+                "zh-CN": "CHUNITHM LUMINOUS PLUS（日服），横向",
+                "zh-TW": "CHUNITHM LUMINOUS PLUS（日本），橫向",
+            },
+            value: "jp-luminousplus-landscape",
+        },
+        {
+            name: "CHUNITHM LUMINOUS (Japan), landscape",
+            name_localizations: {
+                "zh-CN": "CHUNITHM LUMINOUS（日服），横向",
+                "zh-TW": "CHUNITHM LUMINOUS（日本），橫向",
+            },
+            value: "jp-luminous-landscape",
         },
     ];
 

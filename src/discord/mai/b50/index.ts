@@ -26,11 +26,12 @@ export class Best50ChartCommand {
         "jp-prism",
         "jp-prismplus",
     ];
-    private static readonly DEFAULT_VERSION = "jp-prism";
-    /**
-     * @deprecated
-     */
-    private static readonly DEFAULT_THEME = "jp-prism-landscape";
+    private static readonly DEFAULT_VERSION_BY_TRACKER = {
+        kamai: "jp-prism",
+        lxns: "cn-2025",
+        divingfish: "cn-2025",
+        maishift: "jp-prism",
+    };
     private static readonly DEFAULT_THEME_BY_TRACKER = {
         kamai: "jp-prism-landscape",
         lxns: "cn-2025-landscape",
@@ -66,7 +67,7 @@ export class Best50ChartCommand {
             }
             const version =
                 interaction.options.getString("version", false) ||
-                this.DEFAULT_VERSION;
+                this.DEFAULT_VERSION_BY_TRACKER[tracker];
             const theme =
                 interaction.options.getString("theme", false) ||
                 (version && this.AVAILABLE_VERSION_THEME.includes(version)
