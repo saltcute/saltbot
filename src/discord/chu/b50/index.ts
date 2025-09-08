@@ -1,18 +1,16 @@
-import {
-    ApplicationCommandOptionType,
-    AttachmentBuilder,
-    Events,
-} from "discord.js";
+import { ApplicationCommandOptionType, AttachmentBuilder } from "discord.js";
 import { MaiDraw } from "maidraw";
 import { client as kasumi } from "@/kook/init/client";
-import { client } from "@/discord/client";
 import { Telemetry } from "@/util/telemetry";
 import { EResultTypes } from "@/util/telemetry/type";
 
-const lxns = new MaiDraw.Chuni.Best50.LXNS({
+const lxns = new MaiDraw.Chuni.Adapters.LXNS({
     auth: kasumi.config.getSync("maimai::lxns.token"),
 });
-const kamai = new MaiDraw.Chuni.Best50.KamaiTachi();
+const kamai = new MaiDraw.Chuni.Adapters.KamaiTachi();
+
+const painter = new MaiDraw.Chuni.Painters.Best50();
+
 export class Best50ChartCommand {
     private static readonly AVAILABLE_VERSION_THEME = [
         "jp-verse",
@@ -80,11 +78,6 @@ export class Best50ChartCommand {
             const version =
                 interaction.options.getString("version", false) ||
                 this.DEFAULT_VERSION_BY_TRACKER[tracker];
-            const theme =
-                interaction.options.getString("theme", false) ||
-                (version && this.AVAILABLE_VERSION_THEME.includes(version)
-                    ? `${version}-landscape`
-                    : this.DEFAULT_THEME_BY_TRACKER[tracker]);
             const type =
                 interaction.options.getString("type", false) == "recents"
                     ? "recents"
@@ -92,6 +85,13 @@ export class Best50ChartCommand {
                       ? "new"
                       : this.DEFAULT_VERSION_RATING_ALOGRITHM_MAP[version] ||
                         this.DEFAULT_RATING_ALOGRITHM;
+            const theme =
+                interaction.options.getString("theme", false) ||
+                (version && this.AVAILABLE_VERSION_THEME.includes(version)
+                    ? `${version}-landscape`
+                    : this.DEFAULT_THEME_BY_TRACKER[tracker]) +
+                    "-" +
+                    type;
             const pfpOption = interaction.options.getBoolean(
                 "use_profile_picture",
                 false
@@ -207,9 +207,9 @@ export class Best50ChartCommand {
                             kamaiInstance = kamai;
                             break;
                     }
-                    result = await MaiDraw.Chuni.Best50.drawWithScoreSource(
+                    result = await painter.drawWithScoreSource(
                         kamaiInstance,
-                        username,
+                        { username },
                         {
                             theme,
                             profilePicture: useProfilePicture
@@ -230,9 +230,9 @@ export class Best50ChartCommand {
                 //     break;
                 // }
                 case "lxns-chuni": {
-                    result = await MaiDraw.Chuni.Best50.drawWithScoreSource(
+                    result = await painter.drawWithScoreSource(
                         lxns,
-                        username,
+                        { username },
                         {
                             theme,
                             profilePicture: useProfilePicture

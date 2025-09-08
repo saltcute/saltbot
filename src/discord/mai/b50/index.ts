@@ -9,14 +9,16 @@ import { Telemetry } from "@/util/telemetry";
 import { EResultTypes } from "@/util/telemetry/type";
 import { Util } from "@/util";
 
-const lxns = new MaiDraw.Maimai.Best50.LXNS({
+const lxns = new MaiDraw.Maimai.Adapters.LXNS({
     auth: kasumi.config.getSync("maimai::lxns.token"),
 });
-const kamai = new MaiDraw.Maimai.Best50.KamaiTachi();
-const maishift = new MaiDraw.Maimai.Best50.Maishift();
-const divingfish = new MaiDraw.Maimai.Best50.DivingFish({
+const kamai = new MaiDraw.Maimai.Adapters.KamaiTachi();
+const maishift = new MaiDraw.Maimai.Adapters.Maishift();
+const divingfish = new MaiDraw.Maimai.Adapters.DivingFish({
     auth: kasumi.config.getSync("maimai::divingFish.token"),
 });
+
+const painter = new MaiDraw.Maimai.Painters.Best50();
 
 export class Best50ChartCommand {
     private static readonly AVAILABLE_VERSION_THEME = [
@@ -81,6 +83,11 @@ export class Best50ChartCommand {
                 pfpOption == null
                     ? this.DEFAULT_USE_TRACKER_PROFILE_PICTURE
                     : pfpOption;
+            const showRecentUpscore = interaction.options.getBoolean(
+                "show_recent_upscore",
+                false
+            );
+
             let username: string | null = null;
             switch (tracker) {
                 case "kamai": {
@@ -278,11 +285,68 @@ export class Best50ChartCommand {
                         ) {
                             useBrainrot = true;
                         }
-                        result = await MaiDraw.Maimai.Best50.draw(
-                            profile.name,
-                            profile.rating,
-                            score.new,
-                            score.old,
+                        if (showRecentUpscore === true) {
+                            await Promise.all(
+                                [...score.new, ...score.old].map(async (v) => {
+                                    // Get kt score history
+                                    const chardId = v.optionalData?.kt?.chartId;
+                                    if (chardId) {
+                                        const ktScore = (
+                                            await kamaiInstance.getScoreHistory(
+                                                username,
+                                                chardId
+                                            )
+                                        )?.body;
+                                        if (ktScore) {
+                                            const recent = ktScore
+                                                .sort(
+                                                    (a, b) =>
+                                                        a.timeAchieved -
+                                                        b.timeAchieved
+                                                )
+                                                .find(
+                                                    (v1) =>
+                                                        v1.scoreData.percent >=
+                                                        v.achievement
+                                                );
+                                            if (recent) {
+                                                const FRESH_BORDER =
+                                                    5 * 24 * 60 * 60 * 1000; // 5 days
+                                                const DEAD_CUTOFF =
+                                                    180 * 24 * 60 * 60 * 1000; // 180 days
+
+                                                const timeDiff =
+                                                    Date.now() -
+                                                    recent.timeAchieved;
+                                                if (!v.optionalData)
+                                                    v.optionalData = {};
+                                                if (timeDiff < FRESH_BORDER) {
+                                                    v.optionalData.scale = 0;
+                                                } else if (
+                                                    timeDiff > DEAD_CUTOFF
+                                                ) {
+                                                    v.optionalData.scale = 1;
+                                                } else {
+                                                    v.optionalData.scale =
+                                                        (timeDiff -
+                                                            FRESH_BORDER) /
+                                                        (DEAD_CUTOFF -
+                                                            FRESH_BORDER);
+                                                }
+                                            }
+                                        }
+                                    }
+                                })
+                            );
+                        }
+                        // console.dir(score.new, { depth: null });
+                        result = await painter.draw(
+                            {
+                                username: profile.name,
+                                rating: profile.rating,
+                                newScores: score.new,
+                                oldScores: score.old,
+                            },
                             {
                                 theme,
                                 profilePicture: useProfilePicture
@@ -296,17 +360,17 @@ export class Best50ChartCommand {
                     break;
                 }
                 case "divingfish": {
-                    result = await MaiDraw.Maimai.Best50.drawWithScoreSource(
+                    result = await painter.drawWithScoreSource(
                         divingfish,
-                        username,
+                        { username },
                         { theme }
                     );
                     break;
                 }
                 case "lxns": {
-                    result = await MaiDraw.Maimai.Best50.drawWithScoreSource(
+                    result = await painter.drawWithScoreSource(
                         lxns,
-                        username,
+                        { username },
                         {
                             theme,
                             profilePicture: useProfilePicture
@@ -317,9 +381,9 @@ export class Best50ChartCommand {
                     break;
                 }
                 case "maishift": {
-                    result = await MaiDraw.Maimai.Best50.drawWithScoreSource(
+                    result = await painter.drawWithScoreSource(
                         maishift,
-                        username,
+                        { username },
                         {
                             theme,
                             profilePicture: useProfilePicture
@@ -856,6 +920,20 @@ export class Best50ChartCommand {
                                     "zh-CN": "使用你在 Kamaitachi 上的头像。",
                                     "zh-TW":
                                         "使用您在 Kamaitachi 上的個人資料圖像。",
+                                },
+                            },
+                            {
+                                type: ApplicationCommandOptionType.Boolean,
+                                name: "show_recent_upscore",
+                                name_localizations: {
+                                    "zh-CN": "显示最近上分",
+                                    "zh-TW": "顯示最近上分",
+                                },
+                                description:
+                                    "Show an indicator of recently upscored charts.",
+                                description_localizations: {
+                                    "zh-CN": "在最近上分的谱面上显示指示器。",
+                                    "zh-TW": "在最近上分的譜面上顯示指示器。",
                                 },
                             },
                         ],

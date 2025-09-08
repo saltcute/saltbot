@@ -3,11 +3,9 @@ import fs from "fs";
 import {
     ApplicationCommandOption,
     AttachmentBuilder,
-    Events,
     Interaction,
 } from "discord.js";
 import { client as kasumi } from "@/kook/init/client";
-import { client } from "@/discord/client";
 import { EResultTypes } from "@/util/telemetry/type";
 import { Telemetry } from "@/util/telemetry";
 import { Maimai } from "./type";
@@ -20,6 +18,8 @@ import Fuse from "fuse.js";
 
 import { Cache } from "@/util/cache";
 import TSV from "tsv";
+
+const painter = new MaiDraw.Maimai.Painters.Chart();
 
 export class ChartQueryCommand {
     static readonly DATABASE_PATH = kasumi.config.getSync(
@@ -71,10 +71,10 @@ export class ChartQueryCommand {
             let source;
             switch (tracker) {
                 case "kamai":
-                    source = new MaiDraw.Maimai.Best50.KamaiTachi();
+                    source = new MaiDraw.Maimai.Adapters.KamaiTachi();
                     break;
                 case "lxns":
-                    source = new MaiDraw.Maimai.Best50.LXNS({
+                    source = new MaiDraw.Maimai.Adapters.LXNS({
                         auth: kasumi.config.getSync("maimai::lxns.token"),
                     });
                     break;
@@ -97,20 +97,21 @@ export class ChartQueryCommand {
             }
             let result;
             if (source && username) {
-                result = await MaiDraw.Maimai.Chart.drawWithScoreSource(
+                result = await painter.drawWithScoreSource(
                     source,
-                    username,
-                    song,
+                    { username, chartId: song },
                     {
                         region,
                     }
                 );
             } else {
-                result = await MaiDraw.Maimai.Chart.draw(
-                    "maimai",
-                    0,
-                    song,
-                    [],
+                result = await painter.draw(
+                    {
+                        username: "maimai",
+                        rating: 0,
+                        chartId: song,
+                        scores: [],
+                    },
                     {
                         region,
                     }

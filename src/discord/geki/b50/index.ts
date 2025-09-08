@@ -9,7 +9,10 @@ import { client } from "@/discord/client";
 import { Telemetry } from "@/util/telemetry";
 import { EResultTypes } from "@/util/telemetry/type";
 
-const kamai = new MaiDraw.Geki.Best50.KamaiTachi();
+const kamai = new MaiDraw.Geki.Adapters.KamaiTachi();
+
+const painter = new MaiDraw.Geki.Painters.Best50();
+
 export class Best50ChartCommand {
     private static readonly AVAILABLE_VERSION_THEME = [
         "jp-refresh",
@@ -54,12 +57,6 @@ export class Best50ChartCommand {
                 const themeVersion = version.includes("act")
                     ? version.replace(/act[1-3]/, "")
                     : version;
-                const theme =
-                    interaction.options.getString("theme", false) ||
-                    (themeVersion &&
-                    this.AVAILABLE_VERSION_THEME.includes(themeVersion)
-                        ? `${themeVersion}-landscape`
-                        : this.DEFAULT_THEME);
                 const type =
                     interaction.options.getString("type", false) == "classic"
                         ? "classic"
@@ -69,6 +66,15 @@ export class Best50ChartCommand {
                           : this.DEFAULT_VERSION_RATING_ALOGRITHM_MAP[
                                 version
                             ] || this.DEFAULT_RATING_ALOGRITHM;
+
+                const theme =
+                    interaction.options.getString("theme", false) ||
+                    (themeVersion &&
+                    this.AVAILABLE_VERSION_THEME.includes(themeVersion)
+                        ? `${themeVersion}-landscape`
+                        : this.DEFAULT_THEME) +
+                        "-" +
+                        type;
                 const pfpOption = interaction.options.getBoolean(
                     "use_profile_picture",
                     false
@@ -78,6 +84,7 @@ export class Best50ChartCommand {
                         ? this.DEFAULT_USE_TRACKER_PROFILE_PICTURE
                         : pfpOption;
                 const tracker = interaction.options.getSubcommand();
+
                 if (
                     !(
                         tracker == "kamai" ||
@@ -105,32 +112,32 @@ export class Best50ChartCommand {
                         break;
                     }
                 }
-            const mention = interaction.options.getUser("dox");
+                const mention = interaction.options.getUser("dox");
                 if (username == null) {
-                if (mention) {
-                    const dbUsername = await kasumi.config.getOne(
-                        `salt::connection.discord.${tracker}.${mention.id}`
-                    );
-                    if (!dbUsername) {
-                        await interaction.reply({
-                            content: `This user has not connected their ${tracker} ${tracker == "lxns" ? "friend code" : "username"} to their Discord account.`,
-                            ephemeral: true,
-                        });
-                        return EResultTypes.INVALID_USERNAME;
-                    } else username = dbUsername;
-                } else {
-                    const dbUsername = await kasumi.config.getOne(
-                        `salt::connection.discord.${tracker}.${interaction.user.id}`
-                    );
-                    if (!dbUsername) {
-                        await interaction.reply({
-                            content: `Please provide your ${tracker == "lxns" ? "friend code" : "username"}. To use without a ${tracker == "lxns" ? "friend code" : "username"}, you need to select "remember my username" after generating a chart or use \`/mai link\` to link your account.`,
-                            ephemeral: true,
-                        });
-                        return EResultTypes.INVALID_USERNAME;
-                    } else username = dbUsername;
+                    if (mention) {
+                        const dbUsername = await kasumi.config.getOne(
+                            `salt::connection.discord.${tracker}.${mention.id}`
+                        );
+                        if (!dbUsername) {
+                            await interaction.reply({
+                                content: `This user has not connected their ${tracker} ${tracker == "lxns" ? "friend code" : "username"} to their Discord account.`,
+                                ephemeral: true,
+                            });
+                            return EResultTypes.INVALID_USERNAME;
+                        } else username = dbUsername;
+                    } else {
+                        const dbUsername = await kasumi.config.getOne(
+                            `salt::connection.discord.${tracker}.${interaction.user.id}`
+                        );
+                        if (!dbUsername) {
+                            await interaction.reply({
+                                content: `Please provide your ${tracker == "lxns" ? "friend code" : "username"}. To use without a ${tracker == "lxns" ? "friend code" : "username"}, you need to select "remember my username" after generating a chart or use \`/mai link\` to link your account.`,
+                                ephemeral: true,
+                            });
+                            return EResultTypes.INVALID_USERNAME;
+                        } else username = dbUsername;
+                    }
                 }
-            }
                 await interaction.deferReply();
                 switch (tracker) {
                     case "kamai": {
@@ -173,9 +180,9 @@ export class Best50ChartCommand {
                                 kamaiInstance = kamai;
                                 break;
                         }
-                        result = await MaiDraw.Geki.Best50.drawWithScoreSource(
+                        result = await painter.drawWithScoreSource(
                             kamaiInstance,
-                            username,
+                            { username },
                             {
                                 theme,
                                 profilePicture: useProfilePicture

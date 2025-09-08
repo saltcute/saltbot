@@ -13,14 +13,16 @@ import { Telemetry } from "@/util/telemetry";
 import { EResultTypes } from "@/util/telemetry/type";
 import { Util } from "@/util";
 
-const lxns = new MaiDraw.Maimai.Best50.LXNS({
+const lxns = new MaiDraw.Maimai.Adapters.LXNS({
     auth: kasumi.config.getSync("maimai::lxns.token"),
 });
-const kamai = new MaiDraw.Maimai.Best50.KamaiTachi();
-const maishift = new MaiDraw.Maimai.Best50.Maishift();
-const divingfish = new MaiDraw.Maimai.Best50.DivingFish({
+const kamai = new MaiDraw.Maimai.Adapters.KamaiTachi();
+const maishift = new MaiDraw.Maimai.Adapters.Maishift();
+const divingfish = new MaiDraw.Maimai.Adapters.DivingFish({
     auth: kasumi.config.getSync("maimai::divingFish.token"),
 });
+
+const painter = new MaiDraw.Maimai.Painters.Level50();
 
 export class Level50ChartCommand {
     private static readonly AVAILABLE_VERSION_THEME = [
@@ -44,7 +46,8 @@ export class Level50ChartCommand {
             let result: Buffer | null = null,
                 useBrainrot = false;
             const theme =
-                interaction.options.getString("theme", false) || this.DEFAULT_THEME;
+                interaction.options.getString("theme", false) ||
+                this.DEFAULT_THEME;
             const level = interaction.options.getNumber("level", true);
             if (level < 1 || level > 15) {
                 await interaction.reply({
@@ -123,31 +126,25 @@ export class Level50ChartCommand {
                     ) {
                         useBrainrot = true;
                     }
-                    result = await MaiDraw.Maimai.Level50.drawWithScoreSource(
+                    result = await painter.drawWithScoreSource(
                         kamai,
-                        username,
-                        level,
-                        page,
+                        { username, level, page },
                         { theme }
                     );
                     break;
                 }
                 case "divingfish": {
-                    result = await MaiDraw.Maimai.Level50.drawWithScoreSource(
+                    result = await painter.drawWithScoreSource(
                         divingfish,
-                        username,
-                        level,
-                        page,
+                        { username, level, page },
                         { theme }
                     );
                     break;
                 }
                 case "lxns": {
-                    result = await MaiDraw.Maimai.Level50.drawWithScoreSource(
+                    result = await painter.drawWithScoreSource(
                         lxns,
-                        username,
-                        level,
-                        page,
+                        { username, level, page },
                         {
                             theme,
                             profilePicture: useProfilePicture
@@ -158,11 +155,9 @@ export class Level50ChartCommand {
                     break;
                 }
                 case "maishift": {
-                    result = await MaiDraw.Maimai.Level50.drawWithScoreSource(
+                    result = await painter.drawWithScoreSource(
                         maishift,
-                        username,
-                        level,
-                        page,
+                        { username, level, page },
                         {
                             theme,
                             profilePicture: useProfilePicture
@@ -289,14 +284,11 @@ export class Level50ChartCommand {
                     let result;
                     switch (tracker) {
                         case "kamai":
-                            result =
-                                await MaiDraw.Maimai.Level50.drawWithScoreSource(
-                                    kamai,
-                                    username,
-                                    level,
-                                    page,
-                                    { theme }
-                                );
+                            result = await painter.drawWithScoreSource(
+                                kamai,
+                                { username, level, page },
+                                { theme }
+                            );
                             break;
                     }
                     if (result) {
@@ -644,7 +636,7 @@ export class Level50ChartCommand {
                                     "zh-CN": "使用你在 Kamaitachi 上的头像。",
                                     "zh-TW":
                                         "使用您在 Kamaitachi 上的個人資料圖像。",
-                                }
+                                },
                             },
                         ],
                     },

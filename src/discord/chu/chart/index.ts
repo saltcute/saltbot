@@ -8,7 +8,6 @@ import {
     Interaction,
 } from "discord.js";
 import { client as kasumi } from "@/kook/init/client";
-import { client } from "@/discord/client";
 import { EResultTypes } from "@/util/telemetry/type";
 import { Telemetry } from "@/util/telemetry";
 import { Chunithm } from "./type";
@@ -21,6 +20,8 @@ import Fuse from "fuse.js";
 
 import { Cache } from "@/util/cache";
 import TSV from "tsv";
+
+const painter = new MaiDraw.Chuni.Painters.Chart();
 
 export class ChartQueryCommand {
     static readonly DATABASE_PATH = kasumi.config.getSync(
@@ -78,10 +79,10 @@ export class ChartQueryCommand {
             let source;
             switch (tracker) {
                 case "kamai":
-                    source = new MaiDraw.Chuni.Best50.KamaiTachi();
+                    source = new MaiDraw.Chuni.Adapters.KamaiTachi();
                     break;
                 case "lxns-chuni":
-                    source = new MaiDraw.Chuni.Best50.LXNS({
+                    source = new MaiDraw.Chuni.Adapters.LXNS({
                         auth: kasumi.config.getSync("maimai::lxns.token"),
                     });
                     break;
@@ -104,20 +105,19 @@ export class ChartQueryCommand {
             }
             let result;
             if (source && username) {
-                result = await MaiDraw.Chuni.Chart.drawWithScoreSource(
-                    source,
+                result = await painter.drawWithScoreSource(source, {
                     username,
-                    song,
-                    type
-                );
+                    chartId: song,
+                    type,
+                });
             } else {
-                result = await MaiDraw.Chuni.Chart.draw(
-                    "CHUNITHM",
-                    0,
-                    song,
-                    [],
-                    type
-                );
+                result = await painter.draw({
+                    username: "CHUNITHM",
+                    rating: 0,
+                    chartId: song,
+                    scores: [],
+                    type,
+                });
             }
             if (result instanceof Buffer) {
                 await interaction.editReply({

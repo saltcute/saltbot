@@ -6,17 +6,17 @@ import { Chuni } from "./chu";
 
 export const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 
-MaiDraw.Maimai.Chart.Database.setLocalDatabasePath(
+MaiDraw.Maimai.Database.setLocalDatabasePath(
     kasumi.config.getSync("maimai::config.useLocalDatabase")
         ? kasumi.config.getSync("maimai::config.localDatabasePath")
         : ""
 );
-MaiDraw.Chuni.Chart.Database.setLocalDatabasePath(
+MaiDraw.Chuni.Database.setLocalDatabasePath(
     kasumi.config.getSync("maimai::config.useLocalDatabase")
         ? kasumi.config.getSync("maimai::config.localDatabasePath")
         : ""
 );
-MaiDraw.Geki.Chart.Database.setLocalDatabasePath(
+MaiDraw.Geki.Database.setLocalDatabasePath(
     kasumi.config.getSync("maimai::config.useLocalDatabase")
         ? kasumi.config.getSync("maimai::config.localDatabasePath")
         : ""
