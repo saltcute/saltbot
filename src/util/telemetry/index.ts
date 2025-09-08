@@ -83,10 +83,31 @@ export class Telemetry {
                                 return commands;
                             })(),
                             args: interaction.isChatInputCommand()
-                                ? interaction.options.data.map((v) => ({
-                                      name: v.name,
-                                      value: v.value?.toString() || "",
-                                  }))
+                                ? interaction.options.data.map((option) => {
+                                      const mapOption = (
+                                          opt: typeof option
+                                      ): any => {
+                                          const { name, value, options } =
+                                              opt as any;
+                                          if (
+                                              options &&
+                                              Array.isArray(options) &&
+                                              options.length > 0
+                                          ) {
+                                              return {
+                                                  name,
+                                                  options:
+                                                      options.map(mapOption),
+                                              };
+                                          } else {
+                                              return {
+                                                  name,
+                                                  value: value?.toString(),
+                                              };
+                                          }
+                                      };
+                                      return mapOption(option);
+                                  })
                                 : [],
                             result,
                         });
