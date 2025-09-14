@@ -86,12 +86,12 @@ export class Best50ChartCommand {
                       : this.DEFAULT_VERSION_RATING_ALOGRITHM_MAP[version] ||
                         this.DEFAULT_RATING_ALOGRITHM;
             const theme =
-                interaction.options.getString("theme", false) ||
-                (version && this.AVAILABLE_VERSION_THEME.includes(version)
-                    ? `${version}-landscape`
-                    : this.DEFAULT_THEME_BY_TRACKER[tracker]) +
-                    "-" +
-                    type;
+                (interaction.options.getString("theme", false) ||
+                    (version && this.AVAILABLE_VERSION_THEME.includes(version)
+                        ? `${version}-landscape`
+                        : this.DEFAULT_THEME_BY_TRACKER[tracker])) +
+                "-" +
+                type;
             const pfpOption = interaction.options.getBoolean(
                 "use_profile_picture",
                 false
