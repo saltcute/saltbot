@@ -4,16 +4,14 @@ import {
     ApplicationCommandOption,
     ApplicationCommandOptionType,
     AttachmentBuilder,
-    Events,
     Interaction,
 } from "discord.js";
 import { client as kasumi } from "@/kook/init/client";
 import { EResultTypes } from "@/util/telemetry/type";
 import { Telemetry } from "@/util/telemetry";
-import { Chunithm } from "./type";
+import { Ongeki } from "./type";
 import _ from "lodash";
 import { MaiDraw } from "maidraw";
-import axios from "axios";
 
 // @ts-ignore
 import Fuse from "fuse.js";
@@ -21,7 +19,7 @@ import Fuse from "fuse.js";
 import { Cache } from "@/util/cache";
 import TSV from "tsv";
 
-const painter = new MaiDraw.Chuni.Painters.Chart();
+const painter = new MaiDraw.Geki.Painters.Chart();
 
 export class ChartQueryCommand {
     static readonly DATABASE_PATH = kasumi.config.getSync(
@@ -30,10 +28,10 @@ export class ChartQueryCommand {
     static readonly CHART_PATH = upath.join(
         this.DATABASE_PATH,
         "assets",
-        "chunithm",
+        "ongeki",
         "charts"
     );
-    private static readonly DEFAULT_RATING_ALOGRITHM = "new";
+    private static readonly DEFAULT_RATING_ALOGRITHM = "refresh";
 
     static getChoices<T>(payload: any, choices: T[], defaults: T): T {
         if (choices.includes(payload)) return payload;
@@ -43,23 +41,21 @@ export class ChartQueryCommand {
     static readonly CHAT_COMMAND_HANDLER = Telemetry.discordMiddleware(
         async (interaction) => {
             if (!interaction.isChatInputCommand()) return EResultTypes.IGNORED;
-            if (interaction.commandName != "chu") return EResultTypes.IGNORED;
+            if (interaction.commandName != "geki") return EResultTypes.IGNORED;
             if (interaction.options.getSubcommand() != "chart")
                 return EResultTypes.IGNORED;
 
             await interaction.deferReply();
 
             const song = interaction.options.getInteger("song", true);
-            const tracker = this.getChoices<
-                "kamai" | "lxns-chuni" | "divingfish" | "none"
-            >(
+            const tracker = this.getChoices<"kamai" | "none">(
                 interaction.options.getString("source", false),
-                ["kamai", "lxns-chuni", "none"],
+                ["kamai", "none"],
                 "kamai"
             );
-            const type = this.getChoices<"new" | "recents">(
+            const type = this.getChoices<"refresh" | "classic">(
                 interaction.options.getString("type", false),
-                ["new", "recents"],
+                ["refresh", "classic"],
                 this.DEFAULT_RATING_ALOGRITHM
             );
             // const region = this.getChoices<"DX" | "EX" | "CN">(
@@ -79,12 +75,7 @@ export class ChartQueryCommand {
             let source;
             switch (tracker) {
                 case "kamai":
-                    source = new MaiDraw.Chuni.Adapters.KamaiTachi();
-                    break;
-                case "lxns-chuni":
-                    source = new MaiDraw.Chuni.Adapters.LXNS({
-                        auth: kasumi.config.getSync("maimai::lxns.token"),
-                    });
+                    source = new MaiDraw.Geki.Adapters.KamaiTachi();
                     break;
                 case "none":
                     source = null;
@@ -112,7 +103,7 @@ export class ChartQueryCommand {
                 });
             } else {
                 result = await painter.draw({
-                    username: "CHUNITHM",
+                    username: "ONGEKI",
                     rating: 0,
                     chartId: song,
                     scores: [],
@@ -141,7 +132,7 @@ export class ChartQueryCommand {
         if (!interaction.isAutocomplete()) return;
         const focusedValue = interaction.options.getFocused();
         if (
-            interaction.commandName == "chu" &&
+            interaction.commandName == "geki" &&
             interaction.options.getSubcommand() == "chart"
         ) {
             if (!this.searchDatabaseLock && focusedValue) {
@@ -182,9 +173,6 @@ export class ChartQueryCommand {
                             ...(await ChartQueryCommand.OtherSongNameAlias.getAliasBySongName(
                                 v.name
                             )),
-                            ...(await ChartQueryCommand.ChineseSongNameAlias.getAliasBySongId(
-                                v.id
-                            )),
                         ],
                         nameRomaji: Kuroshiro.Util.isJapanese(v.name)
                             ? await kuroshiro.convert(v.name, {
@@ -202,7 +190,7 @@ export class ChartQueryCommand {
                 useExtendedSearch: true,
                 ignoreFieldNorm: true,
             });
-            kasumi.logger.info(`[CHUNITHM] Fuzzy search database loading finished.`);
+            kasumi.logger.info(`[ONGEKI] Fuzzy search database loading finished.`);
             this.searchDatabaseLock = false;
         })();
     }
@@ -214,7 +202,7 @@ export class ChartQueryCommand {
         );
         if (fs.existsSync(targetPath)) {
             const chartFiles = fs.readdirSync(targetPath);
-            const charts: Chunithm.IChart[] = [];
+            const charts: Ongeki.IChart[] = [];
             for (const chart of chartFiles) {
                 try {
                     charts.push(require(upath.join(targetPath, chart)));
@@ -249,14 +237,14 @@ export class ChartQueryCommand {
 
     static readonly types = [
         {
-            name: "Best 50 (New 20 + Old 30)",
-            name_localizations: { "zh-CN": "B50（b20 + b30）" },
-            value: "new",
+            name: "Best 60 (New 10 + Old 50 + Platinum 50)",
+            name_localizations: { "zh-CN": "B50（b10 + b50 + p50）" },
+            value: "refresh",
         },
         {
-            name: "Best 40 (Recent 10 + Best 30)",
-            name_localizations: { "zh-CN": "B50（r10 + b30）" },
-            value: "recents",
+            name: "Best 55 (New 15 + Best 30 + Recent 10)",
+            name_localizations: { "zh-CN": "B55（b15 + b30 + r10）" },
+            value: "classic",
         },
     ];
     static getCommand(): ApplicationCommandOption[] {
@@ -336,12 +324,12 @@ export class ChartQueryCommand {
                                 "zh-TW": "模式",
                             },
                             description:
-                                "Choose between generating Best 40 (recents 10) or Best 50 (new 20).",
+                                "Choose between generating Best 60 (platinum 50) or Best 55 (recent 10).",
                             descriptionLocalizations: {
                                 "zh-CN":
-                                    "选择生成 b40 (r10 + b30) 或是 b50 (b20 + b30)。",
+                                    "选择生成 b60 (b10 + b50 + p50) 或是 b55 (b15 + b30 + r10)。",
                                 "zh-TW":
-                                    "選擇生成 Best 40 (recents 10) 或是 Best 50 (new 20)。",
+                                    "選擇生成 Best 60 (platinum 50) 或是 Best 55 (recent 10)。",
                             },
                             choices: this.types,
                         },
@@ -363,14 +351,6 @@ export class ChartQueryCommand {
                             choices: [
                                 { name: "Kamaitachi", value: "kamai" },
                                 {
-                                    name: "LXNS",
-                                    value: "lxns-chuni",
-                                    nameLocalizations: {
-                                        "zh-CN": "落雪查分器",
-                                        "zh-TW": "LXNS",
-                                    },
-                                },
-                                {
                                     name: "None",
                                     nameLocalizations: {
                                         "zh-CN": "无",
@@ -389,47 +369,8 @@ export class ChartQueryCommand {
 }
 export namespace ChartQueryCommand {
     export const cache = new Cache();
-    export class ChineseSongNameAlias {
-        static readonly ENDPOINT =
-            "https://maimai.lxns.net/api/v0/chunithm/alias/list";
-        private static async get(endpoint: string, data?: any, options?: any) {
-            const cached = await ChartQueryCommand.cache.get(endpoint);
-            if (cached) {
-                return cached;
-            }
-            const response = await axios
-                .get(endpoint, { ...options, data, timeout: 2000 })
-                .catch(() => null);
-            if (!response) {
-                return null;
-            }
-            await ChartQueryCommand.cache.put(
-                endpoint,
-                response.data,
-                1000 * 60 * 60
-            );
-            return response.data;
-        }
-        static async getAllAlias() {
-            const res = await this.get(this.ENDPOINT);
-            if (!res) return [];
-            const contents: {
-                song_id: number;
-                aliases: string[];
-            }[] = res.aliases;
-            return contents;
-        }
-        static async getAliasBySongId(id: number) {
-            const alias = await this.getAllAlias();
-            const song = alias.find((v) => v.song_id == id);
-            if (song) {
-                return song.aliases;
-            }
-            return [];
-        }
-    }
     export class OtherSongNameAlias {
-        private static readonly CACHE_KEY = "GCMBOT_ALIAS_CHUNI";
+        private static readonly CACHE_KEY = "GCMBOT_ALIAS_GEKI";
         static path = upath.join(
             __dirname,
             "..",
@@ -445,9 +386,11 @@ export namespace ChartQueryCommand {
             if (cached) return cached;
             const contents: { [k: string]: string[] } = {};
             for (const locale of ["en", "ko", "ja"]) {
-                if (fs.existsSync(upath.join(this.path, locale, "chuni.tsv"))) {
+                if (
+                    fs.existsSync(upath.join(this.path, locale, "ongeki.tsv"))
+                ) {
                     const tsv = fs.readFileSync(
-                        upath.join(this.path, locale, "chuni.tsv"),
+                        upath.join(this.path, locale, "ongeki.tsv"),
                         { encoding: "utf8" }
                     );
                     const records: string[][] = new TSV.Parser("\t", {

@@ -39,218 +39,211 @@ export class Best50ChartCommand {
         "jp-plus": "classic",
         "jp-ongeki": "classic",
     };
-    static {
-        client.on(
-            Events.InteractionCreate,
-            Telemetry.discordMiddleware(async (interaction) => {
-                if (!interaction.isChatInputCommand())
-                    return EResultTypes.IGNORED;
-                if (interaction.commandName != "geki")
-                    return EResultTypes.IGNORED;
-                if (interaction.options.getSubcommandGroup() != "b50")
-                    return EResultTypes.IGNORED;
+    static readonly CHAT_COMMAND_HANDLER = Telemetry.discordMiddleware(
+        async (interaction) => {
+            if (!interaction.isChatInputCommand()) return EResultTypes.IGNORED;
+            if (interaction.commandName != "geki") return EResultTypes.IGNORED;
+            if (interaction.options.getSubcommandGroup() != "b50")
+                return EResultTypes.IGNORED;
 
-                let result: Buffer | null = null;
-                const version =
-                    interaction.options.getString("version", false) ||
-                    this.DEFAULT_VERSION;
-                const themeVersion = version.includes("act")
-                    ? version.replace(/act[1-3]/, "")
-                    : version;
-                const type =
-                    interaction.options.getString("type", false) == "classic"
-                        ? "classic"
-                        : interaction.options.getString("type", false) ==
-                            "refresh"
-                          ? "refresh"
-                          : this.DEFAULT_VERSION_RATING_ALOGRITHM_MAP[
-                                version
-                            ] || this.DEFAULT_RATING_ALOGRITHM;
+            let result: Buffer | null = null;
+            const version =
+                interaction.options.getString("version", false) ||
+                this.DEFAULT_VERSION;
+            const themeVersion = version.includes("act")
+                ? version.replace(/act[1-3]/, "")
+                : version;
+            const type =
+                interaction.options.getString("type", false) == "classic"
+                    ? "classic"
+                    : interaction.options.getString("type", false) == "refresh"
+                      ? "refresh"
+                      : this.DEFAULT_VERSION_RATING_ALOGRITHM_MAP[version] ||
+                        this.DEFAULT_RATING_ALOGRITHM;
 
-                const theme =
-                    interaction.options.getString("theme", false) ||
-                    (themeVersion &&
-                    this.AVAILABLE_VERSION_THEME.includes(themeVersion)
-                        ? `${themeVersion}-landscape`
-                        : this.DEFAULT_THEME) +
-                        "-" +
-                        type;
-                const pfpOption = interaction.options.getBoolean(
-                    "use_profile_picture",
-                    false
-                );
-                const useProfilePicture =
-                    pfpOption == null
-                        ? this.DEFAULT_USE_TRACKER_PROFILE_PICTURE
-                        : pfpOption;
-                const tracker = interaction.options.getSubcommand();
+            const theme =
+                interaction.options.getString("theme", false) ||
+                (themeVersion &&
+                this.AVAILABLE_VERSION_THEME.includes(themeVersion)
+                    ? `${themeVersion}-landscape`
+                    : this.DEFAULT_THEME) +
+                    "-" +
+                    type;
+            const pfpOption = interaction.options.getBoolean(
+                "use_profile_picture",
+                false
+            );
+            const useProfilePicture =
+                pfpOption == null
+                    ? this.DEFAULT_USE_TRACKER_PROFILE_PICTURE
+                    : pfpOption;
+            const tracker = interaction.options.getSubcommand();
 
-                if (
-                    !(
-                        tracker == "kamai" ||
-                        tracker == "divingfish" ||
-                        tracker == "lxns"
-                    )
-                ) {
-                    await interaction.editReply({
-                        content: "Invalid tracker. Please try again.",
-                    });
-                    return EResultTypes.INVALID_TRACKER;
+            if (
+                !(
+                    tracker == "kamai" ||
+                    tracker == "divingfish" ||
+                    tracker == "lxns"
+                )
+            ) {
+                await interaction.editReply({
+                    content: "Invalid tracker. Please try again.",
+                });
+                return EResultTypes.INVALID_TRACKER;
+            }
+            let username: string | null = null;
+            switch (tracker) {
+                case "kamai": {
+                    username = interaction.options.getString("user");
+                    break;
                 }
-                let username: string | null = null;
-                switch (tracker) {
-                    case "kamai": {
-                        username = interaction.options.getString("user");
-                        break;
-                    }
-                    case "divingfish": {
-                        // username = interaction.options.getString("username");
-                        break;
-                    }
-                    case "lxns": {
-                        // username = interaction.options.getString("friendcode");
-                        break;
-                    }
+                case "divingfish": {
+                    // username = interaction.options.getString("username");
+                    break;
                 }
-                const mention = interaction.options.getUser("dox");
-                if (username == null) {
-                    if (mention) {
-                        const dbUsername = await kasumi.config.getOne(
-                            `salt::connection.discord.${tracker}.${mention.id}`
-                        );
-                        if (!dbUsername) {
-                            await interaction.reply({
-                                content: `This user has not connected their ${tracker} ${tracker == "lxns" ? "friend code" : "username"} to their Discord account.`,
-                                ephemeral: true,
-                            });
-                            return EResultTypes.INVALID_USERNAME;
-                        } else username = dbUsername;
-                    } else {
-                        const dbUsername = await kasumi.config.getOne(
-                            `salt::connection.discord.${tracker}.${interaction.user.id}`
-                        );
-                        if (!dbUsername) {
-                            await interaction.reply({
-                                content: `Please provide your ${tracker == "lxns" ? "friend code" : "username"}. To use without a ${tracker == "lxns" ? "friend code" : "username"}, you need to select "remember my username" after generating a chart or use \`/mai link\` to link your account.`,
-                                ephemeral: true,
-                            });
-                            return EResultTypes.INVALID_USERNAME;
-                        } else username = dbUsername;
-                    }
+                case "lxns": {
+                    // username = interaction.options.getString("friendcode");
+                    break;
                 }
-                await interaction.deferReply();
-                switch (tracker) {
-                    case "kamai": {
-                        let kamaiInstance;
-                        switch (version) {
-                            case "jp-refresh":
-                                kamaiInstance = kamai.refresh();
-                                break;
-                            case "jp-brightmemoryact3":
-                                kamaiInstance = kamai.brightMemoryAct3();
-                                break;
-                            case "jp-brightmemoryact2":
-                                kamaiInstance = kamai.brightMemoryAct2();
-                                break;
-                            case "jp-brightmemoryact1":
-                                kamaiInstance = kamai.brightMemoryAct1();
-                                break;
-                            case "jp-bright":
-                                kamaiInstance = kamai.bright();
-                                break;
-                            case "jp-redplus":
-                                kamaiInstance = kamai.redPlus();
-                                break;
-                            case "jp-red":
-                                kamaiInstance = kamai.red();
-                                break;
-                            case "jp-summerplus":
-                                kamaiInstance = kamai.summerPlus();
-                                break;
-                            case "jp-summer":
-                                kamaiInstance = kamai.summer();
-                                break;
-                            case "jp-plus":
-                                kamaiInstance = kamai.plus();
-                                break;
-                            case "jp-ongeki":
-                                kamaiInstance = kamai.ongeki();
-                                break;
-                            default:
-                                kamaiInstance = kamai;
-                                break;
-                        }
-                        result = await painter.drawWithScoreSource(
-                            kamaiInstance,
-                            { username },
-                            {
-                                theme,
-                                profilePicture: useProfilePicture
-                                    ? undefined
-                                    : null,
-                                type,
-                            }
-                        );
-                        break;
-                    }
-                }
-                if (!result) {
-                    await interaction.editReply({
-                        content:
-                            "Failed to generate a chart. Please check your input.",
-                    });
-                    return EResultTypes.TRACKER_BAD_RESPONSE;
+            }
+            const mention = interaction.options.getUser("dox");
+            if (username == null) {
+                if (mention) {
+                    const dbUsername = await kasumi.config.getOne(
+                        `salt::connection.discord.${tracker}.${mention.id}`
+                    );
+                    if (!dbUsername) {
+                        await interaction.reply({
+                            content: `This user has not connected their ${tracker} ${tracker == "lxns" ? "friend code" : "username"} to their Discord account.`,
+                            ephemeral: true,
+                        });
+                        return EResultTypes.INVALID_USERNAME;
+                    } else username = dbUsername;
                 } else {
-                    await interaction.editReply({
-                        content: "",
-                        files: [
-                            new AttachmentBuilder(result, {
-                                name: "result.png",
-                            }),
-                        ],
-                    });
-                    const link = await kasumi.config.getOne(
+                    const dbUsername = await kasumi.config.getOne(
                         `salt::connection.discord.${tracker}.${interaction.user.id}`
                     );
-                    const ignore = await kasumi.config.getOne(
-                        `salt::connection.discord.ignore.${tracker}.${interaction.user.id}`
-                    );
-                    if (!link && !ignore && !mention) {
-                        await interaction.followUp({
-                            content: `Do you want to link this user on \`${tracker}\` to your discord account?`,
+                    if (!dbUsername) {
+                        await interaction.reply({
+                            content: `Please provide your ${tracker == "lxns" ? "friend code" : "username"}. To use without a ${tracker == "lxns" ? "friend code" : "username"}, you need to select "remember my username" after generating a chart or use \`/mai link\` to link your account.`,
                             ephemeral: true,
-                            components: [
-                                {
-                                    type: 1,
-                                    components: [
-                                        {
-                                            type: 2,
-                                            label: "Onegai shimasu",
-                                            style: 1,
-                                            custom_id: `maimai::tracker.link.${tracker}.${interaction.user.id}.${username}`,
-                                        },
-                                        {
-                                            type: 2,
-                                            label: "Later",
-                                            style: 3,
-                                            custom_id: `maimai::tracker.link.nocomment`,
-                                        },
-                                        {
-                                            type: 2,
-                                            label: "GO MIND YOUR OWN BUSINESS",
-                                            style: 4,
-                                            custom_id: `maimai::tracker.link.ignore.${tracker}.${interaction.user.id}`,
-                                        },
-                                    ],
-                                },
-                            ],
                         });
-                    }
-                    return EResultTypes.GENERATE_SUCCESS;
+                        return EResultTypes.INVALID_USERNAME;
+                    } else username = dbUsername;
                 }
-            })
-        );
-    }
+            }
+            await interaction.deferReply();
+            switch (tracker) {
+                case "kamai": {
+                    let kamaiInstance;
+                    switch (version) {
+                        case "jp-refresh":
+                            kamaiInstance = kamai.refresh();
+                            break;
+                        case "jp-brightmemoryact3":
+                            kamaiInstance = kamai.brightMemoryAct3();
+                            break;
+                        case "jp-brightmemoryact2":
+                            kamaiInstance = kamai.brightMemoryAct2();
+                            break;
+                        case "jp-brightmemoryact1":
+                            kamaiInstance = kamai.brightMemoryAct1();
+                            break;
+                        case "jp-bright":
+                            kamaiInstance = kamai.bright();
+                            break;
+                        case "jp-redplus":
+                            kamaiInstance = kamai.redPlus();
+                            break;
+                        case "jp-red":
+                            kamaiInstance = kamai.red();
+                            break;
+                        case "jp-summerplus":
+                            kamaiInstance = kamai.summerPlus();
+                            break;
+                        case "jp-summer":
+                            kamaiInstance = kamai.summer();
+                            break;
+                        case "jp-plus":
+                            kamaiInstance = kamai.plus();
+                            break;
+                        case "jp-ongeki":
+                            kamaiInstance = kamai.ongeki();
+                            break;
+                        default:
+                            kamaiInstance = kamai;
+                            break;
+                    }
+                    result = await painter.drawWithScoreSource(
+                        kamaiInstance,
+                        { username },
+                        {
+                            theme,
+                            profilePicture: useProfilePicture
+                                ? undefined
+                                : null,
+                            type,
+                        }
+                    );
+                    break;
+                }
+            }
+            if (!result) {
+                await interaction.editReply({
+                    content:
+                        "Failed to generate a chart. Please check your input.",
+                });
+                return EResultTypes.TRACKER_BAD_RESPONSE;
+            } else {
+                await interaction.editReply({
+                    content: "",
+                    files: [
+                        new AttachmentBuilder(result, {
+                            name: "result.png",
+                        }),
+                    ],
+                });
+                const link = await kasumi.config.getOne(
+                    `salt::connection.discord.${tracker}.${interaction.user.id}`
+                );
+                const ignore = await kasumi.config.getOne(
+                    `salt::connection.discord.ignore.${tracker}.${interaction.user.id}`
+                );
+                if (!link && !ignore && !mention) {
+                    await interaction.followUp({
+                        content: `Do you want to link this user on \`${tracker}\` to your discord account?`,
+                        ephemeral: true,
+                        components: [
+                            {
+                                type: 1,
+                                components: [
+                                    {
+                                        type: 2,
+                                        label: "Onegai shimasu",
+                                        style: 1,
+                                        custom_id: `maimai::tracker.link.${tracker}.${interaction.user.id}.${username}`,
+                                    },
+                                    {
+                                        type: 2,
+                                        label: "Later",
+                                        style: 3,
+                                        custom_id: `maimai::tracker.link.nocomment`,
+                                    },
+                                    {
+                                        type: 2,
+                                        label: "GO MIND YOUR OWN BUSINESS",
+                                        style: 4,
+                                        custom_id: `maimai::tracker.link.ignore.${tracker}.${interaction.user.id}`,
+                                    },
+                                ],
+                            },
+                        ],
+                    });
+                }
+                return EResultTypes.GENERATE_SUCCESS;
+            }
+        }
+    );
     static readonly types = [
         {
             name: "Best 60 (New 10 + Old 50 + Platinum 50)",

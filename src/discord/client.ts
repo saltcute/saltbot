@@ -3,6 +3,7 @@ import { client as kasumi } from "@/kook/init/client";
 import { MaiDraw } from "maidraw";
 import { Maimai } from "./mai";
 import { Chuni } from "./chu";
+import { Ongeki } from "./geki";
 
 export const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 
@@ -36,4 +37,5 @@ client.on(Events.InteractionCreate, async (interaction) => {
         return;
     Maimai.INTERACTION_HANDLER(interaction);
     Chuni.INTERACTION_HANDLER(interaction);
+    Ongeki.INTERACTION_HANDLER(interaction);
 });

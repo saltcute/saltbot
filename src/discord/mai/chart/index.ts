@@ -204,7 +204,7 @@ export class ChartQueryCommand {
                 useExtendedSearch: true,
                 ignoreFieldNorm: true,
             });
-            kasumi.logger.info(`Fuzzy search database loading finished.`);
+            kasumi.logger.info(`[maimai] Fuzzy search database loading finished.`);
             this.searchDatabaseLock = false;
         })();
     }
