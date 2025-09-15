@@ -23,7 +23,7 @@ export class Best50ChartCommand {
     };
     private static readonly DEFAULT_THEME_BY_TRACKER = {
         kamai: "jp-luminous-landscape",
-        "lxns-chuni": "jp-luminous-landscape",
+        "lxns-chuni": "jp-verse-landscape",
     };
     private static readonly DEFAULT_USE_TRACKER_PROFILE_PICTURE = true;
     private static readonly DEFAULT_RATING_ALOGRITHM = "new";
@@ -238,7 +238,7 @@ export class Best50ChartCommand {
                             profilePicture: useProfilePicture
                                 ? undefined
                                 : null,
-                            type: "recents",
+                            type: "new",
                         }
                     );
                     break;
