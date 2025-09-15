@@ -62,13 +62,14 @@ export class Best50ChartCommand {
                         this.DEFAULT_RATING_ALOGRITHM;
 
             const theme =
-                interaction.options.getString("theme", false) ||
-                (themeVersion &&
-                this.AVAILABLE_VERSION_THEME.includes(themeVersion)
-                    ? `${themeVersion}-landscape`
-                    : this.DEFAULT_THEME) +
-                    "-" +
-                    type;
+                (interaction.options.getString("theme", false) ||
+                    (themeVersion &&
+                    this.AVAILABLE_VERSION_THEME.includes(themeVersion)
+                        ? `${themeVersion}-landscape`
+                        : this.DEFAULT_THEME)) +
+                "-" +
+                type;
+
             const pfpOption = interaction.options.getBoolean(
                 "use_profile_picture",
                 false
