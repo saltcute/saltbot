@@ -462,10 +462,26 @@ export class Best50ChartCommand {
 
     static readonly themes = [
         {
+            name: "maimai でらっくす CiRCLE (Japan), landscape",
+            name_localizations: {
+                "zh-CN": "maimai でらっくす CiRCLE（日服），横向",
+                "zh-TW": "maimai でらっくす CiRCLE（日本），橫向",
+            },
+            value: "jp-circle-landscape",
+        },
+        {
+            name: "maimai でらっくす CiRCLE (Japan), portrait",
+            name_localizations: {
+                "zh-CN": "maimai でらっくす CiRCLE（日服），纵向",
+                "zh-TW": "maimai でらっくす CiRCLE（日本），縱向",
+            },
+            value: "jp-circle-portrait",
+        },
+        {
             name: "maimai でらっくす PRiSM PLUS (Japan), landscape",
             name_localizations: {
                 "zh-CN": "maimai でらっくす PRiSM PLUS（日服），横向",
-                "zh-TW": "maimai でらっくす PRiSM（日本），橫向",
+                "zh-TW": "maimai でらっくす PRiSM PLUS（日本），橫向",
             },
             value: "jp-prismplus-landscape",
         },

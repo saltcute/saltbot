@@ -13,6 +13,7 @@ const painter = new MaiDraw.Chuni.Painters.Best50();
 
 export class Best50ChartCommand {
     private static readonly AVAILABLE_VERSION_THEME = [
+        "jp-xverse",
         "jp-verse",
         "jp-luminousplus",
         "jp-luminous",
@@ -32,6 +33,7 @@ export class Best50ChartCommand {
         string,
         "new" | "recents"
     > = {
+        "jp-xverse": "new",
         "jp-verse": "new",
         "jp-luminousplus": "recents",
         "jp-luminous": "recents",
@@ -315,6 +317,14 @@ export class Best50ChartCommand {
 
     static readonly themes = [
         {
+            name: "CHUNITHM X-VERSE (Japan), landscape",
+            name_localizations: {
+                "zh-CN": "CHUNITHM X-VERSE（日服），横向",
+                "zh-TW": "CHUNITHM X-VERSE（日本），橫向",
+            },
+            value: "jp-xverse-landscape",
+        },
+        {
             name: "CHUNITHM VERSE (Japan), landscape",
             name_localizations: {
                 "zh-CN": "CHUNITHM VERSE（日服），横向",
@@ -341,6 +351,15 @@ export class Best50ChartCommand {
     ];
 
     static readonly versions = [
+        // TODO: support at maidraw
+        // {
+        //     name: "CHUNITHM X-VERSE (Japan)",
+        //     name_localizations: {
+        //         "zh-CN": "CHUNITHM X-VERSE（日服）",
+        //         "zh-TW": "CHUNITHM X-VERSE（日本）",
+        //     },
+        //     value: "jp-xverse",
+        // },
         {
             name: "CHUNITHM VERSE (Japan)",
             name_localizations: {
