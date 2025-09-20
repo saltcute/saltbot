@@ -38,6 +38,7 @@ export class ChartQueryCommand {
         else return defaults;
     }
 
+    static readonly DEFAULT_THEME = "jp-refresh";
     static readonly CHAT_COMMAND_HANDLER = Telemetry.discordMiddleware(
         async (interaction) => {
             if (!interaction.isChatInputCommand()) return EResultTypes.IGNORED;
@@ -58,6 +59,9 @@ export class ChartQueryCommand {
                 ["refresh", "classic"],
                 this.DEFAULT_RATING_ALOGRITHM
             );
+            const theme =
+                interaction.options.getString("theme", false) ||
+                this.DEFAULT_THEME;
             // const region = this.getChoices<"DX" | "EX" | "CN">(
             //     interaction.options.getString("region", false),
             //     ["DX", "EX", "CN"],
@@ -96,19 +100,26 @@ export class ChartQueryCommand {
             }
             let result;
             if (source && username) {
-                result = await painter.drawWithScoreSource(source, {
-                    username,
-                    chartId: song,
-                    type,
-                });
+                result = await painter.drawWithScoreSource(
+                    source,
+                    {
+                        username,
+                        chartId: song,
+                        type,
+                    },
+                    { theme }
+                );
             } else {
-                result = await painter.draw({
-                    username: "ONGEKI",
-                    rating: 0,
-                    chartId: song,
-                    scores: [],
-                    type,
-                });
+                result = await painter.draw(
+                    {
+                        username: "ONGEKI",
+                        rating: 0,
+                        chartId: song,
+                        scores: [],
+                        type,
+                    },
+                    { theme }
+                );
             }
             if (result instanceof Buffer) {
                 await interaction.editReply({
@@ -139,10 +150,19 @@ export class ChartQueryCommand {
                 const result = this.fuse
                     .search(focusedValue)
                     .filter((v) => (v.score ? v.score < 0.1 : false))
+                    .filter(
+                        (v) =>
+                            !(
+                                v.item.chart.meta.isLunatic &&
+                                v.item.chart.meta.reMaster
+                            )
+                    )
                     .map((v) => {
                         const id = parseInt(v.item.id);
                         return {
-                            name: v.item.name,
+                            name:
+                                v.item.name +
+                                (v.item.chart.meta.isLunatic ? " Lunatic" : ""),
                             value: id,
                         };
                     })
@@ -152,7 +172,14 @@ export class ChartQueryCommand {
         }
     }
 
-    static fuse: Fuse<{ id: string; name: string; nameRomaji: string }>;
+    static fuse: Fuse<{
+        id: string;
+        name: string;
+        cleanName: string;
+        alias: string[];
+        nameRomaji: string;
+        chart: Ongeki.IChart;
+    }>;
     static searchDatabaseLock = true;
     static {
         (async () => {
@@ -162,7 +189,7 @@ export class ChartQueryCommand {
 
             await kuroshiro.init(new KuromojiAnalyzer());
             const songs = await Promise.all(
-                ChartQueryCommand.getAllSongs().map(async (v) => {
+                (await ChartQueryCommand.getAllSongs()).map(async (v) => {
                     return {
                         id: v.id.toString(),
                         name: v.name,
@@ -179,6 +206,7 @@ export class ChartQueryCommand {
                                   to: "romaji",
                               })
                             : v.name,
+                        chart: v,
                     };
                 })
             );
@@ -190,7 +218,9 @@ export class ChartQueryCommand {
                 useExtendedSearch: true,
                 ignoreFieldNorm: true,
             });
-            kasumi.logger.info(`[ONGEKI] Fuzzy search database loading finished.`);
+            kasumi.logger.info(
+                `[ONGEKI] Fuzzy search database loading finished.`
+            );
             this.searchDatabaseLock = false;
         })();
     }
@@ -213,17 +243,24 @@ export class ChartQueryCommand {
         return null;
     }
 
-    static getAllSongs() {
+    static async getAllSongs(): Promise<Ongeki.IChart[]> {
+        const CACHE_KEY = "geki-chart-ongeki-all-songs";
+        const cached = await this.cache.get(CACHE_KEY);
+        if (cached) return cached;
+        const charts: Ongeki.IChart[] = [];
         const chartFolders = fs.readdirSync(this.CHART_PATH);
-        const songs: { id: number; name: string; level: number }[] = [];
         for (const folder of chartFolders) {
-            for (let i = 0; i <= 5; ++i) {
+            for (
+                let i = Ongeki.EDifficulty.BASIC;
+                i <= Ongeki.EDifficulty.LUNATIC;
+                ++i
+            ) {
                 if (
                     fs.existsSync(
                         upath.join(this.CHART_PATH, folder, `${i}.json`)
                     )
                 ) {
-                    songs.push(
+                    charts.push(
                         require(
                             upath.join(this.CHART_PATH, folder, `${i}.json`)
                         )
@@ -232,7 +269,8 @@ export class ChartQueryCommand {
                 }
             }
         }
-        return songs;
+        this.cache.put(CACHE_KEY, charts, 1000 * 60 * 60);
+        return charts;
     }
 
     static readonly types = [
@@ -247,6 +285,26 @@ export class ChartQueryCommand {
             value: "classic",
         },
     ];
+
+    static readonly themes = [
+        {
+            name: "オンゲキ Re:Fresh (Japan)",
+            name_localizations: {
+                "zh-CN": "オンゲキ Re:Fresh（日服）",
+                "zh-TW": "オンゲキ Re:Fresh（日本）",
+            },
+            value: "jp-refresh",
+        },
+        {
+            name: "オンゲキ bright MEMORY (Japan)",
+            name_localizations: {
+                "zh-CN": "オンゲキ bright MEMORY（日服）",
+                "zh-TW": "オンゲキ bright MEMORY（日本）",
+            },
+            value: "jp-brightmemory",
+        },
+    ];
+
     static getCommand(): ApplicationCommandOption[] {
         if (fs.existsSync(this.DATABASE_PATH)) {
             return [
@@ -267,9 +325,9 @@ export class ChartQueryCommand {
                                 "zh-TW": "歌曲",
                             },
                             description:
-                                "The name of the song you are looking for.",
+                                "The name of the song you are looking for. (Including English names and aliases)",
                             descriptionLocalizations: {
-                                "zh-CN": "你想要搜索的歌名。",
+                                "zh-CN": "你想要搜索的歌名。（支持中文别名）",
                                 "zh-TW": "您想要搜尋的歌名。",
                             },
                             required: true,
@@ -360,6 +418,21 @@ export class ChartQueryCommand {
                                 },
                             ],
                             required: false,
+                        },
+                        {
+                            type: ApplicationCommandOptionType.String,
+                            name: "theme",
+                            nameLocalizations: {
+                                "zh-CN": "主题",
+                                "zh-TW": "主題",
+                            },
+                            description:
+                                "Choose from a variety of themes for your Best 50 chart.",
+                            descriptionLocalizations: {
+                                "zh-CN": "选择 b50 图片的主题。",
+                                "zh-TW": "選擇 Best 50 圖像的主題。",
+                            },
+                            choices: this.themes,
                         },
                     ],
                 },

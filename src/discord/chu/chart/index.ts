@@ -40,6 +40,7 @@ export class ChartQueryCommand {
         else return defaults;
     }
 
+    static readonly DEFAULT_THEME = "jp-xverse";
     static readonly CHAT_COMMAND_HANDLER = Telemetry.discordMiddleware(
         async (interaction) => {
             if (!interaction.isChatInputCommand()) return EResultTypes.IGNORED;
@@ -62,6 +63,9 @@ export class ChartQueryCommand {
                 ["new", "recents"],
                 this.DEFAULT_RATING_ALOGRITHM
             );
+            const theme =
+                interaction.options.getString("theme", false) ||
+                this.DEFAULT_THEME;
             // const region = this.getChoices<"DX" | "EX" | "CN">(
             //     interaction.options.getString("region", false),
             //     ["DX", "EX", "CN"],
@@ -105,19 +109,26 @@ export class ChartQueryCommand {
             }
             let result;
             if (source && username) {
-                result = await painter.drawWithScoreSource(source, {
-                    username,
-                    chartId: song,
-                    type,
-                });
+                result = await painter.drawWithScoreSource(
+                    source,
+                    {
+                        username,
+                        chartId: song,
+                        type,
+                    },
+                    { theme }
+                );
             } else {
-                result = await painter.draw({
-                    username: "CHUNITHM",
-                    rating: 0,
-                    chartId: song,
-                    scores: [],
-                    type,
-                });
+                result = await painter.draw(
+                    {
+                        username: "CHUNITHM",
+                        rating: 0,
+                        chartId: song,
+                        scores: [],
+                        type,
+                    },
+                    { theme }
+                );
             }
             if (result instanceof Buffer) {
                 await interaction.editReply({
@@ -202,7 +213,9 @@ export class ChartQueryCommand {
                 useExtendedSearch: true,
                 ignoreFieldNorm: true,
             });
-            kasumi.logger.info(`[CHUNITHM] Fuzzy search database loading finished.`);
+            kasumi.logger.info(
+                `[CHUNITHM] Fuzzy search database loading finished.`
+            );
             this.searchDatabaseLock = false;
         })();
     }
@@ -259,6 +272,26 @@ export class ChartQueryCommand {
             value: "recents",
         },
     ];
+
+    static readonly themes = [
+        {
+            name: "CHUNITHM X-VERSE (Japan)",
+            name_localizations: {
+                "zh-CN": "CHUNITHM X-VERSE（日服）",
+                "zh-TW": "CHUNITHM X-VERSE（日本）",
+            },
+            value: "jp-xverse",
+        },
+        {
+            name: "CHUNITHM VERSE (Japan)",
+            name_localizations: {
+                "zh-CN": "CHUNITHM VERSE（日服）",
+                "zh-TW": "CHUNITHM VERSE（日本）",
+            },
+            value: "jp-verse",
+        },
+    ];
+
     static getCommand(): ApplicationCommandOption[] {
         if (fs.existsSync(this.DATABASE_PATH)) {
             return [
@@ -279,9 +312,9 @@ export class ChartQueryCommand {
                                 "zh-TW": "歌曲",
                             },
                             description:
-                                "The name of the song you are looking for.",
+                                "The name of the song you are looking for. (Including English names and aliases)",
                             descriptionLocalizations: {
-                                "zh-CN": "你想要搜索的歌名。",
+                                "zh-CN": "你想要搜索的歌名。（支持中文别名）",
                                 "zh-TW": "您想要搜尋的歌名。",
                             },
                             required: true,
@@ -380,6 +413,21 @@ export class ChartQueryCommand {
                                 },
                             ],
                             required: false,
+                        },
+                        {
+                            type: ApplicationCommandOptionType.String,
+                            name: "theme",
+                            nameLocalizations: {
+                                "zh-CN": "主题",
+                                "zh-TW": "主題",
+                            },
+                            description:
+                                "Choose from a variety of themes for your Best 50 chart.",
+                            descriptionLocalizations: {
+                                "zh-CN": "选择 b50 图片的主题。",
+                                "zh-TW": "選擇 Best 50 圖像的主題。",
+                            },
+                            choices: this.themes,
                         },
                     ],
                 },

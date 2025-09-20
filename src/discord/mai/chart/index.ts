@@ -2,6 +2,7 @@ import upath from "upath";
 import fs from "fs";
 import {
     ApplicationCommandOption,
+    ApplicationCommandOptionType,
     AttachmentBuilder,
     Interaction,
 } from "discord.js";
@@ -37,6 +38,7 @@ export class ChartQueryCommand {
         else return defaults;
     }
 
+    static readonly DEFAULT_THEME = "jp-prismplus";
     static readonly CHAT_COMMAND_HANDLER = Telemetry.discordMiddleware(
         async (interaction) => {
             if (!interaction.isChatInputCommand()) return EResultTypes.IGNORED;
@@ -54,6 +56,9 @@ export class ChartQueryCommand {
                 ["kamai", "lxns", "none"],
                 "kamai"
             );
+            const theme =
+                interaction.options.getString("theme", false) ||
+                this.DEFAULT_THEME;
             const region = this.getChoices<"DX" | "EX" | "CN">(
                 interaction.options.getString("region", false),
                 ["DX", "EX", "CN"],
@@ -102,6 +107,7 @@ export class ChartQueryCommand {
                     { username, chartId: song },
                     {
                         region,
+                        theme,
                     }
                 );
             } else {
@@ -114,6 +120,7 @@ export class ChartQueryCommand {
                     },
                     {
                         region,
+                        theme,
                     }
                 );
             }
@@ -204,7 +211,9 @@ export class ChartQueryCommand {
                 useExtendedSearch: true,
                 ignoreFieldNorm: true,
             });
-            kasumi.logger.info(`[maimai] Fuzzy search database loading finished.`);
+            kasumi.logger.info(
+                `[maimai] Fuzzy search database loading finished.`
+            );
             this.searchDatabaseLock = false;
         })();
     }
@@ -249,6 +258,33 @@ export class ChartQueryCommand {
         return songs;
     }
 
+    static readonly themes = [
+        {
+            name: "maimai でらっくす CiRCLE (Japan)",
+            name_localizations: {
+                "zh-CN": "maimai でらっくす CiRCLE（日服）",
+                "zh-TW": "maimai でらっくす CiRCLE（日本）",
+            },
+            value: "jp-circle",
+        },
+        {
+            name: "maimai でらっくす PRiSM PLUS (Japan)",
+            name_localizations: {
+                "zh-CN": "maimai でらっくす PRiSM PLUS（日服）",
+                "zh-TW": "maimai でらっくす PRiSM PLUS（日本）",
+            },
+            value: "jp-prismplus",
+        },
+        {
+            name: "maimai でらっくす PRiSM (Japan)",
+            name_localizations: {
+                "zh-CN": "maimai でらっくす PRiSM（日服）",
+                "zh-TW": "maimai でらっくす PRiSM（日本）",
+            },
+            value: "jp-prism",
+        },
+    ];
+
     static getCommand(): ApplicationCommandOption[] {
         if (fs.existsSync(this.DATABASE_PATH)) {
             return [
@@ -269,9 +305,9 @@ export class ChartQueryCommand {
                                 "zh-TW": "歌曲",
                             },
                             description:
-                                "The name of the song you are looking for.",
+                                "The name of the song you are looking for. (Including English names and aliases)",
                             descriptionLocalizations: {
-                                "zh-CN": "你想要搜索的歌名。",
+                                "zh-CN": "你想要搜索的歌名。（支持中文别名）",
                                 "zh-TW": "您想要搜尋的歌名。",
                             },
                             required: true,
@@ -352,6 +388,21 @@ export class ChartQueryCommand {
                                 },
                             ],
                             required: false,
+                        },
+                        {
+                            type: ApplicationCommandOptionType.String,
+                            name: "theme",
+                            nameLocalizations: {
+                                "zh-CN": "主题",
+                                "zh-TW": "主題",
+                            },
+                            description:
+                                "Choose from a variety of themes for your Best 50 chart.",
+                            descriptionLocalizations: {
+                                "zh-CN": "选择 b50 图片的主题。",
+                                "zh-TW": "選擇 Best 50 圖像的主題。",
+                            },
+                            choices: this.themes,
                         },
                     ],
                 },

@@ -56,6 +56,11 @@ export namespace Ongeki {
                 };
                 level: number;
             };
+            isLunatic: boolean;
+            reMaster?: {
+                standard: number;
+                real: number;
+            };
         };
         /**
          * Events that happened to the chart in versions.
