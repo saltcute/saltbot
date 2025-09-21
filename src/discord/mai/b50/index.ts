@@ -27,18 +27,19 @@ export class Best50ChartCommand {
         "jp-buddiesplus",
         "jp-prism",
         "jp-prismplus",
+        "jp-circle",
     ];
     private static readonly DEFAULT_VERSION_BY_TRACKER = {
         kamai: "jp-prism",
         lxns: "cn-2025",
         divingfish: "cn-2025",
-        maishift: "jp-prism",
+        maishift: "jp-prismplus",
     };
     private static readonly DEFAULT_THEME_BY_TRACKER = {
         kamai: "jp-prism-landscape",
         lxns: "cn-2025-landscape",
         divingfish: "cn-2025-landscape",
-        maishift: "jp-prism-landscape",
+        maishift: "jp-prismplus-landscape",
     };
     private static readonly DEFAULT_USE_TRACKER_PROFILE_PICTURE = true;
 
@@ -139,9 +140,6 @@ export class Best50ChartCommand {
                     let kamaiInstance;
                     switch (version) {
                         case "jp-maimai":
-                            kamaiInstance = kamai.versions().maimai();
-                            break;
-                        case "ex-maimai":
                             kamaiInstance = kamai.versions().maimai();
                             break;
                         case "jp-maimaiplus":
@@ -269,6 +267,12 @@ export class Best50ChartCommand {
                             break;
                         case "ex-prismplus":
                             kamaiInstance = kamai.versions().prismPlus("EX");
+                            break;
+                        case "jp-circle":
+                            kamaiInstance = kamai.versions().circle();
+                            break;
+                        case "ex-circle":
+                            kamaiInstance = kamai.versions().circle("EX");
                             break;
                         default:
                             kamaiInstance = kamai;
@@ -592,6 +596,14 @@ export class Best50ChartCommand {
     ];
 
     static readonly versions = [
+        {
+            name: "maimai でらっくす CiRCLE (Japan)",
+            name_localizations: {
+                "zh-CN": "maimai でらっくす CiRCLE（日服）",
+                "zh-TW": "maimai でらっくす CiRCLE（日本）",
+            },
+            value: "jp-circle",
+        },
         {
             name: "maimai でらっくす PRiSM PLUS (Japan)",
             name_localizations: {
