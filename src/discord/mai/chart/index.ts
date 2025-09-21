@@ -38,7 +38,7 @@ export class ChartQueryCommand {
         else return defaults;
     }
 
-    static readonly DEFAULT_THEME = "jp-prismplus";
+    static readonly DEFAULT_THEME = "jp-circle";
     static readonly CHAT_COMMAND_HANDLER = Telemetry.discordMiddleware(
         async (interaction) => {
             if (!interaction.isChatInputCommand()) return EResultTypes.IGNORED;
