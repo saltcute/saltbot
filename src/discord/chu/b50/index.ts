@@ -351,36 +351,44 @@ export class Best50ChartCommand {
 
     static readonly themes = [
         {
-            name: "CHUNITHM X-VERSE (Japan), landscape",
+            name: "CHUNITHM X-VERSE (Japan)",
             name_localizations: {
-                "zh-CN": "CHUNITHM X-VERSE（日服），横向",
-                "zh-TW": "CHUNITHM X-VERSE（日本），橫向",
+                "zh-CN": "CHUNITHM X-VERSE（日服）",
+                "zh-TW": "CHUNITHM X-VERSE（日本）",
             },
             value: "jp-xverse-landscape",
         },
         {
-            name: "CHUNITHM VERSE (Japan), landscape",
+            name: "CHUNITHM VERSE (Japan)",
             name_localizations: {
-                "zh-CN": "CHUNITHM VERSE（日服），横向",
-                "zh-TW": "CHUNITHM VERSE（日本），橫向",
+                "zh-CN": "CHUNITHM VERSE（日服）",
+                "zh-TW": "CHUNITHM VERSE（日本）",
             },
             value: "jp-verse-landscape",
         },
         {
-            name: "CHUNITHM LUMINOUS PLUS (Japan), landscape",
+            name: "CHUNITHM LUMINOUS PLUS (Japan)",
             name_localizations: {
-                "zh-CN": "CHUNITHM LUMINOUS PLUS（日服），横向",
-                "zh-TW": "CHUNITHM LUMINOUS PLUS（日本），橫向",
+                "zh-CN": "CHUNITHM LUMINOUS PLUS（日服）",
+                "zh-TW": "CHUNITHM LUMINOUS PLUS（日本）",
             },
             value: "jp-luminousplus-landscape",
         },
         {
-            name: "CHUNITHM LUMINOUS (Japan), landscape",
+            name: "CHUNITHM LUMINOUS (Japan)",
             name_localizations: {
-                "zh-CN": "CHUNITHM LUMINOUS（日服），横向",
-                "zh-TW": "CHUNITHM LUMINOUS（日本），橫向",
+                "zh-CN": "CHUNITHM LUMINOUS（日服）",
+                "zh-TW": "CHUNITHM LUMINOUS（日本）",
             },
             value: "jp-luminous-landscape",
+        },
+        {
+            name: "CHUNITHM PARADISE LOST (Japan)",
+            name_localizations: {
+                "zh-CN": "CHUNITHM PARADISE LOST（日服）",
+                "zh-TW": "CHUNITHM PARADISE LOST（日本）",
+            },
+            value: "jp-paradiselost-landscape",
         },
     ];
 
