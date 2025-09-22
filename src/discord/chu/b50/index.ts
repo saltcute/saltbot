@@ -17,6 +17,7 @@ export class Best50ChartCommand {
         "jp-verse",
         "jp-luminousplus",
         "jp-luminous",
+        "jp-paradiselost",
     ];
     private static readonly DEFAULT_VERSION_BY_TRACKER = {
         kamai: "jp-luminous",
@@ -80,6 +81,35 @@ export class Best50ChartCommand {
             const version =
                 interaction.options.getString("version", false) ||
                 this.DEFAULT_VERSION_BY_TRACKER[tracker];
+            const maiDrawVersion = (() => {
+                switch (version) {
+                    case "jp-chunithm":
+                    case "jp-chunithmplus":
+                    case "jp-air":
+                    case "jp-airplus":
+                    case "jp-star":
+                    case "jp-starplus":
+                    case "jp-amazon":
+                    case "jp-amazonplus":
+                        return "chunithm";
+                    case "jp-crystal":
+                    case "jp-crystalplus":
+                    case "jp-paradise":
+                    case "jp-paradiselost":
+                        return "crystal";
+                    case "jp-new":
+                    case "jp-newplus":
+                    case "jp-sun":
+                    case "jp-sunplus":
+                    case "jp-luminous":
+                    case "jp-luminousplus":
+                        return "new";
+                    case "jp-verse":
+                    case "jp-xverse":
+                    default:
+                        return "verse";
+                }
+            })();
             const type =
                 interaction.options.getString("type", false) == "recents"
                     ? "recents"
@@ -205,6 +235,9 @@ export class Best50ChartCommand {
                         case "jp-verse":
                             kamaiInstance = kamai.verse();
                             break;
+                        case "jp-xverse":
+                            kamaiInstance = kamai.xverse();
+                            break;
                         default:
                             kamaiInstance = kamai;
                             break;
@@ -218,6 +251,7 @@ export class Best50ChartCommand {
                                 ? undefined
                                 : null,
                             type,
+                            version: maiDrawVersion,
                         }
                     );
                     break;
@@ -351,15 +385,14 @@ export class Best50ChartCommand {
     ];
 
     static readonly versions = [
-        // TODO: support at maidraw
-        // {
-        //     name: "CHUNITHM X-VERSE (Japan)",
-        //     name_localizations: {
-        //         "zh-CN": "CHUNITHM X-VERSE（日服）",
-        //         "zh-TW": "CHUNITHM X-VERSE（日本）",
-        //     },
-        //     value: "jp-xverse",
-        // },
+        {
+            name: "CHUNITHM X-VERSE (Japan)",
+            name_localizations: {
+                "zh-CN": "CHUNITHM X-VERSE（日服）",
+                "zh-TW": "CHUNITHM X-VERSE（日本）",
+            },
+            value: "jp-xverse",
+        },
         {
             name: "CHUNITHM VERSE (Japan)",
             name_localizations: {
