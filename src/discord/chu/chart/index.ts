@@ -453,7 +453,7 @@ export namespace ChartQueryCommand {
                 return cached;
             }
             const response = await axios
-                .get(endpoint, { ...options, data, timeout: 2000 })
+                .get(endpoint, { ...options, data, timeout: 5000 })
                 .catch(() => null);
             if (!response) {
                 return null;
