@@ -162,7 +162,7 @@ export class ChartQueryCommand {
                     .map((v) => {
                         const id = parseInt(v.item.id);
                         return {
-                            name: v.item.name,
+                            name: `${v.item.name}${v.matches?.[0].value && v.matches[0].key?.toLowerCase().includes("alias") ? `　|「${v.matches[0].value}」` : ""}`,
                             value: id,
                         };
                     })
@@ -172,7 +172,13 @@ export class ChartQueryCommand {
         }
     }
 
-    static fuse: Fuse<{ id: string; name: string; nameRomaji: string }>;
+    static fuse: Fuse<{
+        id: string;
+        name: string;
+        nameRomaji: string;
+        cleanName: string;
+        alias: string[];
+    }>;
     static searchDatabaseLock = true;
     static {
         (async () => {
@@ -212,6 +218,7 @@ export class ChartQueryCommand {
                 ignoreDiacritics: true,
                 useExtendedSearch: true,
                 ignoreFieldNorm: true,
+                includeMatches: true,
             });
             kasumi.logger.info(
                 `[CHUNITHM] Fuzzy search database loading finished.`

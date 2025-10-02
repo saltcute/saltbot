@@ -160,9 +160,7 @@ export class ChartQueryCommand {
                     .map((v) => {
                         const id = parseInt(v.item.id);
                         return {
-                            name:
-                                v.item.name +
-                                (v.item.chart.meta.isLunatic ? " Lunatic" : ""),
+                            name: `${v.item.name}${v.item.chart.meta.isLunatic ? " Lunatic" : ""}${v.matches?.[0].value && v.matches[0].key?.toLowerCase().includes("alias") ? `　|「${v.matches[0].value}」` : ""}`,
                             value: id,
                         };
                     })
@@ -217,6 +215,7 @@ export class ChartQueryCommand {
                 ignoreDiacritics: true,
                 useExtendedSearch: true,
                 ignoreFieldNorm: true,
+                includeMatches: true,
             });
             kasumi.logger.info(
                 `[ONGEKI] Fuzzy search database loading finished.`
