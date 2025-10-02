@@ -194,6 +194,9 @@ export class ChartQueryCommand {
                                 ...(await ChartQueryCommand.ChineseSongNameAlias.getAliasBySongId(
                                     v.id
                                 )),
+                                ...(await ChartQueryCommand.ChineseSongNameAliasLXNS.getAliasBySongId(
+                                    v.id
+                                )),
                             ],
                             nameRomaji: Kuroshiro.Util.isJapanese(v.name)
                                 ? await kuroshiro.convert(v.name, {
@@ -421,7 +424,7 @@ export namespace ChartQueryCommand {
                 return cached;
             }
             const response = await axios
-                .get(endpoint, { ...options, data, timeout: 2000 })
+                .get(endpoint, { ...options, data, timeout: 4000 })
                 .catch(() => null);
             if (!response) {
                 return null;
@@ -448,6 +451,45 @@ export namespace ChartQueryCommand {
             const song = alias.find((v) => v.SongID == id);
             if (song) {
                 return song.Alias;
+            }
+            return [];
+        }
+    }
+    export class ChineseSongNameAliasLXNS {
+        static readonly ENDPOINT =
+            "https://maimai.lxns.net/api/v0/maimai/alias/list";
+        private static async get(endpoint: string, data?: any, options?: any) {
+            const cached = await ChartQueryCommand.cache.get(endpoint);
+            if (cached) {
+                return cached;
+            }
+            const response = await axios
+                .get(endpoint, { ...options, data, timeout: 2000 })
+                .catch(() => null);
+            if (!response) {
+                return null;
+            }
+            await ChartQueryCommand.cache.put(
+                endpoint,
+                response.data,
+                1000 * 60 * 60
+            );
+            return response.data;
+        }
+        static async getAllAlias() {
+            const res = await this.get(this.ENDPOINT);
+            if (!res) return [];
+            const contents: {
+                song_id: number;
+                aliases: string[];
+            }[] = res.aliases;
+            return contents;
+        }
+        static async getAliasBySongId(id: number) {
+            const alias = await this.getAllAlias();
+            const song = alias.find((v) => v.song_id == id);
+            if (song) {
+                return song.aliases;
             }
             return [];
         }
