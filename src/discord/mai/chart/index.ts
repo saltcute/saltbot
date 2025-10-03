@@ -429,7 +429,7 @@ export namespace ChartQueryCommand {
                 return cached;
             }
             const response = await axios
-                .get(endpoint, { ...options, data, timeout: 10000 })
+                .get(endpoint, { ...options, data, timeout: 30 * 1000 })
                 .catch(() => null);
             if (!response) {
                 return null;
@@ -437,7 +437,7 @@ export namespace ChartQueryCommand {
             await ChartQueryCommand.cache.put(
                 endpoint,
                 response.data,
-                1000 * 60 * 60
+                24 * 60 * 60 * 1000
             );
             return response.data;
         }
@@ -469,7 +469,7 @@ export namespace ChartQueryCommand {
                 return cached;
             }
             const response = await axios
-                .get(endpoint, { ...options, data, timeout: 5000 })
+                .get(endpoint, { ...options, data, timeout: 30 * 1000 })
                 .catch(() => null);
             if (!response) {
                 return null;
@@ -477,7 +477,7 @@ export namespace ChartQueryCommand {
             await ChartQueryCommand.cache.put(
                 endpoint,
                 response.data,
-                1000 * 60 * 60
+                24 * 60 * 60 * 1000
             );
             return response.data;
         }
@@ -529,7 +529,7 @@ export namespace ChartQueryCommand {
             ChartQueryCommand.cache.put(
                 this.CACHE_KEY,
                 contents,
-                1000 * 60 * 60
+                24 * 60 * 60 * 1000
             );
             return contents;
         }

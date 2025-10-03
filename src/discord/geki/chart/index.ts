@@ -480,7 +480,7 @@ export namespace ChartQueryCommand {
             ChartQueryCommand.cache.put(
                 this.CACHE_KEY,
                 contents,
-                1000 * 60 * 60
+                24 * 60 * 60 * 1000
             );
             return contents;
         }
