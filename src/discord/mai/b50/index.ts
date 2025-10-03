@@ -315,7 +315,7 @@ export class Best50ChartCommand {
                                                 );
                                             if (recent) {
                                                 const FRESH_BORDER =
-                                                    5 * 24 * 60 * 60 * 1000; // 5 days
+                                                    1 * 24 * 60 * 60 * 1000; // 1 day
                                                 const DEAD_CUTOFF =
                                                     180 * 24 * 60 * 60 * 1000; // 180 days
 
@@ -331,11 +331,32 @@ export class Best50ChartCommand {
                                                 ) {
                                                     v.optionalData.scale = 1;
                                                 } else {
-                                                    v.optionalData.scale =
+                                                    const rawScale =
                                                         (timeDiff -
                                                             FRESH_BORDER) /
                                                         (DEAD_CUTOFF -
                                                             FRESH_BORDER);
+                                                    const midpointDay =
+                                                        15 *
+                                                        24 *
+                                                        60 *
+                                                        60 *
+                                                        1000; // 15 days
+                                                    const midpointScale =
+                                                        midpointDay /
+                                                        (DEAD_CUTOFF -
+                                                            FRESH_BORDER);
+                                                    v.optionalData.scale =
+                                                        rawScale < midpointScale
+                                                            ? (rawScale /
+                                                                  midpointScale) *
+                                                              0.3
+                                                            : 0.3 +
+                                                              ((rawScale -
+                                                                  midpointScale) /
+                                                                  (1 -
+                                                                      midpointScale)) *
+                                                                  0.3;
                                                 }
                                             }
                                         }
