@@ -50,10 +50,10 @@ export class ChartQueryCommand {
 
             const song = interaction.options.getInteger("song", true);
             const tracker = this.getChoices<
-                "kamai" | "lxns" | "divingfish" | "none"
+                "kamai" | "maishift" | "lxns" | "divingfish" | "none"
             >(
                 interaction.options.getString("source", false),
-                ["kamai", "lxns", "none"],
+                ["kamai", "maishift", "lxns", "none"],
                 "kamai"
             );
             const theme =
@@ -66,6 +66,8 @@ export class ChartQueryCommand {
                     switch (tracker) {
                         case "lxns":
                             return "CN";
+                        case "maishift":
+                            return "EX";
                         case "kamai":
                         case "none":
                         default:
@@ -77,6 +79,9 @@ export class ChartQueryCommand {
             switch (tracker) {
                 case "kamai":
                     source = new MaiDraw.Maimai.Adapters.KamaiTachi();
+                    break;
+                case "maishift":
+                    source = new MaiDraw.Maimai.Adapters.Maishift();
                     break;
                 case "lxns":
                     source = new MaiDraw.Maimai.Adapters.LXNS({
@@ -378,6 +383,7 @@ export class ChartQueryCommand {
                             },
                             choices: [
                                 { name: "Kamaitachi", value: "kamai" },
+                                { name: "Maishift", value: "maishift" },
                                 {
                                     name: "LXNS",
                                     value: "lxns",
