@@ -11,19 +11,19 @@
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/HexaNona/kasumi-template.git"
+        "url": "git+https://github.com/saltcute/saltbot.git"
     },
     "keywords": [
         "Kasumi",
         "kook",
         "bot"
     ],
-    "author": "HexaNona",
+    "author": "saltcute",
     "license": "MIT",
     "bugs": {
-        "url": "https://github.com/HexaNona/kasumi-template/issues"
+        "url": "https://github.com/saltcute/saltbot/issues"
     },
-    "homepage": "https://github.com/HexaNona/kasumi-template#readme",
+    "homepage": "https://github.com/saltcute/saltbot#readme",
     "dependencies": {
         "@m31coding/fuzzy-search": "^1.0.2",
         "@saltcute/kasumi-essential": "^0.1.4",
