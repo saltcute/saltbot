@@ -161,7 +161,7 @@ export class ChartQueryCommand {
                     .map((v) => {
                         const id = parseInt(v.item.id);
                         return {
-                            name: `${v.item.name}${id > 10000 && id < 100000 ? " DX" : ""}${v.matches?.[0].value && v.matches[0].key?.toLowerCase().includes("alias") ? `　|「${v.matches[0].value}」` : ""}`,
+                            name: `${v.item.name.length > 50 ? `${v.item.name.slice(0, 50)}...` : v.item.name}${id > 10000 && id < 100000 ? " DX" : ""}${v.matches?.[0].value && v.matches[0].key?.toLowerCase().includes("alias") ? `　|「${v.matches[0].value}」` : ""}`,
                             value: id,
                         };
                     })
