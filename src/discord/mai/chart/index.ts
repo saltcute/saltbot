@@ -141,7 +141,7 @@ export class ChartQueryCommand {
                 return EResultTypes.GENERATE_SUCCESS;
             } else {
                 await interaction.editReply({
-                    content: `Failed to generate a chart.`,
+                    content: `Failed to generate a chart. If there is a problem with the score source, you can try again with option "source" set to "None".`,
                 });
                 return EResultTypes.ERROR;
             }
