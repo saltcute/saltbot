@@ -20,11 +20,11 @@ export class Best50ChartCommand {
         "jp-paradiselost",
     ];
     private static readonly DEFAULT_VERSION_BY_TRACKER = {
-        kamai: "jp-luminousplus",
+        kamai: "jp-verse",
         "lxns-chuni": "cn-2025",
     };
     private static readonly DEFAULT_THEME_BY_TRACKER = {
-        kamai: "jp-luminousplus-landscape",
+        kamai: "jp-verse-landscape",
         "lxns-chuni": "jp-verse-landscape",
     };
     private static readonly DEFAULT_USE_TRACKER_PROFILE_PICTURE = true;
