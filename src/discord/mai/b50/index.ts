@@ -33,13 +33,13 @@ export class Best50ChartCommand {
         kamai: "jp-prism",
         lxns: "cn-2025",
         divingfish: "cn-2025",
-        maishift: "jp-prismplus",
+        maishift: "jp-circle",
     };
     private static readonly DEFAULT_THEME_BY_TRACKER = {
         kamai: "jp-prism-landscape",
         lxns: "cn-2025-landscape",
         divingfish: "cn-2025-landscape",
-        maishift: "jp-prismplus-landscape",
+        maishift: "jp-circle-landscape",
     };
     private static readonly DEFAULT_USE_TRACKER_PROFILE_PICTURE = true;
 
