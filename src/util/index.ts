@@ -17,4 +17,8 @@ export class Util {
         if (randomPhrase) return randomPhrase;
         else return null;
     }
+
+    static getUserAgent(): string {
+        return `saltbot/${process.env.npm_package_version} (+https://github.com/saltcute/saltbot)`;
+    }
 }
