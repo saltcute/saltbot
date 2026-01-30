@@ -24,12 +24,36 @@ export class Util {
         return `salt/${process.env.npm_package_version} (+https://maimaidx.cab/github)`;
     }
 
+    static symbolMap: Record<string, string> = {
+        "@": "\\@",
+        "<": "\\<",
+        ">": "\\>",
+        "#": "\\#",
+        "\\": "\\\\",
+        "*": "\\*",
+        _: "\\_",
+        "`": "\\`",
+        "~": "\\~",
+    };
+    static sanitizeString(string: string) {
+        return string
+            .split("")
+            .map((v) => {
+                if (Util.symbolMap[v]) {
+                    return Util.symbolMap[v];
+                } else {
+                    return v;
+                }
+            })
+            .join("");
+    }
+
     static async reportError(
         interaction: Interaction<CacheType>,
         error: MaiDraw.BaseError
     ) {
         if (!interaction.isChatInputCommand()) return;
-        const msg = `An error occurred (\`${error.type}\`) at \`${error.namespace}\`:\n\t${error.message}`;
+        const msg = `An error occurred (\`${this.sanitizeString(error.type)}\`) at \`${this.sanitizeString(error.namespace)}\`:\n\t${this.sanitizeString(error.message)}`;
         if (interaction.deferred || interaction.replied) {
             await interaction.editReply(msg);
         } else {
