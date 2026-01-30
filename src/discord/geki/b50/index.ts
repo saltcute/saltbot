@@ -8,6 +8,7 @@ import { client as kasumi } from "@/kook/init/client";
 import { client } from "@/discord/client";
 import { Telemetry } from "@/util/telemetry";
 import { EResultTypes } from "@/util/telemetry/type";
+import { Util } from "@/util";
 
 const kamai = new MaiDraw.Geki.Adapters.KamaiTachi();
 
@@ -46,7 +47,9 @@ export class Best50ChartCommand {
             if (interaction.options.getSubcommandGroup() != "b50")
                 return EResultTypes.IGNORED;
 
-            let result: Buffer | null = null;
+            let result:
+                | { data: Buffer; err?: undefined }
+                | { data?: undefined; err: MaiDraw.BaseError };
             const version =
                 interaction.options.getString("version", false) ||
                 this.DEFAULT_VERSION;
@@ -80,13 +83,7 @@ export class Best50ChartCommand {
                     : pfpOption;
             const tracker = interaction.options.getSubcommand();
 
-            if (
-                !(
-                    tracker == "kamai" ||
-                    tracker == "divingfish" ||
-                    tracker == "lxns"
-                )
-            ) {
+            if (!(tracker == "kamai")) {
                 await interaction.editReply({
                     content: "Invalid tracker. Please try again.",
                 });
@@ -98,14 +95,6 @@ export class Best50ChartCommand {
                     username = interaction.options.getString("user");
                     break;
                 }
-                case "divingfish": {
-                    // username = interaction.options.getString("username");
-                    break;
-                }
-                case "lxns": {
-                    // username = interaction.options.getString("friendcode");
-                    break;
-                }
             }
             const mention = interaction.options.getUser("dox");
             if (username == null) {
@@ -115,7 +104,7 @@ export class Best50ChartCommand {
                     );
                     if (!dbUsername) {
                         await interaction.reply({
-                            content: `This user has not connected their ${tracker} ${tracker == "lxns" ? "friend code" : "username"} to their Discord account.`,
+                            content: `This user has not connected their ${tracker} username to their Discord account.`,
                             ephemeral: true,
                         });
                         return EResultTypes.INVALID_USERNAME;
@@ -126,7 +115,7 @@ export class Best50ChartCommand {
                     );
                     if (!dbUsername) {
                         await interaction.reply({
-                            content: `Please provide your ${tracker == "lxns" ? "friend code" : "username"}. To use without a ${tracker == "lxns" ? "friend code" : "username"}, you need to select "remember my username" after generating a chart or use \`/mai link\` to link your account.`,
+                            content: `Please provide your username. To use without a username, you need to select "remember my username" after generating a chart or use \`/mai link\` to link your account.`,
                             ephemeral: true,
                         });
                         return EResultTypes.INVALID_USERNAME;
@@ -189,17 +178,14 @@ export class Best50ChartCommand {
                     break;
                 }
             }
-            if (!result) {
-                await interaction.editReply({
-                    content:
-                        "Failed to generate a chart. Please check your input.",
-                });
+            if (result.err) {
+                await Util.reportError(interaction, result.err);
                 return EResultTypes.TRACKER_BAD_RESPONSE;
             } else {
                 await interaction.editReply({
                     content: "",
                     files: [
-                        new AttachmentBuilder(result, {
+                        new AttachmentBuilder(result.data, {
                             name: "result.png",
                         }),
                     ],

@@ -43,7 +43,9 @@ export class Level50ChartCommand {
             if (interaction.options.getSubcommandGroup() != "level50")
                 return EResultTypes.IGNORED;
 
-            let result: Buffer | null = null,
+            let result:
+                    | { data: Buffer; err?: undefined }
+                    | { data?: undefined; err: MaiDraw.BaseError },
                 useBrainrot = false;
             const theme =
                 interaction.options.getString("theme", false) ||
@@ -115,11 +117,12 @@ export class Level50ChartCommand {
             await interaction.deferReply();
             switch (tracker) {
                 case "kamai": {
-                    const score = await kamai.getPlayerLevel50(
-                        username,
-                        level,
-                        page
-                    );
+                    const { data: score, err: serr } =
+                        await kamai.getPlayerLevel50(username, level, page);
+                    if (serr) {
+                        await Util.reportError(interaction, serr);
+                        return EResultTypes.ERROR;
+                    }
                     if (
                         score &&
                         score.findIndex((v) => v.chart.name == "Baqeela") != -1
@@ -168,17 +171,14 @@ export class Level50ChartCommand {
                     break;
                 }
             }
-            if (!result) {
-                await interaction.editReply({
-                    content:
-                        "Failed to generate a chart. Please check your input.",
-                });
+            if (result.err) {
+                await Util.reportError(interaction, result.err);
                 return EResultTypes.TRACKER_BAD_RESPONSE;
             } else {
                 await interaction.editReply({
                     content: `Showing results ${(page - 1) * 50 + 1} to ${page * 50}`,
                     files: [
-                        new AttachmentBuilder(result, {
+                        new AttachmentBuilder(result.data, {
                             name: "result.png",
                         }),
                     ],
@@ -291,12 +291,15 @@ export class Level50ChartCommand {
                             );
                             break;
                     }
-                    if (result) {
+                    if (result.err) {
+                        await Util.reportError(interaction, result.err);
+                        return EResultTypes.TRACKER_BAD_RESPONSE;
+                    } else {
                         await interaction
                             .update({
                                 content: `Showing results ${(page - 1) * 50 + 1} to ${page * 50}`,
                                 files: [
-                                    new AttachmentBuilder(result, {
+                                    new AttachmentBuilder(result.data, {
                                         name: "result.png",
                                     }),
                                 ],

@@ -18,6 +18,7 @@ import Fuse from "fuse.js";
 
 import { Cache } from "@/util/cache";
 import TSV from "tsv";
+import { Util } from "@/util";
 
 const painter = new MaiDraw.Geki.Painters.Chart();
 
@@ -121,21 +122,19 @@ export class ChartQueryCommand {
                     { theme }
                 );
             }
-            if (result instanceof Buffer) {
+            if (result.err) {
+                await Util.reportError(interaction, result.err);
+                return EResultTypes.TRACKER_BAD_RESPONSE;
+            } else {
                 await interaction.editReply({
                     content: "",
                     files: [
-                        new AttachmentBuilder(result, {
+                        new AttachmentBuilder(result.data, {
                             name: "result.png",
                         }),
                     ],
                 });
                 return EResultTypes.GENERATE_SUCCESS;
-            } else {
-                await interaction.editReply({
-                    content: `Failed to generate a chart. If there is a problem with the score source, you can try again with option "source" set to "None".`,
-                });
-                return EResultTypes.ERROR;
             }
         }
     );

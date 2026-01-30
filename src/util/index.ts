@@ -1,4 +1,6 @@
+import { MaiDraw } from "maidraw";
 import "./telemetry";
+import { CacheType, Interaction } from "discord.js";
 
 export class Util {
     static brainrotGenerator() {
@@ -19,6 +21,19 @@ export class Util {
     }
 
     static getUserAgent(): string {
-        return `saltbot/${process.env.npm_package_version} (+https://github.com/saltcute/saltbot)`;
+        return `salt/${process.env.npm_package_version} (+https://maimaidx.cab/github)`;
+    }
+
+    static async reportError(
+        interaction: Interaction<CacheType>,
+        error: MaiDraw.BaseError
+    ) {
+        if (!interaction.isChatInputCommand()) return;
+        const msg = `An error occurred (\`${error.type}\`) at \`${error.namespace}\`:\n\t${error.message}`;
+        if (interaction.deferred || interaction.replied) {
+            await interaction.editReply(msg);
+        } else {
+            await interaction.reply(msg);
+        }
     }
 }

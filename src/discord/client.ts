@@ -27,8 +27,6 @@ client.on(Events.ClientReady, () => {
     kasumi.logger.info(`Logged in as ${client.user?.tag}!`);
 });
 
-client.login(kasumi.config.getSync("discord::auth.token"));
-
 client.on(Events.InteractionCreate, async (interaction) => {
     if (
         !interaction.isAutocomplete() &&
@@ -39,3 +37,5 @@ client.on(Events.InteractionCreate, async (interaction) => {
     Chuni.INTERACTION_HANDLER(interaction);
     Ongeki.INTERACTION_HANDLER(interaction);
 });
+
+client.login(kasumi.config.getSync("discord::auth.token"));

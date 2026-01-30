@@ -50,7 +50,9 @@ export class Best50ChartCommand {
             if (interaction.options.getSubcommandGroup() != "b50")
                 return EResultTypes.IGNORED;
 
-            let result: Buffer | null = null,
+            let result:
+                    | { data: Buffer; err?: undefined }
+                    | { data?: undefined; err: MaiDraw.BaseError },
                 useBrainrot = false;
 
             const tracker = interaction.options.getSubcommand();
@@ -278,10 +280,18 @@ export class Best50ChartCommand {
                             kamaiInstance = kamai;
                             break;
                     }
-                    const profile = await kamaiInstance.getPlayerInfo(username);
-                    const score = await kamaiInstance.getPlayerBest50(username);
-                    if (!profile || !score) result = null;
-                    else {
+                    const { data: profile, err: perr } =
+                        await kamaiInstance.getPlayerInfo(username);
+                    if (perr) {
+                        await Util.reportError(interaction, perr);
+                        return EResultTypes.ERROR;
+                    }
+                    const { data: score, err: serr } =
+                        await kamaiInstance.getPlayerBest50(username);
+                    if (serr) {
+                        await Util.reportError(interaction, serr);
+                        return EResultTypes.ERROR;
+                    } else {
                         if (
                             [...score.new, ...score.old].findIndex(
                                 (v) => v.chart.name == "Baqeela"
@@ -295,14 +305,13 @@ export class Best50ChartCommand {
                                     // Get kt score history
                                     const chardId = v.optionalData?.kt?.chartId;
                                     if (chardId) {
-                                        const ktScore = (
+                                        const ktScore =
                                             await kamaiInstance.getScoreHistory(
                                                 username,
                                                 chardId
-                                            )
-                                        )?.body;
-                                        if (ktScore) {
-                                            const recent = ktScore
+                                            );
+                                        if (ktScore?.success) {
+                                            const recent = ktScore.body
                                                 .sort(
                                                     (a, b) =>
                                                         a.timeAchieved -
@@ -374,11 +383,15 @@ export class Best50ChartCommand {
                             },
                             {
                                 theme,
-                                profilePicture: useProfilePicture
-                                    ? (await kamaiInstance.getPlayerProfilePicture(
-                                          username
-                                      )) || undefined
-                                    : undefined,
+                                profilePicture: await (async () => {
+                                    if (!useProfilePicture) return undefined;
+                                    const { data: pfp, err } =
+                                        await kamaiInstance.getPlayerProfilePicture(
+                                            username
+                                        );
+                                    if (err) return undefined;
+                                    return pfp;
+                                })(),
                             }
                         );
                     }
@@ -419,17 +432,14 @@ export class Best50ChartCommand {
                     break;
                 }
             }
-            if (!result) {
-                await interaction.editReply({
-                    content:
-                        "Failed to generate a chart. Please check your input.",
-                });
+            if (result.err) {
+                await Util.reportError(interaction, result.err);
                 return EResultTypes.TRACKER_BAD_RESPONSE;
             } else {
                 await interaction.editReply({
                     content: "",
                     files: [
-                        new AttachmentBuilder(result, {
+                        new AttachmentBuilder(result.data, {
                             name: "result.png",
                         }),
                     ],

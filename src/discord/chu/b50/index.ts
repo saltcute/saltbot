@@ -3,6 +3,7 @@ import { MaiDraw } from "maidraw";
 import { client as kasumi } from "@/kook/init/client";
 import { Telemetry } from "@/util/telemetry";
 import { EResultTypes } from "@/util/telemetry/type";
+import { Util } from "@/util";
 
 const lxns = new MaiDraw.Chuni.Adapters.LXNS({
     auth: kasumi.config.getSync("maimai::lxns.token"),
@@ -62,7 +63,9 @@ export class Best50ChartCommand {
             if (interaction.options.getSubcommandGroup() != "b50")
                 return EResultTypes.IGNORED;
 
-            let result: Buffer | null = null;
+            let result:
+                | { data: Buffer; err?: undefined }
+                | { data?: undefined; err: MaiDraw.BaseError };
 
             const subCommand = interaction.options.getSubcommand();
             const tracker = subCommand == "lxns" ? "lxns-chuni" : subCommand;
@@ -280,17 +283,14 @@ export class Best50ChartCommand {
                     break;
                 }
             }
-            if (!result) {
-                await interaction.editReply({
-                    content:
-                        "Failed to generate a chart. Please check your input.",
-                });
+            if (result.err) {
+                await Util.reportError(interaction, result.err);
                 return EResultTypes.TRACKER_BAD_RESPONSE;
             } else {
                 await interaction.editReply({
                     content: "",
                     files: [
-                        new AttachmentBuilder(result, {
+                        new AttachmentBuilder(result.data, {
                             name: "result.png",
                         }),
                     ],
