@@ -31,9 +31,10 @@ export class Level50ChartCommand {
         "jp-buddiesplus",
         "jp-prism",
         "jp-prismplus",
+        "jp-circle",
     ];
-    private static readonly DEFAULT_VERSION = "jp-prism";
-    private static readonly DEFAULT_THEME = "jp-prism-portrait";
+    private static readonly DEFAULT_VERSION = "jp-prismplus";
+    private static readonly DEFAULT_THEME = "jp-prismplus-portrait";
     private static readonly DEFAULT_USE_TRACKER_PROFILE_PICTURE = true;
 
     static readonly CHAT_COMMAND_HANDLER = Telemetry.discordMiddleware(
@@ -49,7 +50,9 @@ export class Level50ChartCommand {
                 useBrainrot = false;
             const theme =
                 interaction.options.getString("theme", false) ||
-                this.DEFAULT_THEME;
+                Util.isAprilFools()
+                    ? "salt-2026-portrait"
+                    : this.DEFAULT_THEME;
             const level = interaction.options.getNumber("level", true);
             if (level < 1 || level > 15) {
                 await interaction.reply({
