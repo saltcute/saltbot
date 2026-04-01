@@ -75,11 +75,11 @@ export class Best50ChartCommand {
                 this.DEFAULT_VERSION_BY_TRACKER[tracker];
             const theme =
                 interaction.options.getString("theme", false) ||
-                Util.isAprilFools()
+                (Util.isAprilFools()
                     ? "salt-2026-landscape"
                     : version && this.AVAILABLE_VERSION_THEME.includes(version)
                       ? `${version}-landscape`
-                      : this.DEFAULT_THEME_BY_TRACKER[tracker];
+                      : this.DEFAULT_THEME_BY_TRACKER[tracker]);
             const pfpOption = interaction.options.getBoolean(
                 "use_profile_picture",
                 false

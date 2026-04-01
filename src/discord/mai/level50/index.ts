@@ -50,9 +50,9 @@ export class Level50ChartCommand {
                 useBrainrot = false;
             const theme =
                 interaction.options.getString("theme", false) ||
-                Util.isAprilFools()
+                (Util.isAprilFools()
                     ? "salt-2026-portrait"
-                    : this.DEFAULT_THEME;
+                    : this.DEFAULT_THEME);
             const level = interaction.options.getNumber("level", true);
             if (level < 1 || level > 15) {
                 await interaction.reply({
