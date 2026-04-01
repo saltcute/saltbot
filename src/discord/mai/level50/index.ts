@@ -284,6 +284,11 @@ export class Level50ChartCommand {
                         });
                         return EResultTypes.IGNORED;
                     }
+                    await interaction.update({
+                        content: `Loading results ${(page - 1) * 50 + 1} to ${page * 50}...`,
+                        files: [],
+                        components: [],
+                    });
                     let result;
                     switch (tracker) {
                         case "kamai":
@@ -299,7 +304,7 @@ export class Level50ChartCommand {
                         return EResultTypes.TRACKER_BAD_RESPONSE;
                     } else {
                         await interaction
-                            .update({
+                            .editReply({
                                 content: `Showing results ${(page - 1) * 50 + 1} to ${page * 50}`,
                                 files: [
                                     new AttachmentBuilder(result.data, {
