@@ -62,7 +62,20 @@ export class Util {
     }
 
     static isAprilFools(): boolean {
-        const now = new Date();
-        return now.getMonth() === 3 && now.getDate() === 1;
+        const isAprilFools = (date: Date) => {
+            return date.getMonth() === 3 && date.getDate() === 1;
+        };
+
+        const late = new Date(
+                new Date().toLocaleString("en-US", { timeZone: "Etc/GMT-14" })
+            ),
+            utc = new Date(
+                new Date().toLocaleString("en-US", { timeZone: "Etc/GMT" })
+            ),
+            early = new Date(
+                new Date().toLocaleString("en-US", { timeZone: "Etc/GMT+12" })
+            );
+
+        return isAprilFools(late) || isAprilFools(utc) || isAprilFools(early);
     }
 }
