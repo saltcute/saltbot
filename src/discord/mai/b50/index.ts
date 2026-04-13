@@ -28,6 +28,7 @@ export class Best50ChartCommand {
         "jp-prism",
         "jp-prismplus",
         "jp-circle",
+        "jp-circleplus",
     ];
     private static readonly DEFAULT_VERSION_BY_TRACKER = {
         kamai: "jp-prismplus",
@@ -499,6 +500,22 @@ export class Best50ChartCommand {
 
     static readonly themes = [
         {
+            name: "maimai でらっくす CiRCLE PLUS (Japan), landscape",
+            name_localizations: {
+                "zh-CN": "maimai でらっくす CiRCLE PLUS（日服），横向",
+                "zh-TW": "maimai でらっくす CiRCLE PLUS（日本），橫向",
+            },
+            value: "jp-circleplus-landscape",
+        },
+        {
+            name: "maimai でらっくす CiRCLE PLUS (Japan), portrait",
+            name_localizations: {
+                "zh-CN": "maimai でらっくす CiRCLE PLUS（日服），纵向",
+                "zh-TW": "maimai でらっくす CiRCLE PLUS（日本），縱向",
+            },
+            value: "jp-circleplus-portrait",
+        },
+        {
             name: "maimai でらっくす CiRCLE (Japan), landscape",
             name_localizations: {
                 "zh-CN": "maimai でらっくす CiRCLE（日服），横向",
@@ -629,6 +646,14 @@ export class Best50ChartCommand {
     ];
 
     static readonly versions = [
+        {
+            name: "maimai でらっくす CiRCLE PLUS (Japan)",
+            name_localizations: {
+                "zh-CN": "maimai でらっくす CiRCLE PLUS（日服）",
+                "zh-TW": "maimai でらっくす CiRCLE PLUS（日本）",
+            },
+            value: "jp-circleplus",
+        },
         {
             name: "maimai でらっくす CiRCLE (Japan)",
             name_localizations: {
