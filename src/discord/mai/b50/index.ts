@@ -279,6 +279,12 @@ export class Best50ChartCommand {
                         case "ex-circle":
                             kamaiInstance = kamai.versions().circle("EX");
                             break;
+                        case "jp-circleplus":
+                            kamaiInstance = kamai.versions().circlePlus();
+                            break;
+                        case "ex-circleplus":
+                            kamaiInstance = kamai.versions().circlePlus("EX");
+                            break;
                         default:
                             kamaiInstance = kamai;
                             break;
