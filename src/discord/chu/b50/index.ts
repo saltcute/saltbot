@@ -35,27 +35,28 @@ export class Best50ChartCommand {
         string,
         "new" | "recents"
     > = {
-        "jp-xverse": "new",
-        "jp-verse": "new",
-        "jp-luminousplus": "recents",
-        "jp-luminous": "recents",
-        "jp-sunplus": "recents",
-        "jp-sun": "recents",
-        "jp-newplus": "recents",
-        "jp-new": "recents",
-        "jp-paradiselost": "recents",
-        "jp-paradise": "recents",
-        "jp-crystalplus": "recents",
-        "jp-crystal": "recents",
-        "jp-amazonplus": "recents",
-        "jp-amazon": "recents",
-        "jp-starplus": "recents",
-        "jp-star": "recents",
-        "jp-airplus": "recents",
-        "jp-air": "recents",
-        "jp-chunithmplus": "recents",
-        "jp-chunithm": "recents",
-    };
+            "jp-xversex": "new",
+            "jp-xverse": "new",
+            "jp-verse": "new",
+            "jp-luminousplus": "recents",
+            "jp-luminous": "recents",
+            "jp-sunplus": "recents",
+            "jp-sun": "recents",
+            "jp-newplus": "recents",
+            "jp-new": "recents",
+            "jp-paradiselost": "recents",
+            "jp-paradise": "recents",
+            "jp-crystalplus": "recents",
+            "jp-crystal": "recents",
+            "jp-amazonplus": "recents",
+            "jp-amazon": "recents",
+            "jp-starplus": "recents",
+            "jp-star": "recents",
+            "jp-airplus": "recents",
+            "jp-air": "recents",
+            "jp-chunithmplus": "recents",
+            "jp-chunithm": "recents",
+        };
     static CHAT_COMMAND_HANDLER = Telemetry.discordMiddleware(
         async (interaction) => {
             if (!interaction.isChatInputCommand()) return EResultTypes.IGNORED;
@@ -109,6 +110,7 @@ export class Best50ChartCommand {
                         return "new";
                     case "jp-verse":
                     case "jp-xverse":
+                    case "jp-xversex":
                     default:
                         return "verse";
                 }
@@ -117,8 +119,8 @@ export class Best50ChartCommand {
                 interaction.options.getString("type", false) == "recents"
                     ? "recents"
                     : interaction.options.getString("type", false) == "new"
-                      ? "new"
-                      : this.DEFAULT_VERSION_RATING_ALOGRITHM_MAP[version] ||
+                        ? "new"
+                        : this.DEFAULT_VERSION_RATING_ALOGRITHM_MAP[version] ||
                         this.DEFAULT_RATING_ALOGRITHM;
             const theme =
                 (interaction.options.getString("theme", false) ||
@@ -240,6 +242,9 @@ export class Best50ChartCommand {
                             break;
                         case "jp-xverse":
                             kamaiInstance = kamai.xverse();
+                            break;
+                        case "jp-xversex":
+                            kamaiInstance = kamai.xversex();
                             break;
                         default:
                             kamaiInstance = kamai;
@@ -393,6 +398,14 @@ export class Best50ChartCommand {
     ];
 
     static readonly versions = [
+        {
+            name: "CHUNITHM X-VERSE-X (Japan)",
+            name_localizations: {
+                "zh-CN": "CHUNITHM X-VERSE-X（日服）",
+                "zh-TW": "CHUNITHM X-VERSE-X（日本）",
+            },
+            value: "jp-xversex",
+        },
         {
             name: "CHUNITHM X-VERSE (Japan)",
             name_localizations: {
@@ -674,84 +687,84 @@ export class Best50ChartCommand {
                     ...(() => {
                         return kasumi.config.getSync("maimai::lxns.token")
                             ? [
-                                  {
-                                      type: ApplicationCommandOptionType.Subcommand,
-                                      name: "lxns",
-                                      description:
-                                          "Get best 50 scores from LXNS.",
-                                      description_localizations: {
-                                          "zh-CN":
-                                              "从 落雪查分器 获取 b50 信息。",
-                                          "zh-TW":
-                                              "從 LXNS 獲取 Best 50 資料。",
-                                      },
-                                      options: [
-                                          {
-                                              type: ApplicationCommandOptionType.String,
-                                              name: "friendcode",
-                                              name_localizations: {
-                                                  "zh-CN": "好友码",
-                                                  "zh-TW": "好友代號",
-                                              },
-                                              description:
-                                                  "You can see your friend code at https://maimai.lxns.net/user/profile.",
-                                              description_localizations: {
-                                                  "zh-CN":
-                                                      "你可以在 https://maimai.lxns.net/user/profile 看到你的好友码。",
-                                                  "zh-TW":
-                                                      "您可以在 https://maimai.lxns.net/user/profile 檢視您的好友代號。",
-                                              },
-                                          },
-                                          {
-                                              type: ApplicationCommandOptionType.User,
-                                              name: "dox",
-                                              name_localizations: {
-                                                  "zh-CN": "看看你的",
-                                                  "zh-TW": "看看你的",
-                                              },
-                                              description:
-                                                  "Get the b50 chart of the selected user.",
-                                              description_localizations: {
-                                                  "zh-CN": "看看 ta 的 b50。",
-                                                  "zh-TW":
-                                                      "看看他的 Best 50 圖像。",
-                                              },
-                                          },
-                                          {
-                                              type: ApplicationCommandOptionType.String,
-                                              name: "theme",
-                                              name_localizations: {
-                                                  "zh-CN": "主题",
-                                                  "zh-TW": "主題",
-                                              },
-                                              description:
-                                                  "Choose from a variety of themes for your Best 50 chart.",
-                                              description_localizations: {
-                                                  "zh-CN":
-                                                      "选择 b50 图片的主题。",
-                                                  "zh-TW":
-                                                      "選擇 Best 50 圖像的主題。",
-                                              },
-                                              choices: this.themes,
-                                          },
-                                          // {
-                                          //     type: ApplicationCommandOptionType.Boolean,
-                                          //     name: "use_profile_picture",
-                                          //     name_localizations: {
-                                          //         "zh-CN": "使用头像",
-                                          //         "zh-TW": "使用個人資料圖像",
-                                          //     },
-                                          //     description:
-                                          //         "Use your profile picture from LXNS.",
-                                          //     description_localizations: {
-                                          //         "zh-CN": "使用你在 落雪查分器 上的头像。",
-                                          //         "zh-TW": "使用您在 LXNS 上的個人資料圖像。",
-                                          //     },
-                                          //     choices: this.versions,
-                                          // },
-                                      ],
-                                  },
-                              ]
+                                {
+                                    type: ApplicationCommandOptionType.Subcommand,
+                                    name: "lxns",
+                                    description:
+                                        "Get best 50 scores from LXNS.",
+                                    description_localizations: {
+                                        "zh-CN":
+                                            "从 落雪查分器 获取 b50 信息。",
+                                        "zh-TW":
+                                            "從 LXNS 獲取 Best 50 資料。",
+                                    },
+                                    options: [
+                                        {
+                                            type: ApplicationCommandOptionType.String,
+                                            name: "friendcode",
+                                            name_localizations: {
+                                                "zh-CN": "好友码",
+                                                "zh-TW": "好友代號",
+                                            },
+                                            description:
+                                                "You can see your friend code at https://maimai.lxns.net/user/profile.",
+                                            description_localizations: {
+                                                "zh-CN":
+                                                    "你可以在 https://maimai.lxns.net/user/profile 看到你的好友码。",
+                                                "zh-TW":
+                                                    "您可以在 https://maimai.lxns.net/user/profile 檢視您的好友代號。",
+                                            },
+                                        },
+                                        {
+                                            type: ApplicationCommandOptionType.User,
+                                            name: "dox",
+                                            name_localizations: {
+                                                "zh-CN": "看看你的",
+                                                "zh-TW": "看看你的",
+                                            },
+                                            description:
+                                                "Get the b50 chart of the selected user.",
+                                            description_localizations: {
+                                                "zh-CN": "看看 ta 的 b50。",
+                                                "zh-TW":
+                                                    "看看他的 Best 50 圖像。",
+                                            },
+                                        },
+                                        {
+                                            type: ApplicationCommandOptionType.String,
+                                            name: "theme",
+                                            name_localizations: {
+                                                "zh-CN": "主题",
+                                                "zh-TW": "主題",
+                                            },
+                                            description:
+                                                "Choose from a variety of themes for your Best 50 chart.",
+                                            description_localizations: {
+                                                "zh-CN":
+                                                    "选择 b50 图片的主题。",
+                                                "zh-TW":
+                                                    "選擇 Best 50 圖像的主題。",
+                                            },
+                                            choices: this.themes,
+                                        },
+                                        // {
+                                        //     type: ApplicationCommandOptionType.Boolean,
+                                        //     name: "use_profile_picture",
+                                        //     name_localizations: {
+                                        //         "zh-CN": "使用头像",
+                                        //         "zh-TW": "使用個人資料圖像",
+                                        //     },
+                                        //     description:
+                                        //         "Use your profile picture from LXNS.",
+                                        //     description_localizations: {
+                                        //         "zh-CN": "使用你在 落雪查分器 上的头像。",
+                                        //         "zh-TW": "使用您在 LXNS 上的個人資料圖像。",
+                                        //     },
+                                        //     choices: this.versions,
+                                        // },
+                                    ],
+                                },
+                            ]
                             : [];
                     })(),
                 ],
