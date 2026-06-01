@@ -41,7 +41,7 @@ export class ChartQueryCommand {
         else return defaults;
     }
 
-    static readonly DEFAULT_THEME = "jp-xverse";
+    static readonly DEFAULT_THEME = "jp-xversex";
     static readonly CHAT_COMMAND_HANDLER = Telemetry.discordMiddleware(
         async (interaction) => {
             if (!interaction.isChatInputCommand()) return EResultTypes.IGNORED;
@@ -206,8 +206,8 @@ export class ChartQueryCommand {
                         ],
                         nameRomaji: Kuroshiro.Util.isJapanese(v.name)
                             ? await kuroshiro.convert(v.name, {
-                                  to: "romaji",
-                              })
+                                to: "romaji",
+                            })
                             : v.name,
                     };
                 })
@@ -239,7 +239,7 @@ export class ChartQueryCommand {
             for (const chart of chartFiles) {
                 try {
                     charts.push(require(upath.join(targetPath, chart)));
-                } catch {}
+                } catch { }
             }
             return charts;
         }

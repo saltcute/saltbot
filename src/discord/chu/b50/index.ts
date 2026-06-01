@@ -14,6 +14,7 @@ const painter = new MaiDraw.Chuni.Painters.Best50();
 
 export class Best50ChartCommand {
     private static readonly AVAILABLE_VERSION_THEME = [
+        "jp-xversex",
         "jp-xverse",
         "jp-verse",
         "jp-luminousplus",
