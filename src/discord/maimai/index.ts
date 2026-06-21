@@ -1,11 +1,11 @@
-import { ChartQueryCommand } from "./chart";
+import type { Interaction } from "discord.js";
 import { Best50ChartCommand } from "./b50";
-import { LinkUserCommand } from "./link";
+import { ChartQueryCommand } from "./chart";
 import { Level50ChartCommand } from "./level50";
-import { Interaction } from "discord.js";
+import { LinkUserCommand } from "./link";
 
 export class Maimai {
-    static async INTERACTION_HANDLER(interaction: Interaction) {
+    static readonly INTERACTION_HANDLER = async (interaction: Interaction) => {
         Best50ChartCommand.CHAT_COMMAND_HANDLER(interaction);
         ChartQueryCommand.CHAT_COMMAND_HANDLER(interaction);
         ChartQueryCommand.AUTOCOMPLETE_HANDLER(interaction);
@@ -13,13 +13,13 @@ export class Maimai {
         Level50ChartCommand.BUTTON_HANDLER(interaction);
         LinkUserCommand.CHAT_COMMAND_HANDLER(interaction);
         LinkUserCommand.BUTTON_HANDLER(interaction);
-    }
+    };
     static getCommand() {
         return {
             type: 1,
             name: "mai",
             description: "Everything about Dance Cube!",
-            description_localizations: {
+            descriptionLocalizations: {
                 "zh-CN": "舞萌小工具！",
                 "zh-TW": "maimai 小工具！",
             },

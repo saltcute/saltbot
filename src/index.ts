@@ -1,7 +1,8 @@
 import "./kook";
 
-import { Util } from "./util";
 import axios from "axios";
+import { Util } from "./util";
+
 axios.defaults.headers.common["User-Agent"] = Util.getUserAgent();
 
 import "./discord";

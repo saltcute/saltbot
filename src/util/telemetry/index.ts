@@ -1,7 +1,7 @@
+import type { CacheType, Interaction } from "discord.js";
+import { type Collection, MongoClient } from "mongodb";
 import { client as kasumi } from "@/kook/init/client";
-import { CacheType, Interaction } from "discord.js";
-import { Collection, MongoClient } from "mongodb";
-import { EResultTypes } from "./type";
+import { ResultTypes } from "./type";
 
 export class Telemetry {
     private static isReady = false;
@@ -9,23 +9,17 @@ export class Telemetry {
     private static collection: Collection;
     static {
         kasumi.on("connect.*", async () => {
-            const mongodbURI = kasumi.config.getSync(
-                "kasumi::config.mongoConnectionString"
-            );
-            const mongodbDatabase = kasumi.config.getSync(
-                "kasumi::config.mongoDatabaseName"
-            );
-            if (mongodbURI) {
-                this.mongodb = new MongoClient(mongodbURI);
-                this.mongodb.on("error", () => {
+            const mongodbUri = kasumi.config.getSync("kasumi::config.mongoConnectionString");
+            const mongodbDatabase = kasumi.config.getSync("kasumi::config.mongoDatabaseName");
+            if (mongodbUri) {
+                Telemetry.mongodb = new MongoClient(mongodbUri);
+                Telemetry.mongodb.on("error", () => {
                     console.error("Telemetry initialization failed");
                 });
-                await this.mongodb.connect();
-                this.collection = await this.mongodb
-                    .db(mongodbDatabase)
-                    .collection("usage");
+                await Telemetry.mongodb.connect();
+                Telemetry.collection = await Telemetry.mongodb.db(mongodbDatabase).collection("usage");
             }
-            this.isReady = true;
+            Telemetry.isReady = true;
         });
     }
     public static logCommandUsage(content: {
@@ -36,15 +30,11 @@ export class Telemetry {
         args: Record<string, string>[];
         result: string;
     }): boolean {
-        if (!this.isReady) return false;
-        this.collection.insertOne({ ...content, time: new Date() });
+        if (!Telemetry.isReady) return false;
+        Telemetry.collection.insertOne({ ...content, time: new Date() });
         return true;
     }
-    public static discordMiddleware(
-        handler: (
-            interaction: Interaction<CacheType>
-        ) => Promise<EResultTypes> | EResultTypes
-    ) {
+    public static discordMiddleware(handler: (interaction: Interaction<CacheType>) => Promise<ResultTypes> | ResultTypes) {
         return async (interaction: Interaction<CacheType>) => {
             try {
                 if (interaction.isCommand()) {
@@ -53,9 +43,9 @@ export class Telemetry {
                         returnValue.catch(kasumi.logger.error);
                     }
                     const result = await returnValue;
-                    if (result == EResultTypes.IGNORED) return;
+                    if (result === ResultTypes.IGNORED) return;
                     else
-                        this.logCommandUsage({
+                        Telemetry.logCommandUsage({
                             source: "discord",
                             user: {
                                 name: interaction.user.username,
@@ -68,36 +58,23 @@ export class Telemetry {
                             command: (() => {
                                 const commands = [interaction.commandName];
                                 if (interaction.isChatInputCommand()) {
-                                    const subCommandGroup =
-                                        interaction.options.getSubcommandGroup(
-                                            false
-                                        );
-                                    const subCommand =
-                                        interaction.options.getSubcommand(
-                                            false
-                                        );
-                                    if (subCommandGroup)
-                                        commands.push(subCommandGroup);
+                                    const subCommandGroup = interaction.options.getSubcommandGroup(false);
+                                    const subCommand = interaction.options.getSubcommand(false);
+                                    if (subCommandGroup) commands.push(subCommandGroup);
                                     if (subCommand) commands.push(subCommand);
                                 }
                                 return commands;
                             })(),
                             args: interaction.isChatInputCommand()
                                 ? interaction.options.data.map((option) => {
-                                      const mapOption = (
-                                          opt: typeof option
-                                      ): any => {
-                                          const { name, value, options } =
-                                              opt as any;
-                                          if (
-                                              options &&
-                                              Array.isArray(options) &&
-                                              options.length > 0
-                                          ) {
+                                      // biome-ignore lint/suspicious/noExplicitAny: complicated type
+                                      const mapOption = (opt: typeof option): any => {
+                                          // biome-ignore lint/suspicious/noExplicitAny: complicated type
+                                          const { name, value, options } = opt as any;
+                                          if (options && Array.isArray(options) && options.length > 0) {
                                               return {
                                                   name,
-                                                  options:
-                                                      options.map(mapOption),
+                                                  options: options.map(mapOption),
                                               };
                                           } else {
                                               return {

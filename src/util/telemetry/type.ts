@@ -1,4 +1,4 @@
-export enum EResultTypes {
+export enum ResultTypes {
     IGNORED = "Error::ignored",
 
     INVALID_TRACKER = "Error::argument.invalid.tracker",

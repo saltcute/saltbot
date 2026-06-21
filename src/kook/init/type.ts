@@ -11,10 +11,6 @@ export interface CustomStorage {
     "discord::auth.clientId": string;
     "discord::auth.token": string;
 
-    [
-        k: `salt::connection.discord.${Trackers}.${string}`
-    ]: string | undefined;
-    [
-        k: `salt::connection.discord.ignore.${Trackers}.${string}`
-    ]: boolean | undefined;
+    [k: `salt::connection.discord.${Trackers}.${string}`]: string | undefined;
+    [k: `salt::connection.discord.ignore.${Trackers}.${string}`]: boolean | undefined;
 }

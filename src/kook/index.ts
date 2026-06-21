@@ -1,8 +1,8 @@
-import { client } from "@/kook/init/client";
+import * as fs from "node:fs";
 import EssentialMenu from "@saltcute/kasumi-essential";
 import MaiMenu from "@saltcute/kasumi-maimai";
-import * as fs from "fs";
 import upath from "upath";
+import { client } from "@/kook/init/client";
 
 (async () => {
     if (client.config.getSync("kasumi::config.token")) {
