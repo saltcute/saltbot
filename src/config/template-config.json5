@@ -21,4 +21,8 @@
 
     "discord::auth.clientId": "",
     "discord::auth.token": "",
+    "discord::auth.clientSecret": "",
+
+    "webui::config.baseUrl": "http://localhost:19342",
+    "webui::config.sessionSecret": "",
 }

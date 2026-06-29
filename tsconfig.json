@@ -8,9 +8,9 @@
         "lib": ["ES2025"],
         "paths": {
             "@/*": ["./src/*"],
-            "@util/*": ["./src/util/*"],
-            "@discord/*": ["./src/discord/*"],
-            "@kook/*": ["./src/kook/*"]
+            "@util/*": ["./src/bot/util/*"],
+            "@discord/*": ["./src/bot/discord/*"],
+            "@kook/*": ["./src/bot/kook/*"]
         },
         "rootDirs": ["src"],
         "rootDir": "./src",

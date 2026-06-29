@@ -4,11 +4,17 @@
     "description": "Template for Kasumi",
     "main": "index.js",
     "scripts": {
-        "start": "node --nolazy -r ts-node/register -r tsconfig-paths/register src/index.ts",
-        "test": "export LOG_LEVEL=trace && npm start | bunyan -L | pino-pretty",
-        "test-local": "npx install-local \"../maidraw\" && npm test",
+        "start": "concurrently -n \"Bot,Web,Tunnel\" \"npm run start:bot\" \"npm run start:web\" \"npm run tunnel\"",
+        "start:bot": "node --nolazy -r ts-node/register -r tsconfig-paths/register src/index.ts",
+        "start:web": "npm run build:web && CONFIG_PATH=\"$PWD/src/config/config.json5\" PORT=16320 node src/webui/.output/server/index.mjs",
+        "tunnel": "test -f src/config/cloudflared.yml && exec cloudflared tunnel --config src/config/cloudflared.yml run || echo 'Cloudflare tunnel not configured (src/config/cloudflared.yml missing); skipping.'",
+        "build:web": "npm run build -w src/webui",
+        "dev:bot": "export LOG_LEVEL=trace && npm run start:bot | pino-pretty",
+        "dev:web": "npm run dev -w src/webui",
+        "dev": "concurrently -n \"Bot,Web\" \"npm run dev:bot\" \"npm run dev:web\"",
         "format": "biome format --write",
         "lint": "biome lint --write",
+        "check": "biome check --write",
         "pm2": "node src/pm2/index.js"
     },
     "repository": {
@@ -20,6 +26,7 @@
         "kook",
         "bot"
     ],
+    "workspaces": ["src/webui"],
     "author": "saltcute",
     "license": "MIT",
     "bugs": {
@@ -34,11 +41,13 @@
         "@types/lodash": "^4.17.16",
         "@types/memory-cache": "^0.2.6",
         "@types/tsv": "^0.2.4",
+        "concurrently": "^9.2.3",
         "discord.js": "^14.16.3",
         "fuse.js": "^7.1.0",
         "gcm-database": "^1.0.3",
         "gcm-database-local": "^1.0.12",
         "gcm-database-otogedb": "^1.0.1",
+        "hono": "^4.12.27",
         "kasumi.js": "^0.6.0",
         "kuroshiro": "^1.2.0",
         "kuroshiro-analyzer-kuromoji": "^1.1.0",

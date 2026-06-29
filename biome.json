@@ -7,7 +7,16 @@
     },
     "files": {
         "ignoreUnknown": false,
-        "includes": ["src/**/*", "test/**/*", "tools/**/*", "assets/**/*", ".vscode/**/*", "vite.config.ts"]
+        "includes": [
+            "src/**/*",
+            "test/**/*",
+            "tools/**/*",
+            "assets/**/*",
+            ".vscode/**/*",
+            "vite.config.ts",
+            "!src/webui/.output",
+            "!src/webui/src/routeTree.gen.ts"
+        ]
     },
     "formatter": {
         "lineWidth": 150,
@@ -43,6 +52,11 @@
     "javascript": {
         "formatter": {
             "quoteStyle": "double"
+        }
+    },
+    "css": {
+        "parser": {
+            "tailwindDirectives": true
         }
     }
 }
