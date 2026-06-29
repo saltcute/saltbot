@@ -1,6 +1,17 @@
 import { Telemetry } from "@util/telemetry";
 import { ResultTypes } from "@util/telemetry/type";
-import { type Interaction, MessageFlags } from "discord.js";
+import {
+    ActionRowBuilder,
+    ButtonBuilder,
+    ButtonStyle,
+    type Interaction,
+    LabelBuilder,
+    MessageFlags,
+    ModalBuilder,
+    TextInputBuilder,
+    TextInputStyle,
+} from "discord.js";
+import { Crypto } from "maidraw-gcm-net-adapter/common";
 import { client as kasumi } from "@/kook/init/client";
 
 export class LinkUserCommand {
@@ -29,7 +40,7 @@ export class LinkUserCommand {
                 break;
             }
         }
-        if (!username) {
+        if (!(tracker === "gcm-net" || tracker === "gcm-net-ex") && !username) {
             await interaction.reply({
                 content: "Please provide your username.",
                 flags: MessageFlags.Ephemeral,
@@ -47,10 +58,52 @@ export class LinkUserCommand {
                     ephemeral: true,
                 });
                 break;
+            case "gcm-net":
+            case "gcm-net-ex": {
+                await interaction.reply({
+                    content: `Before linking your ${tracker === "gcm-net-ex" ? "maimai DX NET" : "maimaiでらっくすNET"} account to saltbot,
+please note the following **VERY IMPORTANT** information.
+
+- Your Sega ID and **password** is required.
+- You are generally discouraged to provide your password to any person.
+- We make our best effort to keep your information secure. However, make sure to create a unique password specifically for this service in order to reduce the risk of cyber attacks.
+${tracker === "gcm-net-ex" ? "- You must use a Sega ID to log into your account. Partner login like X (Twitter) or Facebook login will not work." : ""}
+
+If you wish to proceed, please click "Continue".`,
+
+                    components: [
+                        new ActionRowBuilder()
+                            .addComponents(
+                                new ButtonBuilder()
+                                    .setLabel("Continue")
+                                    .setStyle(ButtonStyle.Primary)
+                                    .setCustomId(`maimai::tracker.link.${tracker}.${interaction.user.id}.${username}.continue`),
+                            )
+                            .toJSON(),
+                    ],
+                    flags: MessageFlags.Ephemeral,
+                });
+            }
         }
 
         return ResultTypes.LINK_SUCCESS;
     });
+
+    static readonly MODAL_HANDLER = async (interaction: Interaction) => {
+        if (!interaction.isModalSubmit()) return;
+        const [tracker, userId] = interaction.customId.replace("maimai::tracker.link.", "").split(".");
+        const username = interaction.fields.getTextInputValue("username");
+        const password = interaction.fields.getTextInputValue("password");
+
+        if (!Crypto.global) Crypto.global = await Crypto.new();
+        const token = await Crypto.global.encrypt({ segaId: username, password });
+
+        kasumi.config.set(`salt::connection.discord.${tracker}.${userId}`, token);
+        await interaction.reply({
+            content: `Your Sega ID \`${username}\` for \`${tracker}\` has been recorded. Please try using \`/mai b50 ${tracker}\` now.`,
+            flags: MessageFlags.Ephemeral,
+        });
+    };
     static readonly BUTTON_HANDLER = async (interaction: Interaction) => {
         if (!interaction.isButton()) return;
         if (interaction.customId.startsWith("maimai::tracker.link.")) {
@@ -91,6 +144,28 @@ export class LinkUserCommand {
                 }
                 default: {
                     const [tracker, userId, username] = action.split(".");
+
+                    if (tracker === "gcm-net" || tracker === "gcm-net-ex") {
+                        const modal = new ModalBuilder()
+                            .setCustomId(`maimai::tracker.link.${tracker}.${interaction.user.id}.link`)
+                            .setTitle(`Link ${tracker === "gcm-net-ex" ? "maimai DX NET" : "maimaiでらっくすNET"}`);
+
+                        const usernameInput = new TextInputBuilder()
+                            .setCustomId("username")
+                            .setStyle(TextInputStyle.Short)
+                            .setPlaceholder("Your Sega ID");
+                        const usernameLabel = new LabelBuilder().setLabel("Sega ID").setTextInputComponent(usernameInput);
+
+                        const passwordInput = new TextInputBuilder()
+                            .setCustomId("password")
+                            .setStyle(TextInputStyle.Short)
+                            .setPlaceholder("Your Sega ID password (Will show on your screen!)");
+                        const passwordLabel = new LabelBuilder().setLabel("Password").setTextInputComponent(passwordInput);
+
+                        modal.addLabelComponents(usernameLabel, passwordLabel);
+
+                        return interaction.showModal(modal);
+                    }
                     if (tracker && userId && username) {
                         if (!interaction.user.id) return;
                         if (userId !== interaction.user.id) {
@@ -136,6 +211,24 @@ export class LinkUserCommand {
                     "zh-TW": "連結您的 maimai DX 使用者資料。",
                 },
                 options: [
+                    {
+                        type: 1,
+                        name: "gcm-net",
+                        description: "Link your maimaiでらっくすNET account.",
+                        descriptionLocalizations: {
+                            "zh-CN": "绑定你的 maimaiでらっくすNET 账号。",
+                            "zh-TW": "連結您的 maimaiでらっくすNET 使用者資料。",
+                        },
+                    },
+                    {
+                        type: 1,
+                        name: "gcm-net-ex",
+                        description: "Link your maimai DX NET account.",
+                        descriptionLocalizations: {
+                            "zh-CN": "绑定你的 maimai DX NET 账号。",
+                            "zh-TW": "連結您的 maimai DX NET 使用者資料。",
+                        },
+                    },
                     {
                         type: 1,
                         name: "kamai",

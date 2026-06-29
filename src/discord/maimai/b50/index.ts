@@ -1,14 +1,15 @@
 import { Util } from "@util/index";
 import { Telemetry } from "@util/telemetry";
 import { ResultTypes } from "@util/telemetry/type";
-import { ApplicationCommandOptionType, AttachmentBuilder, MessageFlags } from "discord.js";
+import { ApplicationCommandOptionType, AttachmentBuilder, type Interaction, MessageFlags } from "discord.js";
 import { BaseError, type DataOrError } from "maidraw";
 import { Best50Painter } from "maidraw/maimai";
+import { MaimaiDxNetAdapter, MaimaiDxNetEngAdapter } from "maidraw-gcm-net-adapter/maimai";
 import { KamaiTachiScoreAdapter } from "maidraw-kamai-tachi-adapter/maimai";
 import { LxnsScoreAdapter } from "maidraw-lxns-adapter/maimai";
 import { MaishiftScoreAdapter } from "maidraw-maishift-adapter/maimai";
 import { client as kasumi } from "@/kook/init/client";
-import { database } from "../database";
+import { database, otogedb } from "../database";
 
 const lxns = new LxnsScoreAdapter({
     auth: kasumi.config.getSync("maimai::lxns.token"),
@@ -16,11 +17,14 @@ const lxns = new LxnsScoreAdapter({
 });
 const kamai = new KamaiTachiScoreAdapter({ database });
 const maishift = new MaishiftScoreAdapter(database);
+const gcmNet = new MaimaiDxNetAdapter({ database: otogedb });
+const gcmNetEx = new MaimaiDxNetEngAdapter({ database: otogedb });
 // const divingfish = new MaiDraw.Maimai.Adapters.DivingFish({
 //     auth: kasumi.config.getSync("maimai::divingFish.token"),
 // });
 
 const painter = new Best50Painter(database);
+const otogedbPainter = new Best50Painter(otogedb);
 
 export class Best50ChartCommand {
     private static readonly AVAILABLE_VERSION_THEME = [
@@ -40,12 +44,16 @@ export class Best50ChartCommand {
         lxns: "cn-2026",
         divingfish: "cn-2026",
         maishift: "jp-circle",
+        "gcm-net": "jp-circleplus",
+        "gcm-net-ex": "jp-circle",
     };
     private static readonly DEFAULT_THEME_BY_TRACKER = {
         kamai: "jp-prismplus-landscape",
         lxns: "cn-2026-landscape",
         divingfish: "cn-2026-landscape",
         maishift: "jp-circle-landscape",
+        "gcm-net": "jp-circleplus-landscape",
+        "gcm-net-ex": "jp-circle-landscape",
     };
     private static readonly DEFAULT_USE_TRACKER_PROFILE_PICTURE = true;
 
@@ -58,7 +66,16 @@ export class Best50ChartCommand {
             useBrainrot = false;
 
         const tracker = interaction.options.getSubcommand();
-        if (!(tracker === "kamai" || tracker === "divingfish" || tracker === "lxns" || tracker === "maishift")) {
+        if (
+            !(
+                tracker === "kamai" ||
+                tracker === "divingfish" ||
+                tracker === "lxns" ||
+                tracker === "maishift" ||
+                tracker === "gcm-net" ||
+                tracker === "gcm-net-ex"
+            )
+        ) {
             await interaction.reply({
                 content: "Invalid tracker. Please try again.",
                 flags: [MessageFlags.Ephemeral],
@@ -110,10 +127,17 @@ export class Best50ChartCommand {
             } else {
                 const dbUsername = await kasumi.config.getOne(`salt::connection.discord.${tracker}.${interaction.user.id}`);
                 if (!dbUsername) {
-                    await interaction.reply({
-                        content: `Please provide your ${tracker === "lxns" ? "friend code" : "username"}. To use without a ${tracker === "lxns" ? "friend code" : "username"}, you need to select "remember my username" after generating a chart or use \`/mai link\` to link your account.`,
-                        ephemeral: true,
-                    });
+                    if (tracker === "gcm-net" || tracker === "gcm-net-ex") {
+                        await interaction.reply({
+                            content: `Please link your Sega ID using \`/mai link ${tracker}\``,
+                            ephemeral: true,
+                        });
+                    } else {
+                        await interaction.reply({
+                            content: `Please provide your ${tracker === "lxns" ? "friend code" : "username"}. To use without a ${tracker === "lxns" ? "friend code" : "username"}, you need to select "remember my username" after generating a chart or use \`/mai link\` to link your account.`,
+                            ephemeral: true,
+                        });
+                    }
                     return ResultTypes.INVALID_USERNAME;
                 } else username = dbUsername;
             }
@@ -372,6 +396,28 @@ export class Best50ChartCommand {
                 );
                 break;
             }
+            case "gcm-net": {
+                result = await otogedbPainter.drawWithScoreSource(
+                    gcmNet,
+                    { username },
+                    {
+                        theme,
+                        // profilePicture: useProfilePicture ? undefined : null,
+                    },
+                );
+                break;
+            }
+            case "gcm-net-ex": {
+                result = await otogedbPainter.drawWithScoreSource(
+                    gcmNetEx,
+                    { username },
+                    {
+                        theme,
+                        // profilePicture: useProfilePicture ? undefined : null,
+                    },
+                );
+                break;
+            }
         }
         if (result.err) {
             await Util.reportError(interaction, result.err);
@@ -430,6 +476,35 @@ export class Best50ChartCommand {
             return ResultTypes.GENERATE_SUCCESS;
         }
     });
+
+    static readonly AUTOCOMPLETE_HANDLER = async (interaction: Interaction) => {
+        if (!interaction.isAutocomplete()) return;
+        if (interaction.commandName !== "mai") return;
+        if (interaction.options.getSubcommandGroup() !== "b50") return;
+
+        const focused = interaction.options.getFocused(true);
+        let source: { name: string; nameLocalizations: Record<string, string>; value: string }[];
+        if (focused.name === "theme") source = this.themes;
+        else if (focused.name === "version") source = this.versions;
+        else return;
+
+        const locale = interaction.locale as string;
+        const localizedName = (entry: (typeof source)[number]) => entry.nameLocalizations[locale] ?? entry.name;
+
+        const query = focused.value.toLowerCase();
+        const result = source
+            .filter((entry) =>
+                query
+                    ? localizedName(entry).toLowerCase().includes(query) ||
+                      entry.name.toLowerCase().includes(query) ||
+                      entry.value.toLowerCase().includes(query)
+                    : true,
+            )
+            .slice(0, 25)
+            .map((entry) => ({ name: localizedName(entry), value: entry.value }));
+
+        await interaction.respond(result);
+    };
 
     static readonly themes = [
         {
@@ -882,6 +957,82 @@ export class Best50ChartCommand {
                 options: [
                     {
                         type: ApplicationCommandOptionType.Subcommand,
+                        name: "gcm-net",
+                        description: "Get best 50 scores from maimaiでらっくすNET.",
+                        descriptionLocalizations: {
+                            "zh-CN": "从 maimaiでらっくすNET 获取 b50 信息。",
+                            "zh-TW": "從 maimaiでらっくすNET 獲取 Best 50 資料。",
+                        },
+                        options: [
+                            {
+                                type: ApplicationCommandOptionType.User,
+                                name: "dox",
+                                nameLocalizations: {
+                                    "zh-CN": "看看你的",
+                                    "zh-TW": "看看你的",
+                                },
+                                description: "Get the b50 chart of the selected user.",
+                                descriptionLocalizations: {
+                                    "zh-CN": "看看 ta 的 b50。",
+                                    "zh-TW": "看看他的 Best 50 圖像。",
+                                },
+                            },
+                            {
+                                type: ApplicationCommandOptionType.String,
+                                name: "theme",
+                                nameLocalizations: {
+                                    "zh-CN": "主题",
+                                    "zh-TW": "主題",
+                                },
+                                description: "Choose from a variety of themes for your Best 50 chart.",
+                                descriptionLocalizations: {
+                                    "zh-CN": "选择 b50 图片的主题。",
+                                    "zh-TW": "選擇 Best 50 圖像的主題。",
+                                },
+                                autocomplete: true,
+                            },
+                        ],
+                    },
+                    {
+                        type: ApplicationCommandOptionType.Subcommand,
+                        name: "gcm-net-ex",
+                        description: "Get best 50 scores from maimai DX NET.",
+                        descriptionLocalizations: {
+                            "zh-CN": "从 maimai DX NET 获取 b50 信息。",
+                            "zh-TW": "從 maimai DX NET 獲取 Best 50 資料。",
+                        },
+                        options: [
+                            {
+                                type: ApplicationCommandOptionType.User,
+                                name: "dox",
+                                nameLocalizations: {
+                                    "zh-CN": "看看你的",
+                                    "zh-TW": "看看你的",
+                                },
+                                description: "Get the b50 chart of the selected user.",
+                                descriptionLocalizations: {
+                                    "zh-CN": "看看 ta 的 b50。",
+                                    "zh-TW": "看看他的 Best 50 圖像。",
+                                },
+                            },
+                            {
+                                type: ApplicationCommandOptionType.String,
+                                name: "theme",
+                                nameLocalizations: {
+                                    "zh-CN": "主题",
+                                    "zh-TW": "主題",
+                                },
+                                description: "Choose from a variety of themes for your Best 50 chart.",
+                                descriptionLocalizations: {
+                                    "zh-CN": "选择 b50 图片的主题。",
+                                    "zh-TW": "選擇 Best 50 圖像的主題。",
+                                },
+                                autocomplete: true,
+                            },
+                        ],
+                    },
+                    {
+                        type: ApplicationCommandOptionType.Subcommand,
                         name: "kamai",
                         description: "Get best 50 scores from Kamaitachi.",
                         descriptionLocalizations: {
@@ -927,7 +1078,7 @@ export class Best50ChartCommand {
                                     "zh-CN": "选择 b50 图片的主题。",
                                     "zh-TW": "選擇 Best 50 圖像的主題。",
                                 },
-                                choices: Best50ChartCommand.themes,
+                                autocomplete: true,
                             },
                             {
                                 type: ApplicationCommandOptionType.String,
@@ -941,7 +1092,7 @@ export class Best50ChartCommand {
                                     "zh-CN": "选择 b15 的版本。",
                                     "zh-TW": "選擇 New Version 分數的版本。",
                                 },
-                                choices: Best50ChartCommand.versions,
+                                autocomplete: true,
                             },
                             {
                                 type: ApplicationCommandOptionType.Boolean,
@@ -1021,7 +1172,7 @@ export class Best50ChartCommand {
                                                   "zh-CN": "选择 b50 图片的主题。",
                                                   "zh-TW": "選擇 Best 50 圖像的主題。",
                                               },
-                                              choices: Best50ChartCommand.themes,
+                                              autocomplete: true,
                                           },
                                           {
                                               type: ApplicationCommandOptionType.Boolean,
@@ -1091,7 +1242,7 @@ export class Best50ChartCommand {
                                                   "zh-CN": "选择 b50 图片的主题。",
                                                   "zh-TW": "選擇 Best 50 圖像的主題。",
                                               },
-                                              choices: Best50ChartCommand.themes,
+                                              autocomplete: true,
                                           },
                                       ],
                                   },
@@ -1145,7 +1296,7 @@ export class Best50ChartCommand {
                                     "zh-CN": "选择 b50 图片的主题。",
                                     "zh-TW": "選擇 Best 50 圖像的主題。",
                                 },
-                                choices: Best50ChartCommand.themes,
+                                autocomplete: true,
                             },
                             {
                                 type: ApplicationCommandOptionType.Boolean,

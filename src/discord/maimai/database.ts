@@ -1,4 +1,11 @@
 import { client as kasumi } from "@kook/init/client";
 import { Database } from "gcm-database-local/maimai";
+import { CdnSource, LocalSource, Database as OtogeDbDatabase } from "gcm-database-otogedb/maimai";
 
 export const database = new Database(kasumi.config.getSync("maimai::config.localDatabasePath"));
+
+export const otogedb = new OtogeDbDatabase(
+    kasumi.config.getSync("maimai::config.useLocalOtogedbDatabase")
+        ? new LocalSource(kasumi.config.getSync("maimai::config.otogedbDatabasePath"))
+        : new CdnSource(),
+);

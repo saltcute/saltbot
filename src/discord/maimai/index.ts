@@ -7,12 +7,14 @@ import { LinkUserCommand } from "./link";
 export class Maimai {
     static readonly INTERACTION_HANDLER = async (interaction: Interaction) => {
         Best50ChartCommand.CHAT_COMMAND_HANDLER(interaction);
+        Best50ChartCommand.AUTOCOMPLETE_HANDLER(interaction);
         ChartQueryCommand.CHAT_COMMAND_HANDLER(interaction);
         ChartQueryCommand.AUTOCOMPLETE_HANDLER(interaction);
         Level50ChartCommand.CHAT_COMMAND_HANDLER(interaction);
         Level50ChartCommand.BUTTON_HANDLER(interaction);
         LinkUserCommand.CHAT_COMMAND_HANDLER(interaction);
         LinkUserCommand.BUTTON_HANDLER(interaction);
+        LinkUserCommand.MODAL_HANDLER(interaction);
     };
     static getCommand() {
         return {

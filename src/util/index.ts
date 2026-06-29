@@ -31,7 +31,8 @@ export class Util {
         "`": "\\`",
         "~": "\\~",
     };
-    static sanitizeString(string: string) {
+    static sanitizeString(string?: string) {
+        if (!string) return String(string);
         return string
             .split("")
             .map((v) => {
