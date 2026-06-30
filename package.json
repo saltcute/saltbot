@@ -48,7 +48,7 @@
         "fuse.js": "^7.1.0",
         "gcm-database": "^1.0.3",
         "gcm-database-local": "^1.0.12",
-        "gcm-database-otogedb": "^1.0.4",
+        "gcm-database-otogedb": "^1.0.5",
         "hono": "^4.12.27",
         "kasumi.js": "^0.6.0",
         "kuroshiro": "^1.2.0",
