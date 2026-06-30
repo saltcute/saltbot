@@ -9,3 +9,9 @@ export const otogedb = new OtogeDbDatabase(
         ? new LocalSource(kasumi.config.getSync("maimai::config.otogedbDatabasePath"))
         : new CdnSource(),
 );
+export const otogedbIntl = new OtogeDbDatabase(
+    kasumi.config.getSync("maimai::config.useLocalOtogedbDatabase")
+        ? new LocalSource(kasumi.config.getSync("maimai::config.otogedbDatabasePath"))
+        : new CdnSource(),
+    "INT",
+);

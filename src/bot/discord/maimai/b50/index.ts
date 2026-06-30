@@ -9,7 +9,7 @@ import { client as kasumi } from "@/bot/kook/init/client";
 import { Util } from "@/bot/util/index";
 import { Telemetry } from "@/bot/util/telemetry";
 import { ResultTypes } from "@/bot/util/telemetry/type";
-import { database, otogedb } from "../database";
+import { database, otogedb, otogedbIntl } from "../database";
 
 const lxns = new LxnsScoreAdapter({
     auth: kasumi.config.getSync("maimai::lxns.token"),
@@ -18,13 +18,14 @@ const lxns = new LxnsScoreAdapter({
 const kamai = new KamaiTachiScoreAdapter({ database });
 const maishift = new MaishiftScoreAdapter(database);
 const gcmNet = new MaimaiDxNetAdapter({ database: otogedb });
-const gcmNetEx = new MaimaiDxNetEngAdapter({ database: otogedb });
+const gcmNetIntl = new MaimaiDxNetEngAdapter({ database: otogedbIntl });
 // const divingfish = new MaiDraw.Maimai.Adapters.DivingFish({
 //     auth: kasumi.config.getSync("maimai::divingFish.token"),
 // });
 
 const painter = new Best50Painter(database);
 const otogedbPainter = new Best50Painter(otogedb);
+const otogedbIntlPainter = new Best50Painter(otogedbIntl);
 
 export class Best50ChartCommand {
     private static readonly AVAILABLE_VERSION_THEME = [
@@ -45,7 +46,7 @@ export class Best50ChartCommand {
         divingfish: "cn-2026",
         maishift: "jp-circle",
         "gcm-net": "jp-circleplus",
-        "gcm-net-ex": "jp-circle",
+        "gcm-net-intl": "jp-circle",
     };
     private static readonly DEFAULT_THEME_BY_TRACKER = {
         kamai: "jp-prismplus-landscape",
@@ -53,7 +54,7 @@ export class Best50ChartCommand {
         divingfish: "cn-2026-landscape",
         maishift: "jp-circle-landscape",
         "gcm-net": "jp-circleplus-landscape",
-        "gcm-net-ex": "jp-circle-landscape",
+        "gcm-net-intl": "jp-circle-landscape",
     };
     private static readonly DEFAULT_USE_TRACKER_PROFILE_PICTURE = true;
 
@@ -73,7 +74,7 @@ export class Best50ChartCommand {
                 tracker === "lxns" ||
                 tracker === "maishift" ||
                 tracker === "gcm-net" ||
-                tracker === "gcm-net-ex"
+                tracker === "gcm-net-intl"
             )
         ) {
             await interaction.reply({
@@ -127,7 +128,7 @@ export class Best50ChartCommand {
             } else {
                 const dbUsername = await kasumi.config.getOne(`salt::connection.discord.${tracker}.${interaction.user.id}`);
                 if (!dbUsername) {
-                    if (tracker === "gcm-net" || tracker === "gcm-net-ex") {
+                    if (tracker === "gcm-net" || tracker === "gcm-net-intl") {
                         await interaction.reply({
                             content: `Please link your Sega ID using \`/mai link ${tracker}\``,
                             ephemeral: true,
@@ -407,9 +408,9 @@ export class Best50ChartCommand {
                 );
                 break;
             }
-            case "gcm-net-ex": {
-                result = await otogedbPainter.drawWithScoreSource(
-                    gcmNetEx,
+            case "gcm-net-intl": {
+                result = await otogedbIntlPainter.drawWithScoreSource(
+                    gcmNetIntl,
                     { username },
                     {
                         theme,
@@ -995,7 +996,7 @@ export class Best50ChartCommand {
                     },
                     {
                         type: ApplicationCommandOptionType.Subcommand,
-                        name: "gcm-net-ex",
+                        name: "gcm-net-intl",
                         description: "Get best 50 scores from maimai DX NET.",
                         descriptionLocalizations: {
                             "zh-CN": "从 maimai DX NET 获取 b50 信息。",

@@ -5,7 +5,7 @@ import Kasumi from "kasumi.js";
  * interface needs. Kept as a local copy so the webui does not import from the
  * bot source tree across the workspace boundary.
  */
-export type GcmTracker = "gcm-net" | "gcm-net-ex";
+export type GcmTracker = "gcm-net" | "gcm-net-intl";
 
 interface WebuiStorage {
     "discord::auth.clientId": string;

@@ -10,7 +10,7 @@ export const Route = createFileRoute("/api/auth/discord/")({
             // biome-ignore lint/style/useNamingConvention: HTTP method handler key
             GET: async ({ request }) => {
                 const url = new URL(request.url);
-                const tracker = url.searchParams.get("tracker") === "gcm-net-ex" ? "gcm-net-ex" : "gcm-net";
+                const tracker = url.searchParams.get("tracker") === "gcm-net-intl" ? "gcm-net-intl" : "gcm-net";
                 const state = crypto.randomBytes(32).toString("base64url");
 
                 setCookie(OAUTH_STATE_COOKIE, createStateToken(state, tracker), {

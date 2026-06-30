@@ -18,7 +18,7 @@ export const getCurrentUser = createServerFn({ method: "GET" }).handler(async ()
 });
 
 function normalizeTracker(value: unknown): GcmTracker {
-    return value === "gcm-net-ex" ? "gcm-net-ex" : "gcm-net";
+    return value === "gcm-net-intl" ? "gcm-net-intl" : "gcm-net";
 }
 
 /** Whether the logged-in user already has a stored credential for the tracker. */

@@ -1,4 +1,4 @@
-export type Trackers = "kamai" | "divingfish" | "lxns" | "lxns-chuni" | "maishift" | "gcm-net" | "gcm-net-ex";
+export type Trackers = "kamai" | "divingfish" | "lxns" | "lxns-chuni" | "maishift" | "gcm-net" | "gcm-net-intl";
 
 export interface CustomStorage {
     // add your custom storage properties here

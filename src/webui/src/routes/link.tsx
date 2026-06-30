@@ -9,16 +9,16 @@ import { Input } from "#/components/ui/input.tsx";
 import { Label } from "#/components/ui/label.tsx";
 import { getCurrentUser, linkCredentials } from "#/server/functions.ts";
 
-type Tracker = "gcm-net" | "gcm-net-ex";
+type Tracker = "gcm-net" | "gcm-net-intl";
 
 const TRACKER_NAME: Record<Tracker, string> = {
     "gcm-net": "maimaiでらっくすNET",
-    "gcm-net-ex": "maimai DX NET",
+    "gcm-net-intl": "maimai DX NET",
 };
 
 export const Route = createFileRoute("/link")({
     validateSearch: (search: Record<string, unknown>): { tracker: Tracker } => ({
-        tracker: search.tracker === "gcm-net-ex" ? "gcm-net-ex" : "gcm-net",
+        tracker: search.tracker === "gcm-net-intl" ? "gcm-net-intl" : "gcm-net",
     }),
     loader: async () => {
         const user = await getCurrentUser();
@@ -70,7 +70,7 @@ function LinkPage() {
 
                     <CardContent className="flex flex-col gap-6">
                         <div className="inline-flex w-full rounded-4xl border border-border bg-input/30 p-1">
-                            {(["gcm-net", "gcm-net-ex"] as const).map((value) => (
+                            {(["gcm-net", "gcm-net-intl"] as const).map((value) => (
                                 <button
                                     key={value}
                                     type="button"
@@ -104,7 +104,7 @@ function LinkPage() {
                                         By using this service, you agree to have saltbot store your account and password for the purpose of fetching
                                         your best 50 scores only.
                                     </li>
-                                    {tracker === "gcm-net-ex" && (
+                                    {tracker === "gcm-net-intl" && (
                                         <li>
                                             You must use a Sega ID to log into your account. Partner login like X (Twitter) or Facebook login will not
                                             work.
