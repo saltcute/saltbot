@@ -966,12 +966,12 @@ export class Best50ChartCommand {
                         },
                         options: [
                             {
-                                type: ApplicationCommandOptionType.User,
-                                name: "dox",
-                                nameLocalizations: {
-                                    "zh-CN": "看看你的",
-                                    "zh-TW": "看看你的",
-                                },
+                                // type: ApplicationCommandOptionType.User,
+                                // name: "dox",
+                                // nameLocalizations: {
+                                //     "zh-CN": "看看你的",
+                                //     "zh-TW": "看看你的",
+                                // },
                                 description: "Get the b50 chart of the selected user.",
                                 descriptionLocalizations: {
                                     "zh-CN": "看看 ta 的 b50。",
@@ -1004,12 +1004,12 @@ export class Best50ChartCommand {
                         },
                         options: [
                             {
-                                type: ApplicationCommandOptionType.User,
-                                name: "dox",
-                                nameLocalizations: {
-                                    "zh-CN": "看看你的",
-                                    "zh-TW": "看看你的",
-                                },
+                                // type: ApplicationCommandOptionType.User,
+                                // name: "dox",
+                                // nameLocalizations: {
+                                //     "zh-CN": "看看你的",
+                                //     "zh-TW": "看看你的",
+                                // },
                                 description: "Get the b50 chart of the selected user.",
                                 descriptionLocalizations: {
                                     "zh-CN": "看看 ta 的 b50。",

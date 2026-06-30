@@ -3,6 +3,7 @@ import { Best50ChartCommand } from "./b50";
 import { ChartQueryCommand } from "./chart";
 import { Level50ChartCommand } from "./level50";
 import { LinkUserCommand } from "./link";
+import { UnlinkUserCommand } from "./unlink";
 
 export class Maimai {
     static readonly INTERACTION_HANDLER = async (interaction: Interaction) => {
@@ -14,6 +15,7 @@ export class Maimai {
         Level50ChartCommand.BUTTON_HANDLER(interaction);
         LinkUserCommand.CHAT_COMMAND_HANDLER(interaction);
         LinkUserCommand.BUTTON_HANDLER(interaction);
+        UnlinkUserCommand.CHAT_COMMAND_HANDLER(interaction);
     };
     static getCommand() {
         return {
@@ -29,6 +31,7 @@ export class Maimai {
                 ...LinkUserCommand.getCommand(),
                 ...ChartQueryCommand.getCommand(),
                 ...Level50ChartCommand.getCommand(),
+                ...UnlinkUserCommand.getCommand(),
             ],
         };
     }
