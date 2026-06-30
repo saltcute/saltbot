@@ -965,19 +965,19 @@ export class Best50ChartCommand {
                             "zh-TW": "從 maimaiでらっくすNET 獲取 Best 50 資料。",
                         },
                         options: [
-                            {
-                                // type: ApplicationCommandOptionType.User,
-                                // name: "dox",
-                                // nameLocalizations: {
-                                //     "zh-CN": "看看你的",
-                                //     "zh-TW": "看看你的",
-                                // },
-                                description: "Get the b50 chart of the selected user.",
-                                descriptionLocalizations: {
-                                    "zh-CN": "看看 ta 的 b50。",
-                                    "zh-TW": "看看他的 Best 50 圖像。",
-                                },
-                            },
+                            // {
+                            //     type: ApplicationCommandOptionType.User,
+                            //     name: "dox",
+                            //     nameLocalizations: {
+                            //         "zh-CN": "看看你的",
+                            //         "zh-TW": "看看你的",
+                            //     },
+                            //     description: "Get the b50 chart of the selected user.",
+                            //     descriptionLocalizations: {
+                            //         "zh-CN": "看看 ta 的 b50。",
+                            //         "zh-TW": "看看他的 Best 50 圖像。",
+                            //     },
+                            // },
                             {
                                 type: ApplicationCommandOptionType.String,
                                 name: "theme",
@@ -1003,19 +1003,19 @@ export class Best50ChartCommand {
                             "zh-TW": "從 maimai DX NET 獲取 Best 50 資料。",
                         },
                         options: [
-                            {
-                                // type: ApplicationCommandOptionType.User,
-                                // name: "dox",
-                                // nameLocalizations: {
-                                //     "zh-CN": "看看你的",
-                                //     "zh-TW": "看看你的",
-                                // },
-                                description: "Get the b50 chart of the selected user.",
-                                descriptionLocalizations: {
-                                    "zh-CN": "看看 ta 的 b50。",
-                                    "zh-TW": "看看他的 Best 50 圖像。",
-                                },
-                            },
+                            // {
+                            //     type: ApplicationCommandOptionType.User,
+                            //     name: "dox",
+                            //     nameLocalizations: {
+                            //         "zh-CN": "看看你的",
+                            //         "zh-TW": "看看你的",
+                            //     },
+                            //     description: "Get the b50 chart of the selected user.",
+                            //     descriptionLocalizations: {
+                            //         "zh-CN": "看看 ta 的 b50。",
+                            //         "zh-TW": "看看他的 Best 50 圖像。",
+                            //     },
+                            // },
                             {
                                 type: ApplicationCommandOptionType.String,
                                 name: "theme",
