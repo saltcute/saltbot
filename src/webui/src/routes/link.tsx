@@ -85,7 +85,7 @@ function LinkPage() {
 
                         <Alert variant="destructive">
                             <AlertTitle>
-                                Before you link — please read this <strong>VERY IMPORTANT</strong> information
+                                Before you link, please read the following <strong>VERY IMPORTANT</strong> information
                             </AlertTitle>
                             <AlertDescription>
                                 <ul className="list-disc pl-4">
@@ -94,8 +94,12 @@ function LinkPage() {
                                     </li>
                                     <li>You are generally discouraged from providing your password to any person.</li>
                                     <li>
-                                        We make our best effort to keep your information secure. However, make sure to create a unique password
-                                        specifically for this service in order to reduce the risk of cyber attacks.
+                                        We make our best effort to keep your information secure. However, make sure to create a unique password for
+                                        this service to reduce the risk of cyberattacks.
+                                    </li>
+                                    <li>
+                                        By using this service, you agree to have saltbot store your account and password for the purpose of fetching
+                                        your best 50 scores only.
                                     </li>
                                     {tracker === "gcm-net-ex" && (
                                         <li>
@@ -109,7 +113,7 @@ function LinkPage() {
 
                         {status === "done" ? (
                             <Alert>
-                                <AlertTitle>Linked successfully 🎉</AlertTitle>
+                                <AlertTitle>Linked successfully</AlertTitle>
                                 <AlertDescription>
                                     Your {displayName} account has been linked. You can now use <code>/mai b50 {tracker}</code> on Discord. It is now
                                     safe to close this page.
@@ -164,9 +168,7 @@ function LinkPage() {
                 <Card className="w-full max-w-md">
                     <CardHeader className="items-center text-center">
                         <CardTitle className="text-2xl">Link your maimai account</CardTitle>
-                        <CardDescription>
-                            Connect your maimaiでらっくすNET / maimai DX NET account to saltbot.
-                        </CardDescription>
+                        <CardDescription>Connect your maimaiでらっくすNET / maimai DX NET account to saltbot.</CardDescription>
                     </CardHeader>
                     <CardContent>
                         <Button asChild size="lg" className="w-full">

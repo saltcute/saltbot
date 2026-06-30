@@ -56,8 +56,9 @@ export class LinkUserCommand {
 please note the following **VERY IMPORTANT** information.
 
 - Your Sega ID and **password** is required.
-- You are generally discouraged to provide your password to any person.
-- We make our best effort to keep your information secure. However, make sure to create a unique password specifically for this service in order to reduce the risk of cyber attacks.
+- You are generally discouraged from providing your password to any person.
+- We make our best effort to keep your information secure. However, make sure to create a unique password for this service to reduce the risk of cyberattacks.
+- By using this service, you agree to have saltbot store your account and password for the purpose of fetching your best 50 scores only.
 ${tracker === "gcm-net-ex" ? "- You must use a Sega ID to log into your account. Partner login like X (Twitter) or Facebook login will not work." : ""}
 
 If you wish to proceed, please click "Continue".`,
