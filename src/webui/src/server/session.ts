@@ -1,5 +1,5 @@
 import crypto from "node:crypto";
-import { type GcmTracker, getConfig } from "#/server/kasumi.ts";
+import { type GcmTracker, getConfig } from "#/server/config.ts";
 
 /**
  * Stateless, HMAC-signed cookie helpers (no database, no extra dependency).

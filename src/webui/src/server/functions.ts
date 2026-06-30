@@ -1,7 +1,8 @@
 import { createServerFn } from "@tanstack/react-start";
 import { getCookie } from "@tanstack/react-start/server";
+import type { GcmTracker } from "#/server/config.ts";
 import { encryptCredentials } from "#/server/crypto.ts";
-import { type GcmTracker, getLink, saveLink } from "#/server/kasumi.ts";
+import { getLink, saveLink } from "#/server/mongo.ts";
 import { readSession, SESSION_COOKIE } from "#/server/session.ts";
 
 export interface CurrentUser {
@@ -43,6 +44,6 @@ export const linkCredentials = createServerFn({ method: "POST" })
         const session = readSession(getCookie(SESSION_COOKIE));
         if (!session) throw new Error("You must be logged in with Discord to link an account.");
         const token = await encryptCredentials(data.segaId, data.password);
-        saveLink(data.tracker, session.uid, token);
+        await saveLink(data.tracker, session.uid, token);
         return { ok: true };
     });

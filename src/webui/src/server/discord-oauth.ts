@@ -1,4 +1,4 @@
-import { getConfig } from "#/server/kasumi.ts";
+import { getConfig } from "#/server/config.ts";
 
 const DISCORD_API = "https://discord.com/api";
 
