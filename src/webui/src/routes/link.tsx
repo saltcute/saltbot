@@ -92,6 +92,9 @@ function LinkPage() {
                                     <li>
                                         Your Sega ID and <strong>password</strong> are required.
                                     </li>
+                                    <li>
+                                        Despite the unlikely event, saltbot is not responsible if your Sega ID become restricted or banned by Sega.
+                                    </li>
                                     <li>You are generally discouraged from providing your password to any person.</li>
                                     <li>
                                         We make our best effort to keep your information secure. However, make sure to create a unique password for
