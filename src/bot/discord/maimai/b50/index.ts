@@ -1,6 +1,7 @@
 import { ApplicationCommandOptionType, AttachmentBuilder, type Interaction, MessageFlags } from "discord.js";
 import { BaseError, type DataOrError } from "maidraw";
 import { Best50Painter } from "maidraw/maimai";
+import { isAllNetMaintenance } from "maidraw-gcm-net-adapter/common";
 import { MaimaiDxNetAdapter, MaimaiDxNetEngAdapter } from "maidraw-gcm-net-adapter/maimai";
 import { KamaiTachiScoreAdapter } from "maidraw-kamai-tachi-adapter/maimai";
 import { LxnsScoreAdapter } from "maidraw-lxns-adapter/maimai";
@@ -141,6 +142,12 @@ export class Best50ChartCommand {
                     }
                     return ResultTypes.INVALID_USERNAME;
                 } else username = dbUsername;
+            }
+        }
+        if (tracker === "gcm-net" || tracker === "gcm-net-intl") {
+            if (isAllNetMaintenance()) {
+                await Util.allNetMaintenanceNotice(interaction);
+                return ResultTypes.ERROR;
             }
         }
         await interaction.deferReply();

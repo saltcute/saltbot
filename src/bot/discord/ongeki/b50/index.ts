@@ -1,16 +1,20 @@
 import { ApplicationCommandOptionType, AttachmentBuilder } from "discord.js";
 import type { DataOrError } from "maidraw";
 import { Best50Painter } from "maidraw/ongeki";
+import { isAllNetMaintenance } from "maidraw-gcm-net-adapter/common";
+import { OngekiNetAdapter } from "maidraw-gcm-net-adapter/ongeki";
 import { KamaiTachiScoreAdapter } from "maidraw-kamai-tachi-adapter/ongeki";
 import { client as kasumi } from "@/bot/kook/init/client";
 import { Util } from "@/bot/util/index";
 import { Telemetry } from "@/bot/util/telemetry";
 import { ResultTypes } from "@/bot/util/telemetry/type";
-import { database } from "../database";
+import { database, otogedb } from "../database";
 
 const kamai = new KamaiTachiScoreAdapter({ database });
+const gcmNet = new OngekiNetAdapter({ database: otogedb });
 
 const painter = new Best50Painter(database);
+const otogedbPainter = new Best50Painter(otogedb);
 
 export class Best50ChartCommand {
     private static readonly AVAILABLE_VERSION_THEME = ["jp-refresh", "jp-brightmemory"];
@@ -57,7 +61,7 @@ export class Best50ChartCommand {
         const useProfilePicture = pfpOption == null ? this.DEFAULT_USE_TRACKER_PROFILE_PICTURE : pfpOption;
         const tracker = interaction.options.getSubcommand();
 
-        if (!(tracker === "kamai")) {
+        if (!(tracker === "kamai" || tracker === "gcm-net")) {
             await interaction.editReply({
                 content: "Invalid tracker. Please try again.",
             });
@@ -84,12 +88,25 @@ export class Best50ChartCommand {
             } else {
                 const dbUsername = await kasumi.config.getOne(`salt::connection.discord.${tracker}.${interaction.user.id}`);
                 if (!dbUsername) {
-                    await interaction.reply({
-                        content: `Please provide your username. To use without a username, you need to select "remember my username" after generating a chart or use \`/mai link\` to link your account.`,
-                        ephemeral: true,
-                    });
+                    if (tracker === "gcm-net") {
+                        await interaction.reply({
+                            content: `Please link your Sega ID using \`/mai link ${tracker}\``,
+                            ephemeral: true,
+                        });
+                    } else {
+                        await interaction.reply({
+                            content: `Please provide your username. To use without a username, you need to select "remember my username" after generating a chart or use \`/mai link\` to link your account.`,
+                            ephemeral: true,
+                        });
+                    }
                     return ResultTypes.INVALID_USERNAME;
                 } else username = dbUsername;
+            }
+        }
+        if (tracker === "gcm-net") {
+            if (isAllNetMaintenance()) {
+                await Util.allNetMaintenanceNotice(interaction);
+                return ResultTypes.ERROR;
             }
         }
         await interaction.deferReply();
@@ -144,6 +161,17 @@ export class Best50ChartCommand {
                     },
                 );
                 break;
+            }
+            case "gcm-net": {
+                result = await otogedbPainter.drawWithScoreSource(
+                    gcmNet,
+                    { username },
+                    {
+                        theme,
+                        type: "refresh",
+                        // profilePicture: useProfilePicture ? undefined : null,
+                    },
+                );
             }
         }
         if (result.err) {
@@ -328,6 +356,44 @@ export class Best50ChartCommand {
                     "zh-TW": "生成 Best 50 圖像！",
                 },
                 options: [
+                    {
+                        type: ApplicationCommandOptionType.Subcommand,
+                        name: "gcm-net",
+                        description: "Get best 50 scores from オンゲキ-NET.",
+                        descriptionLocalizations: {
+                            "zh-CN": "从 オンゲキ-NET 获取 b50 信息。",
+                            "zh-TW": "從 オンゲキ-NET 獲取 Best 50 資料。",
+                        },
+                        options: [
+                            // {
+                            //     type: ApplicationCommandOptionType.User,
+                            //     name: "dox",
+                            //     nameLocalizations: {
+                            //         "zh-CN": "看看你的",
+                            //         "zh-TW": "看看你的",
+                            //     },
+                            //     description: "Get the b50 chart of the selected user.",
+                            //     descriptionLocalizations: {
+                            //         "zh-CN": "看看 ta 的 b50。",
+                            //         "zh-TW": "看看他的 Best 50 圖像。",
+                            //     },
+                            // },
+                            {
+                                type: ApplicationCommandOptionType.String,
+                                name: "theme",
+                                nameLocalizations: {
+                                    "zh-CN": "主题",
+                                    "zh-TW": "主題",
+                                },
+                                description: "Choose from a variety of themes for your Best 50 chart.",
+                                descriptionLocalizations: {
+                                    "zh-CN": "选择 b50 图片的主题。",
+                                    "zh-TW": "選擇 Best 50 圖像的主題。",
+                                },
+                                choices: Best50ChartCommand.themes,
+                            },
+                        ],
+                    },
                     {
                         type: ApplicationCommandOptionType.Subcommand,
                         name: "kamai",
