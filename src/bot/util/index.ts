@@ -8,7 +8,7 @@ export class Util {
         const startTimestamp = Math.floor(getCurrentMaintenanceStartTime().getTime() / 1000);
         const endTimestamp = Math.floor(getCurrentMaintenanceEndTime().getTime() / 1000);
         await interaction.reply({
-            content: `ALL.Net services are currently under scheduled maintenance. You cannot use ALL.Net services, including maimaiでらっくすNet, maimai DX NET, or オンゲキ-NET, during the maintenance. 
+            content: `ALL.Net services are currently under scheduled maintenance. You cannot use ALL.Net services, including maimaiでらっくすNET, maimai DX NET, or オンゲキ-NET, during the maintenance. 
 
 The maintenance period started at <t:${startTimestamp}:t> (<t:${startTimestamp}:R>), and will end at <t:${endTimestamp}:t> (<t:${endTimestamp}:R>).`,
         });
