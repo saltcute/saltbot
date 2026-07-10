@@ -18,10 +18,19 @@ const otogedbPainter = new Best50Painter(otogedb);
 
 export class Best50ChartCommand {
     private static readonly AVAILABLE_VERSION_THEME = ["jp-refresh", "jp-brightmemory"];
-    private static readonly DEFAULT_VERSION = "jp-brightmemoryact3";
-    private static readonly DEFAULT_THEME = "jp-refresh-landscape";
+    private static readonly DEFAULT_VERSION_BY_TRACKER ={
+        "kamai":  "jp-brightmemoryact3",
+        "gcm-net": "jp-refresh"
+    };
+    private static readonly DEFAULT_THEME_BY_TRACKER = {
+        "kamai": "jp-brightmemoryact3-landscape",
+        "gcm-net": "jp-refresh-landscape"
+    };
     private static readonly DEFAULT_USE_TRACKER_PROFILE_PICTURE = true;
-    private static readonly DEFAULT_RATING_ALOGRITHM = "refresh";
+    private static readonly DEFAULT_RATING_ALOGRITHM_BY_TRACKER = {
+        "kamai": "classic",
+        "gcm-net": "refresh"
+    };
 
     private static readonly DEFAULT_VERSION_RATING_ALOGRITHM_MAP: Record<string, "refresh" | "classic"> = {
         "jp-refresh": "refresh",
@@ -42,23 +51,7 @@ export class Best50ChartCommand {
         if (interaction.options.getSubcommandGroup() !== "b50") return ResultTypes.IGNORED;
 
         let result: DataOrError<Buffer>;
-        const version = interaction.options.getString("version", false) || this.DEFAULT_VERSION;
-        const themeVersion = version.includes("act") ? version.replace(/act[1-3]/, "") : version;
-        const type =
-            interaction.options.getString("type", false) === "classic"
-                ? "classic"
-                : interaction.options.getString("type", false) === "refresh"
-                  ? "refresh"
-                  : this.DEFAULT_VERSION_RATING_ALOGRITHM_MAP[version] || this.DEFAULT_RATING_ALOGRITHM;
 
-        const theme =
-            (interaction.options.getString("theme", false) ||
-                (themeVersion && this.AVAILABLE_VERSION_THEME.includes(themeVersion) ? `${themeVersion}-landscape` : this.DEFAULT_THEME)) +
-            "-" +
-            type;
-
-        const pfpOption = interaction.options.getBoolean("use_profile_picture", false);
-        const useProfilePicture = pfpOption == null ? this.DEFAULT_USE_TRACKER_PROFILE_PICTURE : pfpOption;
         const tracker = interaction.options.getSubcommand();
 
         if (!(tracker === "kamai" || tracker === "gcm-net")) {
@@ -68,6 +61,23 @@ export class Best50ChartCommand {
             return ResultTypes.INVALID_TRACKER;
         }
         let username: string | null = null;
+        const version = interaction.options.getString("version", false) || this.DEFAULT_VERSION_BY_TRACKER[tracker];
+        const themeVersion = version.includes("act") ? version.replace(/act[1-3]/, "") : version;
+        const type =
+            interaction.options.getString("type", false) === "classic"
+                ? "classic"
+                : interaction.options.getString("type", false) === "refresh"
+                  ? "refresh"
+                  : this.DEFAULT_VERSION_RATING_ALOGRITHM_MAP[version] || this.DEFAULT_RATING_ALOGRITHM_BY_TRACKER[tracker];
+
+        const theme =
+            (interaction.options.getString("theme", false) ||
+                (themeVersion && this.AVAILABLE_VERSION_THEME.includes(themeVersion) ? `${themeVersion}-landscape` : this.DEFAULT_THEME_BY_TRACKER[tracker])) +
+            "-" +
+            type;
+
+        const pfpOption = interaction.options.getBoolean("use_profile_picture", false);
+        const useProfilePicture = pfpOption == null ? this.DEFAULT_USE_TRACKER_PROFILE_PICTURE : pfpOption;
         switch (tracker) {
             case "kamai": {
                 username = interaction.options.getString("user");
