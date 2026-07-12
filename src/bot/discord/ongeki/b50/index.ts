@@ -18,18 +18,18 @@ const otogedbPainter = new Best50Painter(otogedb);
 
 export class Best50ChartCommand {
     private static readonly AVAILABLE_VERSION_THEME = ["jp-refresh", "jp-brightmemory"];
-    private static readonly DEFAULT_VERSION_BY_TRACKER ={
-        "kamai":  "jp-brightmemoryact3",
-        "gcm-net": "jp-refresh"
+    private static readonly DEFAULT_VERSION_BY_TRACKER = {
+        kamai: "jp-brightmemoryact3",
+        "gcm-net": "jp-refresh",
     };
     private static readonly DEFAULT_THEME_BY_TRACKER = {
-        "kamai": "jp-brightmemoryact3-landscape",
-        "gcm-net": "jp-refresh-landscape"
+        kamai: "jp-brightmemoryact3-landscape",
+        "gcm-net": "jp-refresh-landscape",
     };
     private static readonly DEFAULT_USE_TRACKER_PROFILE_PICTURE = true;
     private static readonly DEFAULT_RATING_ALOGRITHM_BY_TRACKER = {
-        "kamai": "classic",
-        "gcm-net": "refresh"
+        kamai: "classic",
+        "gcm-net": "refresh",
     };
 
     private static readonly DEFAULT_VERSION_RATING_ALOGRITHM_MAP: Record<string, "refresh" | "classic"> = {
@@ -55,8 +55,9 @@ export class Best50ChartCommand {
         const tracker = interaction.options.getSubcommand();
 
         if (!(tracker === "kamai" || tracker === "gcm-net")) {
-            await interaction.editReply({
+            await interaction.reply({
                 content: "Invalid tracker. Please try again.",
+                ephemeral: true,
             });
             return ResultTypes.INVALID_TRACKER;
         }
@@ -72,7 +73,9 @@ export class Best50ChartCommand {
 
         const theme =
             (interaction.options.getString("theme", false) ||
-                (themeVersion && this.AVAILABLE_VERSION_THEME.includes(themeVersion) ? `${themeVersion}-landscape` : this.DEFAULT_THEME_BY_TRACKER[tracker])) +
+                (themeVersion && this.AVAILABLE_VERSION_THEME.includes(themeVersion)
+                    ? `${themeVersion}-landscape`
+                    : this.DEFAULT_THEME_BY_TRACKER[tracker])) +
             "-" +
             type;
 
@@ -100,12 +103,12 @@ export class Best50ChartCommand {
                 if (!dbUsername) {
                     if (tracker === "gcm-net") {
                         await interaction.reply({
-                            content: `Please link your Sega ID using \`/mai link ${tracker}\``,
+                            content: `Please link your Sega ID using \`/geki link ${tracker}\``,
                             ephemeral: true,
                         });
                     } else {
                         await interaction.reply({
-                            content: `Please provide your username. To use without a username, you need to select "remember my username" after generating a chart or use \`/mai link\` to link your account.`,
+                            content: `Please provide your username. To use without a username, you need to select "remember my username" after generating a chart or use \`/geki link\` to link your account.`,
                             ephemeral: true,
                         });
                     }
@@ -210,19 +213,19 @@ export class Best50ChartCommand {
                                     type: 2,
                                     label: "Onegai shimasu",
                                     style: 1,
-                                    customId: `maimai::tracker.link.${tracker}.${interaction.user.id}.${username}`,
+                                    customId: `ongeki::tracker.link.${tracker}.${interaction.user.id}.${username}`,
                                 },
                                 {
                                     type: 2,
                                     label: "Later",
                                     style: 3,
-                                    customId: `maimai::tracker.link.nocomment`,
+                                    customId: `ongeki::tracker.link.nocomment`,
                                 },
                                 {
                                     type: 2,
                                     label: "GO MIND YOUR OWN BUSINESS",
                                     style: 4,
-                                    customId: `maimai::tracker.link.ignore.${tracker}.${interaction.user.id}`,
+                                    customId: `ongeki::tracker.link.ignore.${tracker}.${interaction.user.id}`,
                                 },
                             ],
                         },

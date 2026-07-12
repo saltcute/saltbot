@@ -7,7 +7,7 @@ import { ResultTypes } from "@/bot/util/telemetry/type";
 export class LinkUserCommand {
     static CHAT_COMMAND_HANDLER = Telemetry.discordMiddleware(async (interaction) => {
         if (!interaction.isChatInputCommand()) return ResultTypes.IGNORED;
-        if (interaction.commandName !== "chu") return ResultTypes.IGNORED;
+        if (interaction.commandName !== "geki") return ResultTypes.IGNORED;
         if (interaction.options.getSubcommandGroup() !== "link") return ResultTypes.IGNORED;
 
         const tracker = interaction.options.getSubcommand();
@@ -17,16 +17,8 @@ export class LinkUserCommand {
                 username = interaction.options.getString("user", true);
                 break;
             }
-            case "divingfish": {
-                username = interaction.options.getString("username", true);
-                break;
-            }
-            case "lxns": {
-                username = interaction.options.getString("friendcode", true);
-                break;
-            }
         }
-        if (!(tracker === "gcm-net" || tracker === "gcm-net-intl") && !username) {
+        if (!(tracker === "gcm-net") && !username) {
             await interaction.reply({
                 content: "Please provide your username.",
                 flags: MessageFlags.Ephemeral,
@@ -35,17 +27,15 @@ export class LinkUserCommand {
         }
         switch (tracker) {
             case "kamai":
-            case "divingfish":
-            case "lxns":
-                kasumi.config.set(`salt::connection.discord.${tracker === "lxns" ? "lxns-chuni" : tracker}.${interaction.user.id}`, username);
+                kasumi.config.set(`salt::connection.discord.${tracker}.${interaction.user.id}`, username);
                 await interaction.reply({
-                    content: `I have linked your discord account to your \`${tracker}\` account \`${username}\`. You can now omit the username field next time you use \`/chu b50 ${tracker}\`.`,
+                    content: `I have linked your discord account to your \`${tracker}\` account \`${username}\`. You can now omit the username field next time you use \`/geki b50 ${tracker}\`.`,
                     flags: MessageFlags.Ephemeral,
                 });
                 break;
             case "gcm-net":
             case "gcm-net-intl": {
-                await Util.gcmNetLinkNotice(interaction, tracker, "chunithm");
+                await Util.gcmNetLinkNotice(interaction, tracker, "ongeki");
             }
         }
 
@@ -54,8 +44,8 @@ export class LinkUserCommand {
 
     static readonly BUTTON_HANDLER = async (interaction: Interaction) => {
         if (!interaction.isButton()) return;
-        if (interaction.customId.startsWith("chuni::tracker.link.")) {
-            const action = interaction.customId.replace("chuni::tracker.link.", "");
+        if (interaction.customId.startsWith("ongeki::tracker.link.")) {
+            const action = interaction.customId.replace("ongeki::tracker.link.", "");
             switch (true) {
                 case action === "nocomment":
                     await interaction.update({
@@ -74,7 +64,7 @@ export class LinkUserCommand {
                             });
                             return;
                         }
-                        if (!(tracker === "kamai" || tracker === "divingfish" || tracker === "lxns-chuni")) {
+                        if (!(tracker === "kamai")) {
                             await interaction.reply({
                                 content: "This shouldn't happen but I don't see the tracker you are using. Please try again.",
                                 ephemeral: true,
@@ -83,7 +73,7 @@ export class LinkUserCommand {
                         }
                         kasumi.config.set(`salt::connection.discord.ignore.${tracker}.${userId}`, true);
                         await interaction.update({
-                            content: `Okay, I won't bother you again, but you can always use \`/chu link ${tracker === "lxns-chuni" ? "lxns" : tracker}\` to link your account if you changed your mind.`,
+                            content: `Okay, I won't bother you again, but you can always use \`/geki link ${tracker}\` to link your account if you changed your mind.`,
                             components: [],
                         });
                         break;
@@ -108,7 +98,7 @@ export class LinkUserCommand {
                             });
                             return;
                         }
-                        if (!(tracker === "kamai" || tracker === "divingfish" || tracker === "lxns-chuni")) {
+                        if (!(tracker === "kamai")) {
                             await interaction.reply({
                                 content: "This shouldn't happen but I don't see the tracker you are using. Please try again.",
                                 ephemeral: true,
@@ -131,10 +121,10 @@ export class LinkUserCommand {
             {
                 type: 2,
                 name: "link",
-                description: "Link your CHUNITHM account to your discord account.",
+                description: "Link your ONGEKI account to your discord account.",
                 descriptionLocalizations: {
-                    "zh-CN": "绑定你的 中二节奏 账号。",
-                    "zh-TW": "連結您的 CHUNITHM 使用者資料。",
+                    "zh-CN": "绑定你的 音击 账号。",
+                    "zh-TW": "連結您的 音擊 使用者資料。",
                 },
                 options: [
                     {
@@ -164,45 +154,11 @@ export class LinkUserCommand {
                     },
                     {
                         type: 1,
-                        name: "lxns",
-                        description: "Link your LXNS account.",
-                        descriptionLocalizations: {
-                            "zh-CN": "绑定你的 落雪查分器 账号。",
-                            "zh-TW": "連結您的 LXNS 使用者資料。",
-                        },
-                        options: [
-                            {
-                                type: 3,
-                                name: "friendcode",
-                                nameLocalizations: {
-                                    "zh-CN": "好友码",
-                                    "zh-TW": "好友代號",
-                                },
-                                description: "You can see your friend code at https://maimai.lxns.net/user/profile.",
-                                descriptionLocalizations: {
-                                    "zh-CN": "你可以在 https://maimai.lxns.net/user/profile 看到你的好友码。",
-                                    "zh-TW": "您可以在 https://maimai.lxns.net/user/profile 檢視您的好友代號。",
-                                },
-                                required: true,
-                            },
-                        ],
-                    },
-                    {
-                        type: 1,
                         name: "gcm-net",
-                        description: "Link your CHUNITHM-NET account.",
+                        description: "Link your オンゲキ-NET account.",
                         descriptionLocalizations: {
-                            "zh-CN": "绑定你的 CHUNITHM-NET 账号。",
-                            "zh-TW": "連結您的 CHUNITHM-NET 使用者資料。",
-                        },
-                    },
-                    {
-                        type: 1,
-                        name: "gcm-net-intl",
-                        description: "Link your CHUNITHM-NET (International ver.) account.",
-                        descriptionLocalizations: {
-                            "zh-CN": "绑定你的 CHUNITHM-NET (国际版) 账号。",
-                            "zh-TW": "連結您的 CHUNITHM-NET (國際版) 使用者資料。",
+                            "zh-CN": "绑定你的 オンゲキ-NET 账号。",
+                            "zh-TW": "連結您的 オンゲキ-NET 使用者資料。",
                         },
                     },
                 ],

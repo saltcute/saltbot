@@ -1,5 +1,6 @@
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle, type Interaction, MessageFlags } from "discord.js";
+import { type Interaction, MessageFlags } from "discord.js";
 import { client as kasumi } from "@/bot/kook/init/client";
+import { Util } from "@/bot/util";
 import { Telemetry } from "@/bot/util/telemetry";
 import { ResultTypes } from "@/bot/util/telemetry/type";
 
@@ -49,28 +50,7 @@ export class LinkUserCommand {
                 break;
             case "gcm-net":
             case "gcm-net-intl": {
-                const baseUrl = (kasumi.config.getSync("webui::config.baseUrl") || "").replace(/\/+$/, "");
-                const linkUrl = `${baseUrl}/link?tracker=${tracker}`;
-                await interaction.reply({
-                    content: `Before linking your ${tracker === "gcm-net-intl" ? "maimai DX NET" : "maimaiでらっくすNET"} account to saltbot,
-please note the following **VERY IMPORTANT** information.
-
-- Your Sega ID and **password** are required.
-- Despite unlikely, saltbot is not responsible if your Sega ID become restricted or banned by Sega.
-- You are generally discouraged from providing your password to any person.
-- We make our best effort to keep your information secure. However, make sure to create a unique password for this service to reduce the risk of cyberattacks.
-- By using this service, you agree to have saltbot store your account and password for the purpose of fetching your best 50 scores only.
-${tracker === "gcm-net-intl" ? "- You must use a Sega ID to log into your account. Partner login like X (Twitter) or Facebook login will not work." : ""}
-
-If you wish to proceed, please click "Continue".`,
-
-                    components: [
-                        new ActionRowBuilder()
-                            .addComponents(new ButtonBuilder().setLabel("Continue").setStyle(ButtonStyle.Link).setURL(linkUrl))
-                            .toJSON(),
-                    ],
-                    flags: MessageFlags.Ephemeral,
-                });
+                await Util.gcmNetLinkNotice(interaction, tracker, "maimaidx");
             }
         }
 

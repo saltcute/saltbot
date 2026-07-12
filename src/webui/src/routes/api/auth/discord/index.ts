@@ -10,10 +10,13 @@ export const Route = createFileRoute("/api/auth/discord/")({
             // biome-ignore lint/style/useNamingConvention: HTTP method handler key
             GET: async ({ request }) => {
                 const url = new URL(request.url);
-                const tracker = url.searchParams.get("tracker") === "gcm-net-intl" ? "gcm-net-intl" : "gcm-net";
+                const rawService = url.searchParams.get("service");
+                const service = rawService === "chunithm" ? "chunithm" : rawService === "ongeki" ? "ongeki" : "maimaidx";
+                // オンゲキ-NET has no international version, so force the JP tracker (same rule as /link).
+                const tracker = service !== "ongeki" && url.searchParams.get("tracker") === "gcm-net-intl" ? "gcm-net-intl" : "gcm-net";
                 const state = crypto.randomBytes(32).toString("base64url");
 
-                setCookie(OAUTH_STATE_COOKIE, createStateToken(state, tracker), {
+                setCookie(OAUTH_STATE_COOKIE, createStateToken(state, tracker, service), {
                     httpOnly: true,
                     secure: url.protocol === "https:",
                     sameSite: "lax",

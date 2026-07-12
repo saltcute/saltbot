@@ -7,6 +7,7 @@ import JSON5 from "json5";
  * bot source tree across the workspace boundary.
  */
 export type GcmTracker = "gcm-net" | "gcm-net-intl";
+export type GcmService = "maimaidx" | "chunithm" | "ongeki";
 
 /**
  * The config keys the webui reads. The `discord::*`/`webui::*` keys back the

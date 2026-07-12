@@ -134,3 +134,8 @@
         @apply font-sans;
     }
 }
+
+/* Bare content links (e.g. in alert text); anchors styled via classes (buttons, nav) opt out. */
+a:not([class]) {
+    text-decoration: underline;
+}

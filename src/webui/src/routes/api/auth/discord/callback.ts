@@ -41,7 +41,7 @@ export const Route = createFileRoute("/api/auth/discord/callback")({
                 return new Response(null, {
                     status: 302,
                     // biome-ignore lint/style/useNamingConvention: HTTP header name
-                    headers: { Location: `${baseUrl()}/link?tracker=${stored.tracker}` },
+                    headers: { Location: `${baseUrl()}/link?tracker=${stored.tracker}&service=${stored.service}` },
                 });
             },
         },

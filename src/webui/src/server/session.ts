@@ -1,10 +1,10 @@
 import crypto from "node:crypto";
-import { type GcmTracker, getConfig } from "#/server/config.ts";
+import { type GcmService, type GcmTracker, getConfig } from "#/server/config.ts";
 
 /**
  * Stateless, HMAC-signed cookie helpers (no database, no extra dependency).
  * The session cookie carries the authenticated Discord identity; the state
- * cookie carries the one-shot OAuth CSRF token + selected tracker.
+ * cookie carries the one-shot OAuth CSRF token + selected tracker/service.
  */
 
 export const SESSION_COOKIE = "session";
@@ -64,15 +64,16 @@ export function readSession(token: string | undefined | null): SessionPayload | 
 interface StatePayload {
     state: string;
     tracker: GcmTracker;
+    service: GcmService;
     exp: number;
 }
 
-export function createStateToken(state: string, tracker: GcmTracker): string {
-    return seal({ state, tracker, exp: Date.now() + STATE_TTL_MS } satisfies StatePayload);
+export function createStateToken(state: string, tracker: GcmTracker, service: GcmService): string {
+    return seal({ state, tracker, service, exp: Date.now() + STATE_TTL_MS } satisfies StatePayload);
 }
 
-export function readState(token: string | undefined | null): { state: string; tracker: GcmTracker } | null {
+export function readState(token: string | undefined | null): { state: string; tracker: GcmTracker; service: GcmService } | null {
     const payload = unseal<StatePayload>(token);
     if (!payload || typeof payload.exp !== "number" || payload.exp < Date.now()) return null;
-    return { state: payload.state, tracker: payload.tracker };
+    return { state: payload.state, tracker: payload.tracker, service: payload.service ?? "maimaidx" };
 }

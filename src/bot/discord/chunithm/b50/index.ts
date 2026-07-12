@@ -1,36 +1,55 @@
 import { ApplicationCommandOptionType, AttachmentBuilder } from "discord.js";
 import type { DataOrError } from "maidraw";
 import { BestPainter } from "maidraw/chunithm";
+import { ChunithmNetAdapter, ChunithmNetEngAdapter } from "maidraw-gcm-net-adapter/chunithm";
+import { isAllNetMaintenance } from "maidraw-gcm-net-adapter/common";
 import { KamaiTachiScoreAdapter } from "maidraw-kamai-tachi-adapter/chunithm";
 import { LxnsScoreAdapter } from "maidraw-lxns-adapter/chunithm";
 import { client as kasumi } from "@/bot/kook/init/client";
 import { Util } from "@/bot/util/index";
 import { Telemetry } from "@/bot/util/telemetry";
 import { ResultTypes } from "@/bot/util/telemetry/type";
-import { database } from "../database";
+import { database, otogedb, otogedbIntl } from "../database";
 
+const kamai = new KamaiTachiScoreAdapter({ database });
 const lxns = new LxnsScoreAdapter({
     auth: kasumi.config.getSync("maimai::lxns.token"),
     database,
 });
-const kamai = new KamaiTachiScoreAdapter({ database });
+const gcmNet = new ChunithmNetAdapter({ database: otogedb });
+const gcmNetIntl = new ChunithmNetEngAdapter({ database: otogedbIntl });
 
 const painter = new BestPainter(database);
+const otogeDbPainter = new BestPainter(otogedb);
+const otogeDbIntlPainter = new BestPainter(otogedbIntl);
 
 export class Best50ChartCommand {
-    private static readonly AVAILABLE_VERSION_THEME = ["jp-xversex", "jp-xverse", "jp-verse", "jp-luminousplus", "jp-luminous", "jp-paradiselost"];
+    private static readonly AVAILABLE_VERSION_THEME = [
+        "jp-mate",
+        "jp-xversex",
+        "jp-xverse",
+        "jp-verse",
+        "jp-luminousplus",
+        "jp-luminous",
+        "jp-paradiselost",
+    ];
     private static readonly DEFAULT_VERSION_BY_TRACKER = {
         kamai: "jp-verse",
         "lxns-chuni": "cn-2025",
+        "gcm-net": "jp-mate",
+        "gcm-net-intl": "jp-xversex",
     };
     private static readonly DEFAULT_THEME_BY_TRACKER = {
         kamai: "jp-verse-landscape",
         "lxns-chuni": "jp-verse-landscape",
+        "gcm-net": "jp-mate-landscape",
+        "gcm-net-intl": "jp-xversex-landscape",
     };
     private static readonly DEFAULT_USE_TRACKER_PROFILE_PICTURE = true;
     private static readonly DEFAULT_RATING_ALOGRITHM = "new";
 
     private static readonly DEFAULT_VERSION_RATING_ALOGRITHM_MAP: Record<string, "new" | "recents"> = {
+        "jp-mate": "new",
         "jp-xversex": "new",
         "jp-xverse": "new",
         "jp-verse": "new",
@@ -66,11 +85,14 @@ export class Best50ChartCommand {
             !(
                 tracker === "kamai" ||
                 // tracker == "divingfish" ||
-                tracker === "lxns-chuni"
+                tracker === "lxns-chuni" ||
+                tracker === "gcm-net" ||
+                tracker === "gcm-net-intl"
             )
         ) {
-            await interaction.editReply({
+            await interaction.reply({
                 content: "Invalid tracker. Please try again.",
+                ephemeral: true,
             });
             return ResultTypes.INVALID_TRACKER;
         }
@@ -144,12 +166,31 @@ export class Best50ChartCommand {
             } else {
                 const dbUsername = await kasumi.config.getOne(`salt::connection.discord.${tracker}.${interaction.user.id}`);
                 if (!dbUsername) {
-                    await interaction.reply({
-                        content: `Please provide your ${tracker === "lxns-chuni" ? "friend code" : "username"}. To use without a ${tracker === "lxns-chuni" ? "friend code" : "username"}, you need to select "remember my username" after generating a chart or use \`/mai link\` to link your account.`,
-                        ephemeral: true,
-                    });
+                    if (tracker === "gcm-net" || tracker === "gcm-net-intl") {
+                        await interaction.reply({
+                            content: `Please link your Sega ID using \`/chu link ${tracker}\``,
+                            ephemeral: true,
+                        });
+                    } else {
+                        await interaction.reply({
+                            content: `Please provide your ${tracker === "lxns-chuni" ? "friend code" : "username"}. To use without a ${tracker === "lxns-chuni" ? "friend code" : "username"}, you need to select "remember my username" after generating a chart or use \`/chu link\` to link your account.`,
+                            ephemeral: true,
+                        });
+                    }
                     return ResultTypes.INVALID_USERNAME;
                 } else username = dbUsername;
+            }
+        }
+        if (tracker === "gcm-net") {
+            if (isAllNetMaintenance(2)) {
+                await Util.allNetMaintenanceNotice(interaction, 2, "chunithm");
+                return ResultTypes.ERROR;
+            }
+        }
+        if (tracker === "gcm-net-intl") {
+            if (isAllNetMaintenance()) {
+                await Util.allNetMaintenanceNotice(interaction);
+                return ResultTypes.ERROR;
             }
         }
         await interaction.deferReply();
@@ -257,6 +298,14 @@ export class Best50ChartCommand {
                 );
                 break;
             }
+            case "gcm-net": {
+                result = await otogeDbPainter.drawWithScoreSource(gcmNet, { username }, { theme });
+                break;
+            }
+            case "gcm-net-intl": {
+                result = await otogeDbIntlPainter.drawWithScoreSource(gcmNetIntl, { username }, { theme });
+                break;
+            }
         }
         if (result.err) {
             await Util.reportError(interaction, result.err);
@@ -320,6 +369,22 @@ export class Best50ChartCommand {
     ];
 
     static readonly themes = [
+        {
+            name: "CHUNITHM MATE (Japan)",
+            nameLocalizations: {
+                "zh-CN": "CHUNITHM MATE（日服）",
+                "zh-TW": "CHUNITHM MATE（日本）",
+            },
+            value: "jp-mate-landscape",
+        },
+        {
+            name: "CHUNITHM X-VERSE-X (Japan)",
+            nameLocalizations: {
+                "zh-CN": "CHUNITHM X-VERSE-X（日服）",
+                "zh-TW": "CHUNITHM X-VERSE-X（日本）",
+            },
+            value: "jp-xversex-landscape",
+        },
         {
             name: "CHUNITHM X-VERSE (Japan)",
             nameLocalizations: {
@@ -544,6 +609,56 @@ export class Best50ChartCommand {
                     "zh-TW": "生成 Best 50 圖像！",
                 },
                 options: [
+                    {
+                        type: ApplicationCommandOptionType.Subcommand,
+                        name: "gcm-net",
+                        description: "Get best 50 scores from CHUNITHM-NET.",
+                        descriptionLocalizations: {
+                            "zh-CN": "从 CHUNITHM-NET 获取 b50 信息。",
+                            "zh-TW": "從 CHUNITHM-NET 獲取 Best 50 資料。",
+                        },
+                        options: [
+                            {
+                                type: ApplicationCommandOptionType.String,
+                                name: "theme",
+                                nameLocalizations: {
+                                    "zh-CN": "主题",
+                                    "zh-TW": "主題",
+                                },
+                                description: "Choose from a variety of themes for your Best 50 chart.",
+                                descriptionLocalizations: {
+                                    "zh-CN": "选择 b50 图片的主题。",
+                                    "zh-TW": "選擇 Best 50 圖像的主題。",
+                                },
+                                choices: Best50ChartCommand.themes,
+                            },
+                        ],
+                    },
+                    {
+                        type: ApplicationCommandOptionType.Subcommand,
+                        name: "gcm-net-intl",
+                        description: "Get best 50 scores from CHUNITHM-NET (International ver.).",
+                        descriptionLocalizations: {
+                            "zh-CN": "从 CHUNITHM-NET (国际版) 获取 b50 信息。",
+                            "zh-TW": "從 CHUNITHM-NET (國際版) 獲取 Best 50 資料。",
+                        },
+                        options: [
+                            {
+                                type: ApplicationCommandOptionType.String,
+                                name: "theme",
+                                nameLocalizations: {
+                                    "zh-CN": "主题",
+                                    "zh-TW": "主題",
+                                },
+                                description: "Choose from a variety of themes for your Best 50 chart.",
+                                descriptionLocalizations: {
+                                    "zh-CN": "选择 b50 图片的主题。",
+                                    "zh-TW": "選擇 Best 50 圖像的主題。",
+                                },
+                                choices: Best50ChartCommand.themes,
+                            },
+                        ],
+                    },
                     {
                         type: ApplicationCommandOptionType.Subcommand,
                         name: "kamai",
