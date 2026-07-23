@@ -45,17 +45,17 @@ export class Best50ChartCommand {
         kamai: "jp-prismplus",
         lxns: "cn-2026",
         divingfish: "cn-2026",
-        maishift: "jp-circle",
+        maishift: "jp-circleplus",
         "gcm-net": "jp-circleplus",
-        "gcm-net-intl": "jp-circle",
+        "gcm-net-intl": "jp-circleplus",
     };
     private static readonly DEFAULT_THEME_BY_TRACKER = {
         kamai: "jp-prismplus-landscape",
         lxns: "cn-2026-landscape",
         divingfish: "cn-2026-landscape",
-        maishift: "jp-circle-landscape",
+        maishift: "jp-circleplus-landscape",
         "gcm-net": "jp-circleplus-landscape",
-        "gcm-net-intl": "jp-circle-landscape",
+        "gcm-net-intl": "jp-circleplus-landscape",
     };
     private static readonly DEFAULT_USE_TRACKER_PROFILE_PICTURE = true;
 
