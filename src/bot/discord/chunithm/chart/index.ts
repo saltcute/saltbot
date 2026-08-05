@@ -29,7 +29,7 @@ export class ChartQueryCommand {
         else return defaults;
     }
 
-    static readonly DEFAULT_THEME = "jp-xversex";
+    static readonly DEFAULT_THEME = "jp-mate";
     static readonly CHAT_COMMAND_HANDLER = Telemetry.discordMiddleware(async (interaction) => {
         if (!interaction.isChatInputCommand()) return ResultTypes.IGNORED;
         if (interaction.commandName !== "chu") return ResultTypes.IGNORED;
@@ -239,6 +239,22 @@ export class ChartQueryCommand {
     ];
 
     static readonly themes = [
+        {
+            name: "CHUNITHM Mate (Japan)",
+            nameLocalizations: {
+                "zh-CN": "CHUNITHM Mate（日服）",
+                "zh-TW": "CHUNITHM Mate（日本）",
+            },
+            value: "jp-mate",
+        },
+        {
+            name: "CHUNITHM X-VERSE-X (Japan)",
+            nameLocalizations: {
+                "zh-CN": "CHUNITHM X-VERSE-X（日服）",
+                "zh-TW": "CHUNITHM X-VERSE-X（日本）",
+            },
+            value: "jp-xversex",
+        },
         {
             name: "CHUNITHM X-VERSE (Japan)",
             nameLocalizations: {
