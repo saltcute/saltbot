@@ -1,17 +1,17 @@
 {
     "name": "saltbot",
     "version": "0.1.0",
-    "description": "Template for Kasumi",
+    "description": "salt bot",
     "main": "index.js",
     "scripts": {
-        "start": "concurrently --kill-others -n \"Bot,Web,Tunnel\" \"npm run start:bot\" \"npm run start:web\" \"npm run tunnel\"",
+        "start": "concurrently --kill-signal SIGINT --kill-others -n \"Bot,Web,Tunnel\" \"npm run start:bot\" \"npm run start:web\" \"npm run tunnel\"",
         "start:bot": "node --nolazy -r ts-node/register -r tsconfig-paths/register src/index.ts",
         "start:web": "npm run build:web && export CONFIG_PATH=\"$PWD/src/config/config.json5\" && export PORT=16320 && node src/webui/.output/server/index.mjs",
         "tunnel": "test -f src/config/cloudflared.yml && cloudflared tunnel --config src/config/cloudflared.yml run || echo 'Cloudflare tunnel not configured (src/config/cloudflared.yml missing); skipping.'",
         "build:web": "npm run build -w src/webui",
         "dev:bot": "export LOG_LEVEL=trace && npm run start:bot | pino-pretty",
         "dev:web": "npm run dev -w src/webui",
-        "dev": "concurrently --kill-others -n \"Bot,Web\" \"npm run dev:bot\" \"npm run dev:web\"",
+        "dev": "concurrently --kill-signal SIGINT --kill-others -n \"Bot,Web\" \"npm run dev:bot\" \"npm run dev:web\"",
         "format": "biome format --write",
         "lint": "biome lint --write",
         "check": "biome check --write",
@@ -24,7 +24,11 @@
     "keywords": [
         "Kasumi",
         "kook",
-        "bot"
+        "discord",
+        "bot",
+        "maimai",
+        "CHUNITHM",
+        "ONGEKI"
     ],
     "workspaces": [
         "src/webui"
