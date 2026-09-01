@@ -182,14 +182,18 @@ export class Best50ChartCommand {
             }
         }
         if (tracker === "gcm-net") {
-            if (isAllNetMaintenance(2)) {
-                await Util.allNetMaintenanceNotice(interaction, 2, "chunithm");
+            if (isAllNetMaintenance(gcmNet.maintenanceStartHour, gcmNet.maintenanceEndHour)) {
+                await interaction.reply({
+                    content: gcmNet.allNetMaintenanceError.getDiscordMarkdownContent(),
+                });
                 return ResultTypes.ERROR;
             }
         }
         if (tracker === "gcm-net-intl") {
-            if (isAllNetMaintenance()) {
-                await Util.allNetMaintenanceNotice(interaction);
+            if (isAllNetMaintenance(gcmNetIntl.maintenanceStartHour, gcmNetIntl.maintenanceEndHour)) {
+                await interaction.reply({
+                    content: gcmNet.allNetMaintenanceError.getDiscordMarkdownContent(),
+                });
                 return ResultTypes.ERROR;
             }
         }

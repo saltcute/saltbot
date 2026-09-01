@@ -1,24 +1,9 @@
 import type { BaseError } from "maidraw";
 import "./telemetry";
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, type CacheType, type CommandInteraction, type Interaction, MessageFlags } from "discord.js";
-import { getCurrentMaintenanceEndTime, getCurrentMaintenanceStartTime } from "maidraw-gcm-net-adapter/common";
 import { client as kasumi } from "../kook/init/client";
 
 export class Util {
-    static readonly servicesMap = {
-        default: "maimaiでらっくすNET, maimai DX NET, CHUNITHM-NET, or オンゲキ-NET",
-        chunithm: "CHUNITHM-NET",
-    };
-    static async allNetMaintenanceNotice(interaction: CommandInteraction, startHour: number = 4, service: "default" | "chunithm" = "default") {
-        const startTimestamp = Math.floor(getCurrentMaintenanceStartTime(startHour).getTime() / 1000);
-        const endTimestamp = Math.floor(getCurrentMaintenanceEndTime().getTime() / 1000);
-        await interaction.reply({
-            content: `The ALL.Net service is currently under scheduled maintenance. You cannot use ALL.Net services, including ${Util.servicesMap[service]}, during the maintenance. 
-
-The maintenance period started at <t:${startTimestamp}:t> (<t:${startTimestamp}:R>), and will end at <t:${endTimestamp}:t> (<t:${endTimestamp}:R>).`,
-        });
-    }
-
     static readonly services = ["maimaidx", "chunithm", "ongeki"] as const;
     static readonly serviceNamesMap = {
         maimaidx: {

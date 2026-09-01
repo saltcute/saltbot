@@ -116,9 +116,12 @@ export class Best50ChartCommand {
                 } else username = dbUsername;
             }
         }
+
         if (tracker === "gcm-net") {
-            if (isAllNetMaintenance()) {
-                await Util.allNetMaintenanceNotice(interaction);
+            if (isAllNetMaintenance(gcmNet.maintenanceStartHour, gcmNet.maintenanceEndHour)) {
+                await interaction.reply({
+                    content: gcmNet.allNetMaintenanceError.getDiscordMarkdownContent(),
+                });
                 return ResultTypes.ERROR;
             }
         }

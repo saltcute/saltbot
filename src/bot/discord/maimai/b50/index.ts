@@ -144,9 +144,19 @@ export class Best50ChartCommand {
                 } else username = dbUsername;
             }
         }
-        if (tracker === "gcm-net" || tracker === "gcm-net-intl") {
-            if (isAllNetMaintenance()) {
-                await Util.allNetMaintenanceNotice(interaction);
+        if (tracker === "gcm-net") {
+            if (isAllNetMaintenance(gcmNet.maintenanceStartHour, gcmNet.maintenanceEndHour)) {
+                await interaction.reply({
+                    content: gcmNet.allNetMaintenanceError.getDiscordMarkdownContent(),
+                });
+                return ResultTypes.ERROR;
+            }
+        }
+        if (tracker === "gcm-net-intl") {
+            if (isAllNetMaintenance(gcmNetIntl.maintenanceStartHour, gcmNetIntl.maintenanceEndHour)) {
+                await interaction.reply({
+                    content: gcmNet.allNetMaintenanceError.getDiscordMarkdownContent(),
+                });
                 return ResultTypes.ERROR;
             }
         }
