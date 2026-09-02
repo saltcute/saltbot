@@ -4,7 +4,9 @@ import { Chuni } from "./chunithm";
 import { Maimai } from "./maimai";
 import { Ongeki } from "./ongeki";
 
-const commands = [Maimai.getCommand(), Chuni.getCommand(), Ongeki.getCommand()];
+import * as WhenMaint from "./whenTFAreTheyGonnaMaint";
+
+const commands = [Maimai.getCommand(), Chuni.getCommand(), Ongeki.getCommand(), WhenMaint.getCommand()];
 (async () => {
     const rest = new REST({ version: "10" }).setToken(client.config.getSync("discord::auth.token"));
 

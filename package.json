@@ -63,6 +63,7 @@
         "maidraw-kamai-tachi-adapter": "^1.0.4",
         "maidraw-lxns-adapter": "^1.0.0",
         "maidraw-maishift-adapter": "^1.0.0",
+        "snakecase-keys": "^9.0.2",
         "ts-node": "^10.9.1",
         "tsconfig-paths": "^4.1.2",
         "tsv": "^0.2.0",

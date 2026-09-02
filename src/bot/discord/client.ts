@@ -4,6 +4,8 @@ import { Chuni } from "./chunithm";
 import { Maimai } from "./maimai";
 import { Ongeki } from "./ongeki";
 
+import * as WhenMaint from "./whenTFAreTheyGonnaMaint";
+
 export const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 
 client.on(Events.ClientReady, () => {
@@ -15,6 +17,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
     Maimai.INTERACTION_HANDLER(interaction);
     Chuni.INTERACTION_HANDLER(interaction);
     Ongeki.INTERACTION_HANDLER(interaction);
+    WhenMaint.getCommandHandler()(interaction);
 });
 
 client.login(kasumi.config.getSync("discord::auth.token"));
