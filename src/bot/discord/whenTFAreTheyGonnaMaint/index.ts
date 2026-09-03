@@ -80,7 +80,7 @@ const chunithmIntl = new ChunithmNetEngAdapter({ database: void 0 as never });
 const ongeki = new OngekiNetAdapter({ database: void 0 as never });
 
 function getMaintenanceNotice(startHour: number, endHour: number, name?: string) {
-    const startTimestamp = Math.floor(getCurrentMaintenanceStartTime(startHour).getTime() / 1000);
+    const startTimestamp = Math.floor(getCurrentMaintenanceStartTime(startHour, endHour).getTime() / 1000);
     const endTimestamp = Math.floor(getCurrentMaintenanceEndTime(endHour).getTime() / 1000);
     const currentTimestamp = Date.now() / 1000;
     return `The maintenance period ${name ? `of ${name} ` : ""}${currentTimestamp >= startTimestamp ? "started" : "will start"} at <t:${startTimestamp}:t> (<t:${startTimestamp}:R>), and ${currentTimestamp >= endTimestamp ? "ended" : "will end"} at <t:${endTimestamp}:t> (<t:${endTimestamp}:R>).`;
