@@ -1,7 +1,6 @@
 import { ApplicationCommandOptionType, AttachmentBuilder, type Interaction, MessageFlags } from "discord.js";
 import { BaseError, type DataOrError } from "maidraw";
 import { Best50Painter } from "maidraw/maimai";
-import { isAllNetMaintenance } from "maidraw-gcm-net-adapter/common";
 import { MaimaiDxNetAdapter, MaimaiDxNetEngAdapter } from "maidraw-gcm-net-adapter/maimai";
 import { KamaiTachiScoreAdapter } from "maidraw-kamai-tachi-adapter/maimai";
 import { LxnsScoreAdapter } from "maidraw-lxns-adapter/maimai";
@@ -145,7 +144,7 @@ export class Best50ChartCommand {
             }
         }
         if (tracker === "gcm-net") {
-            if (isAllNetMaintenance(gcmNet.maintenanceStartHour, gcmNet.maintenanceEndHour)) {
+            if (gcmNet.maintenanceSchedule.isMaintenance()) {
                 await interaction.reply({
                     content: gcmNet.allNetMaintenanceError.getDiscordMarkdownContent(),
                 });
@@ -153,9 +152,9 @@ export class Best50ChartCommand {
             }
         }
         if (tracker === "gcm-net-intl") {
-            if (isAllNetMaintenance(gcmNetIntl.maintenanceStartHour, gcmNetIntl.maintenanceEndHour)) {
+            if (gcmNetIntl.maintenanceSchedule.isMaintenance()) {
                 await interaction.reply({
-                    content: gcmNet.allNetMaintenanceError.getDiscordMarkdownContent(),
+                    content: gcmNetIntl.allNetMaintenanceError.getDiscordMarkdownContent(),
                 });
                 return ResultTypes.ERROR;
             }

@@ -1,6 +1,6 @@
-import { SlashCommandBuilder, SlashCommandStringOption } from "discord.js";
+import { MessageFlags, SlashCommandBuilder, SlashCommandStringOption } from "discord.js";
 import { ChunithmNetAdapter, ChunithmNetEngAdapter } from "maidraw-gcm-net-adapter/chunithm";
-import { getCurrentMaintenanceEndTime, getCurrentMaintenanceStartTime } from "maidraw-gcm-net-adapter/common";
+import type { MaintenanceSchedule } from "maidraw-gcm-net-adapter/common";
 import { MaimaiDxNetAdapter, MaimaiDxNetEngAdapter } from "maidraw-gcm-net-adapter/maimai";
 import { OngekiNetAdapter } from "maidraw-gcm-net-adapter/ongeki";
 import snakecaseKeys from "snakecase-keys";
@@ -79,9 +79,9 @@ const chunithmIntl = new ChunithmNetEngAdapter({ database: void 0 as never });
 
 const ongeki = new OngekiNetAdapter({ database: void 0 as never });
 
-function getMaintenanceNotice(startHour: number, endHour: number, name?: string) {
-    const startTimestamp = Math.floor(getCurrentMaintenanceStartTime(startHour, endHour).getTime() / 1000);
-    const endTimestamp = Math.floor(getCurrentMaintenanceEndTime(endHour).getTime() / 1000);
+function getMaintenanceNotice(startTime: Date, endTime: Date, name?: string) {
+    const startTimestamp = startTime.getTime() / 1000;
+    const endTimestamp = endTime.getTime() / 1000;
     const currentTimestamp = Date.now() / 1000;
     return `The maintenance period ${name ? `of ${name} ` : ""}${currentTimestamp >= startTimestamp ? "started" : "will start"} at <t:${startTimestamp}:t> (<t:${startTimestamp}:R>), and ${currentTimestamp >= endTimestamp ? "ended" : "will end"} at <t:${endTimestamp}:t> (<t:${endTimestamp}:R>).`;
 }
@@ -100,28 +100,33 @@ export function getCommandHandler() {
             return ResultTypes.ERROR;
         }
 
+        let maintenanceSchedule: MaintenanceSchedule | undefined;
         if (game === "maimaidx") {
-            await interaction.reply({
-                content: getMaintenanceNotice(maimaiDx.maintenanceStartHour, maimaiDx.maintenanceEndHour, "maimaiでらっくす"),
-            });
+            maintenanceSchedule = maimaiDx.maintenanceSchedule;
         } else if (game === "maimaidx-intl") {
-            await interaction.reply({
-                content: getMaintenanceNotice(maimaiDxIntl.maintenanceStartHour, maimaiDxIntl.maintenanceEndHour, "maimai DX International ver."),
-            });
+            maintenanceSchedule = maimaiDxIntl.maintenanceSchedule;
         } else if (game === "chunithm") {
-            await interaction.reply({
-                content: getMaintenanceNotice(chunithm.maintenanceStartHour, chunithm.maintenanceEndHour, "CHUNITHM"),
-            });
+            maintenanceSchedule = chunithm.maintenanceSchedule;
         } else if (game === "chunithm-intl") {
-            await interaction.reply({
-                content: getMaintenanceNotice(chunithmIntl.maintenanceStartHour, chunithmIntl.maintenanceEndHour, "CHUNITHM International ver."),
-            });
+            maintenanceSchedule = chunithmIntl.maintenanceSchedule;
         } else if (game === "ongeki") {
-            await interaction.reply({
-                content: getMaintenanceNotice(ongeki.maintenanceStartHour, ongeki.maintenanceEndHour, "オンゲキ"),
-            });
+            maintenanceSchedule = ongeki.maintenanceSchedule;
         }
-
-        return ResultTypes.SUCCESS;
+        if (maintenanceSchedule) {
+            await interaction.reply({
+                content: getMaintenanceNotice(
+                    maintenanceSchedule.getCurrentOrNextWindow().start,
+                    maintenanceSchedule.getCurrentOrNextWindow().end,
+                    "maimaiでらっくす",
+                ),
+            });
+            return ResultTypes.SUCCESS;
+        } else {
+            await interaction.reply({
+                content: "Failed to get the maintenance schedule.",
+                flags: MessageFlags.Ephemeral,
+            });
+            return ResultTypes.ERROR;
+        }
     });
 }

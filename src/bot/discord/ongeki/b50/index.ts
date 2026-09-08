@@ -1,7 +1,6 @@
 import { ApplicationCommandOptionType, AttachmentBuilder } from "discord.js";
 import type { DataOrError } from "maidraw";
 import { Best50Painter } from "maidraw/ongeki";
-import { isAllNetMaintenance } from "maidraw-gcm-net-adapter/common";
 import { OngekiNetAdapter } from "maidraw-gcm-net-adapter/ongeki";
 import { KamaiTachiScoreAdapter } from "maidraw-kamai-tachi-adapter/ongeki";
 import { client as kasumi } from "@/bot/kook/init/client";
@@ -118,7 +117,7 @@ export class Best50ChartCommand {
         }
 
         if (tracker === "gcm-net") {
-            if (isAllNetMaintenance(gcmNet.maintenanceStartHour, gcmNet.maintenanceEndHour)) {
+            if (gcmNet.maintenanceSchedule.isMaintenance()) {
                 await interaction.reply({
                     content: gcmNet.allNetMaintenanceError.getDiscordMarkdownContent(),
                 });
