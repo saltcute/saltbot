@@ -101,23 +101,29 @@ export function getCommandHandler() {
         }
 
         let maintenanceSchedule: MaintenanceSchedule | undefined;
+        let service: string | undefined;
         if (game === "maimaidx") {
             maintenanceSchedule = maimaiDx.maintenanceSchedule;
+            service = "maimaiでらっくす";
         } else if (game === "maimaidx-intl") {
             maintenanceSchedule = maimaiDxIntl.maintenanceSchedule;
+            service = "maimai DX International ver.";
         } else if (game === "chunithm") {
             maintenanceSchedule = chunithm.maintenanceSchedule;
+            service = "CHUNITHM";
         } else if (game === "chunithm-intl") {
             maintenanceSchedule = chunithmIntl.maintenanceSchedule;
+            service = "CHUNITHM International ver.";
         } else if (game === "ongeki") {
             maintenanceSchedule = ongeki.maintenanceSchedule;
+            service = "オンゲキ";
         }
-        if (maintenanceSchedule) {
+        if (maintenanceSchedule && service) {
             await interaction.reply({
                 content: getMaintenanceNotice(
                     maintenanceSchedule.getCurrentOrNextWindow().start,
                     maintenanceSchedule.getCurrentOrNextWindow().end,
-                    "maimaiでらっくす",
+                    service,
                 ),
             });
             return ResultTypes.SUCCESS;
