@@ -25,7 +25,7 @@ const painter = new Level50Painter(database);
 export class Level50ChartCommand {
     // private static readonly AVAILABLE_VERSION_THEME = ["jp-finale", "jp-buddies", "jp-buddiesplus", "jp-prism", "jp-prismplus", "jp-circle"];
     // private static readonly DEFAULT_VERSION = "jp-prismplus";
-    private static readonly DEFAULT_THEME = "jp-prismplus-portrait";
+    private static readonly DEFAULT_THEME = "jp-circleplus-portrait";
     private static readonly DEFAULT_USE_TRACKER_PROFILE_PICTURE = true;
 
     static readonly CHAT_COMMAND_HANDLER = Telemetry.discordMiddleware(async (interaction) => {

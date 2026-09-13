@@ -95,6 +95,15 @@ export class Best50ChartCommand {
         const useProfilePicture = pfpOption == null ? this.DEFAULT_USE_TRACKER_PROFILE_PICTURE : pfpOption;
         const showRecentUpscore = interaction.options.getBoolean("show_recent_upscore", false);
 
+        let dxRatingType: "dx" | "circleplus";
+        switch (version) {
+            case "jp-circleplus":
+                dxRatingType = "circleplus";
+                break;
+            default:
+                dxRatingType = "dx";
+        }
+
         let username: string | null = null;
         switch (tracker) {
             case "kamai": {
@@ -377,6 +386,7 @@ export class Best50ChartCommand {
                                 if (err) return undefined;
                                 return pfp;
                             })(),
+                            dxRatingType,
                         },
                     );
                 }
@@ -398,6 +408,7 @@ export class Best50ChartCommand {
                     {
                         theme,
                         profilePicture: useProfilePicture ? undefined : null,
+                        dxRatingType,
                     },
                 );
                 break;
@@ -409,6 +420,7 @@ export class Best50ChartCommand {
                     {
                         theme,
                         profilePicture: useProfilePicture ? undefined : null,
+                        dxRatingType,
                     },
                 );
                 break;
@@ -420,6 +432,7 @@ export class Best50ChartCommand {
                     {
                         theme,
                         // profilePicture: useProfilePicture ? undefined : null,
+                        dxRatingType,
                     },
                 );
                 break;
@@ -431,6 +444,7 @@ export class Best50ChartCommand {
                     {
                         theme,
                         // profilePicture: useProfilePicture ? undefined : null,
+                        dxRatingType,
                     },
                 );
                 break;
