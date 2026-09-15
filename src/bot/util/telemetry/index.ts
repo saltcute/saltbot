@@ -38,11 +38,7 @@ export class Telemetry {
         return async (interaction: Interaction<CacheType>) => {
             try {
                 if (interaction.isCommand()) {
-                    const returnValue = handler(interaction);
-                    if (returnValue instanceof Promise) {
-                        returnValue.catch(kasumi.logger.error);
-                    }
-                    const result = await returnValue;
+                    const result = await handler(interaction);
                     if (result === ResultTypes.IGNORED) return;
                     else
                         Telemetry.logCommandUsage({
@@ -88,7 +84,7 @@ export class Telemetry {
                                 : [],
                             result,
                         });
-                } else handler(interaction);
+                } else await handler(interaction);
             } catch (e) {
                 kasumi.logger.error(e);
             }
