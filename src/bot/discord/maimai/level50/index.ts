@@ -25,7 +25,7 @@ const painter = new Level50Painter(database);
 export class Level50ChartCommand {
     // private static readonly AVAILABLE_VERSION_THEME = ["jp-finale", "jp-buddies", "jp-buddiesplus", "jp-prism", "jp-prismplus", "jp-circle"];
     // private static readonly DEFAULT_VERSION = "jp-prismplus";
-    private static readonly DEFAULT_THEME = "jp-circleplus-portrait";
+    private static readonly DEFAULT_THEME = "jp-magical-portrait";
     private static readonly DEFAULT_USE_TRACKER_PROFILE_PICTURE = true;
 
     static readonly CHAT_COMMAND_HANDLER = Telemetry.discordMiddleware(async (interaction) => {
@@ -269,14 +269,30 @@ export class Level50ChartCommand {
     });
 
     static readonly themes = [
-        // {
-        //     name: "maimai でらっくす PRiSM PLUS (Japan), landscape",
-        //     nameLocalizations: {
-        //         "zh-CN": "maimai でらっくす PRiSM PLUS（日服），横向",
-        //         "zh-TW": "maimai でらっくす PRiSM（日本），橫向",
-        //     },
-        //     value: "jp-prismplus-landscape",
-        // },
+        {
+            name: "maimai でらっくす MAGiCAL (Japan), portrait",
+            nameLocalizations: {
+                "zh-CN": "maimai でらっくす MAGiCAL（日服），纵向",
+                "zh-TW": "maimai でらっくす MAGiCAL（日本），縱向",
+            },
+            value: "jp-magical-portrait",
+        },
+        {
+            name: "maimai でらっくす CiRCLE PLUS (Japan), portrait",
+            nameLocalizations: {
+                "zh-CN": "maimai でらっくす CiRCLE PLUS（日服），纵向",
+                "zh-TW": "maimai でらっくす CiRCLE PLUS（日本），縱向",
+            },
+            value: "jp-circleplus-portrait",
+        },
+        {
+            name: "maimai でらっくす CiRCLE (Japan), portrait",
+            nameLocalizations: {
+                "zh-CN": "maimai でらっくす CiRCLE（日服），纵向",
+                "zh-TW": "maimai でらっくす CiRCLE（日本），縱向",
+            },
+            value: "jp-circle-portrait",
+        },
         {
             name: "maimai でらっくす PRiSM PLUS (Japan), portrait",
             nameLocalizations: {
@@ -285,14 +301,6 @@ export class Level50ChartCommand {
             },
             value: "jp-prismplus-portrait",
         },
-        // {
-        //     name: "maimai でらっくす PRiSM (Japan), landscape",
-        //     nameLocalizations: {
-        //         "zh-CN": "maimai でらっくす PRiSM（日服），横向",
-        //         "zh-TW": "maimai でらっくす PRiSM（日本），橫向",
-        //     },
-        //     value: "jp-prism-landscape",
-        // },
         {
             name: "maimai でらっくす PRiSM (Japan), portrait",
             nameLocalizations: {
@@ -301,14 +309,6 @@ export class Level50ChartCommand {
             },
             value: "jp-prism-portrait",
         },
-        // {
-        //     name: "maimai でらっくす BUDDiES PLUS (Japan), landscape",
-        //     nameLocalizations: {
-        //         "zh-CN": "maimai でらっくす BUDDiES PLUS（日服），横向",
-        //         "zh-TW": "maimai でらっくす BUDDiES PLUS（日本），橫向",
-        //     },
-        //     value: "jp-buddiesplus-landscape",
-        // },
         {
             name: "maimai でらっくす BUDDiES PLUS (Japan), portrait",
             nameLocalizations: {
@@ -317,14 +317,6 @@ export class Level50ChartCommand {
             },
             value: "jp-buddiesplus-portrait",
         },
-        // {
-        //     name: "maimai でらっくす BUDDiES (Japan), landscape",
-        //     nameLocalizations: {
-        //         "zh-CN": "maimai でらっくす BUDDiES（日服），横向",
-        //         "zh-TW": "maimai でらっくす BUDDiES（日本），橫向",
-        //     },
-        //     value: "jp-buddies-landscape",
-        // },
         {
             name: "maimai でらっくす BUDDiES (Japan), portrait",
             nameLocalizations: {
@@ -333,14 +325,6 @@ export class Level50ChartCommand {
             },
             value: "jp-buddies-portrait",
         },
-        // {
-        //     name: "maimai FiNALE (Japan), landscape",
-        //     nameLocalizations: {
-        //         "zh-CN": "maimai FiNALE（日服），横向",
-        //         "zh-TW": "maimai FiNALE（日本），橫向",
-        //     },
-        //     value: "jp-finale-landscape",
-        // },
         {
             name: "maimai FiNALE (Japan), portrait",
             nameLocalizations: {
@@ -349,14 +333,6 @@ export class Level50ChartCommand {
             },
             value: "jp-finale-portrait",
         },
-        // {
-        //     name: "舞萌DX 2024 (China), landscape",
-        //     nameLocalizations: {
-        //         "zh-CN": "舞萌DX 2024（国服），横向",
-        //         "zh-TW": "舞萌DX 2024（中國），橫向",
-        //     },
-        //     value: "cn-2024-landscape",
-        // },
         {
             name: "舞萌DX 2024 (China), portrait",
             nameLocalizations: {

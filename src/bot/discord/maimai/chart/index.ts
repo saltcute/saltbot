@@ -29,7 +29,7 @@ export class ChartQueryCommand {
         else return defaults;
     }
 
-    static readonly DEFAULT_THEME = "jp-circleplus";
+    static readonly DEFAULT_THEME = "jp-magical";
     static readonly CHAT_COMMAND_HANDLER = Telemetry.discordMiddleware(async (interaction) => {
         if (!interaction.isChatInputCommand()) return ResultTypes.IGNORED;
         if (interaction.commandName !== "mai") return ResultTypes.IGNORED;
@@ -233,6 +233,22 @@ export class ChartQueryCommand {
     }
 
     static readonly themes = [
+        {
+            name: "maimai でらっくす MAGiCAL (Japan)",
+            nameLocalizations: {
+                "zh-CN": "maimai でらっくす MAGiCAL（日服）",
+                "zh-TW": "maimai でらっくす MAGiCAL（日本）",
+            },
+            value: "jp-magical",
+        },
+        {
+            name: "maimai でらっくす CiRCLE PLUS (Japan)",
+            nameLocalizations: {
+                "zh-CN": "maimai でらっくす CiRCLE PLUS（日服）",
+                "zh-TW": "maimai でらっくす CiRCLE PLUS（日本）",
+            },
+            value: "jp-circleplus",
+        },
         {
             name: "maimai でらっくす CiRCLE (Japan)",
             nameLocalizations: {

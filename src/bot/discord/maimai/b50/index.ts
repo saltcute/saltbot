@@ -36,6 +36,7 @@ export class Best50ChartCommand {
         "jp-prismplus",
         "jp-circle",
         "jp-circleplus",
+        "jp-magical",
         "cn-2024",
         "cn-2025",
         "cn-2026",
@@ -45,7 +46,7 @@ export class Best50ChartCommand {
         lxns: "cn-2026",
         divingfish: "cn-2026",
         maishift: "jp-circleplus",
-        "gcm-net": "jp-circleplus",
+        "gcm-net": "jp-magical",
         "gcm-net-intl": "jp-circleplus",
     };
     private static readonly DEFAULT_THEME_BY_TRACKER = {
@@ -53,7 +54,7 @@ export class Best50ChartCommand {
         lxns: "cn-2026-landscape",
         divingfish: "cn-2026-landscape",
         maishift: "jp-circleplus-landscape",
-        "gcm-net": "jp-circleplus-landscape",
+        "gcm-net": "jp-magical-landscape",
         "gcm-net-intl": "jp-circleplus-landscape",
     };
     private static readonly DEFAULT_USE_TRACKER_PROFILE_PICTURE = true;
@@ -97,6 +98,7 @@ export class Best50ChartCommand {
 
         let dxRatingType: "dx" | "circleplus";
         switch (version) {
+            case "jp-magical":
             case "jp-circleplus":
                 dxRatingType = "circleplus";
                 break;
@@ -316,6 +318,9 @@ export class Best50ChartCommand {
                         break;
                     case "ex-circleplus":
                         kamaiInstance = kamai.versions().circlePlus("EX");
+                        break;
+                    case "jp-magical":
+                        kamaiInstance = kamai.versions().magical();
                         break;
                     default:
                         kamaiInstance = kamai;
@@ -539,6 +544,22 @@ export class Best50ChartCommand {
 
     static readonly themes = [
         {
+            name: "maimai でらっくす MAGiCAL (Japan), landscape",
+            nameLocalizations: {
+                "zh-CN": "maimai でらっくす MAGiCAL（日服），横向",
+                "zh-TW": "maimai でらっくす MAGiCAL（日本），橫向",
+            },
+            value: "jp-magical-landscape",
+        },
+        {
+            name: "maimai でらっくす MAGiCAL (Japan), portrait",
+            nameLocalizations: {
+                "zh-CN": "maimai でらっくす MAGiCAL（日服），纵向",
+                "zh-TW": "maimai でらっくす MAGiCAL（日本），縱向",
+            },
+            value: "jp-magical-portrait",
+        },
+        {
             name: "maimai でらっくす CiRCLE PLUS (Japan), landscape",
             nameLocalizations: {
                 "zh-CN": "maimai でらっくす CiRCLE PLUS（日服），横向",
@@ -701,6 +722,14 @@ export class Best50ChartCommand {
     ];
 
     static readonly versions = [
+        {
+            name: "maimai でらっくす MAGiCAL (Japan)",
+            nameLocalizations: {
+                "zh-CN": "maimai でらっくす MAGiCAL（日服）",
+                "zh-TW": "maimai でらっくす MAGiCAL（日本）",
+            },
+            value: "jp-magical",
+        },
         {
             name: "maimai でらっくす CiRCLE PLUS (Japan)",
             nameLocalizations: {
