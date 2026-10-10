@@ -19,10 +19,10 @@ export class Best50ChartCommand {
     private static readonly AVAILABLE_VERSION_THEME = ["jp-refresh", "jp-brightmemory"];
     private static readonly DEFAULT_VERSION_BY_TRACKER = {
         kamai: "jp-brightmemoryact3",
-        "gcm-net": "jp-refresh",
+        "gcm-net": "jp-refreshact2",
     };
     private static readonly DEFAULT_THEME_BY_TRACKER = {
-        kamai: "jp-brightmemoryact3-landscape",
+        kamai: "jp-brightmemory-landscape",
         "gcm-net": "jp-refresh-landscape",
     };
     private static readonly DEFAULT_USE_TRACKER_PROFILE_PICTURE = true;
@@ -32,7 +32,8 @@ export class Best50ChartCommand {
     };
 
     private static readonly DEFAULT_VERSION_RATING_ALOGRITHM_MAP: Record<string, "refresh" | "classic"> = {
-        "jp-refresh": "refresh",
+        "jp-refreshact2": "refresh",
+        "jp-refreshact1": "refresh",
         "jp-brightmemoryact3": "classic",
         "jp-brightmemoryact2": "classic",
         "jp-brightmemoryact1": "classic",
@@ -129,8 +130,11 @@ export class Best50ChartCommand {
             case "kamai": {
                 let kamaiInstance: KamaiTachiScoreAdapter;
                 switch (version) {
-                    case "jp-refresh":
-                        kamaiInstance = kamai.refresh();
+                    case "jp-refreshact2":
+                        kamaiInstance = kamai.refreshAct2();
+                        break;
+                    case "jp-refreshact1":
+                        kamaiInstance = kamai.refreshAct1();
                         break;
                     case "jp-brightmemoryact3":
                         kamaiInstance = kamai.brightMemoryAct3();
@@ -271,12 +275,20 @@ export class Best50ChartCommand {
 
     static readonly versions = [
         {
-            name: "オンゲキ Re:Fresh (Japan)",
+            name: "オンゲキ Re:Fresh Act.2 (Japan)",
             nameLocalizations: {
-                "zh-CN": "オンゲキ Re:Fresh（日服）",
-                "zh-TW": "オンゲキ Re:Fresh（日本）",
+                "zh-CN": "オンゲキ Re:Fresh Act.2（日服）",
+                "zh-TW": "オンゲキ Re:Fresh Act.2（日本）",
             },
-            value: "jp-refresh",
+            value: "jp-refreshact2",
+        },
+        {
+            name: "オンゲキ Re:Fresh Act.1 (Japan)",
+            nameLocalizations: {
+                "zh-CN": "オンゲキ Re:Fresh Act.1（日服）",
+                "zh-TW": "オンゲキ Re:Fresh Act.1（日本）",
+            },
+            value: "jp-refreshact1",
         },
         {
             name: "オンゲキ Bright MEMORY Act.3 (Japan)",
