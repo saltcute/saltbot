@@ -87,9 +87,12 @@ If you wish to proceed, please click "Continue".`,
             .join("");
     }
 
+    static readonly DISCORD_SERVER_LINK = "SahvVPNf4f";
     static async reportError(interaction: Interaction<CacheType>, error: BaseError) {
         if (!interaction.isChatInputCommand()) return;
-        const msg = `An error occurred (\`${Util.sanitizeString(error.type)}\`) at \`${Util.sanitizeString(error.namespace)}\`:\n\t${Util.sanitizeString(error.message)}`;
+        const msg = `Oops, an error occurred! [Join our server](https://discord.com/invite/${Util.DISCORD_SERVER_LINK}) to let us know so that we can fix it!
+        
+Detail info: \`${Util.sanitizeString(error.type)}\` at \`${Util.sanitizeString(error.namespace)}\`:\n\t${Util.sanitizeString(error.message)}`;
         if (interaction.deferred || interaction.replied) {
             await interaction.editReply(msg);
         } else {
