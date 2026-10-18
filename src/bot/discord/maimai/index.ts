@@ -1,6 +1,7 @@
 import type { Interaction } from "discord.js";
 import { Best50ChartCommand } from "./b50";
 import { ChartQueryCommand } from "./chart";
+import { FolderCommand } from "./folder";
 import { Level50ChartCommand } from "./level50";
 import { LinkUserCommand } from "./link";
 import { UnlinkUserCommand } from "./unlink";
@@ -11,6 +12,9 @@ export class Maimai {
         Best50ChartCommand.AUTOCOMPLETE_HANDLER(interaction);
         ChartQueryCommand.CHAT_COMMAND_HANDLER(interaction);
         ChartQueryCommand.AUTOCOMPLETE_HANDLER(interaction);
+        FolderCommand.CHAT_COMMAND_HANDLER(interaction);
+        FolderCommand.AUTOCOMPLETE_HANDLER(interaction);
+        FolderCommand.BUTTON_HANDLER(interaction);
         Level50ChartCommand.CHAT_COMMAND_HANDLER(interaction);
         Level50ChartCommand.BUTTON_HANDLER(interaction);
         LinkUserCommand.CHAT_COMMAND_HANDLER(interaction);
@@ -30,6 +34,7 @@ export class Maimai {
                 ...Best50ChartCommand.getCommand(),
                 ...LinkUserCommand.getCommand(),
                 ...ChartQueryCommand.getCommand(),
+                ...FolderCommand.getCommand(),
                 ...Level50ChartCommand.getCommand(),
                 ...UnlinkUserCommand.getCommand(),
             ],
