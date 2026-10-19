@@ -60,6 +60,8 @@ export default versionFolders({
         song("ジェットブラック", Type.DELUXE, [4, 7.5, 10.2, 13.2]),
         song("トレジャーガーデン", Type.DELUXE, [4, 7.7, 11.7, 13.8]),
         song("最愛人生ランナー", Type.DELUXE, [4, 7.8, 11, 13.8]),
+        // Standard charts count towards the version they were added in, not the version of the song's deluxe charts.
+        song("僕は空気が嫁ない", Type.STANDARD, [4, 7.7, 10.8, 13.5]),
         song("BAD∞END∞NIGHT", Type.DELUXE, [4, 7.8, 11.2, 13.5]),
         song("ラストピースに祝福と栄光を", Type.DELUXE, [7, 9, 12.9, 14.6]),
         song("初音ミクの暴走", Type.DELUXE, [6, 8.8, 12.7, 13.9]),
@@ -77,6 +79,7 @@ export default versionFolders({
         song("勝手に生きましょ", Type.DELUXE, [3, 7.5, 10.4, 13]),
         song("アイアイ傘", Type.DELUXE, [2, 6, 9.7, 12.9]),
         song("INTJINTPENTJENTPINFJENFJINFPENFPISTJISFJESTJESFJESTPISTPISFPESFP", Type.DELUXE, [3, 6.5, 9.9, 13.3]),
+        song("Paranoia", Type.STANDARD, [3, 7, 10.2, 13.6]),
         song("Restricted Access", Type.DELUXE, [4, 7.8, 11.5, 13.8]),
         song("胡蝶乃舞", Type.DELUXE, [4, 7.8, 11.7, 13.9]),
         song("零號車輛", Type.DELUXE, [6, 8.5, 12.8, 14.7], { intl: { levels: [6, 8.5, 12.8, 14.6] } }),

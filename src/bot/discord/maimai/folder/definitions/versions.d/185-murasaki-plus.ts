@@ -1,0 +1,60 @@
+import { Type } from "gcm-database/maimai";
+import { song, versionFolders } from "../../helpers";
+
+/**
+ * Charts are in the version their region of the game says, so Japan and International differ in a few songs.
+ * Japan uses its internal levels, and International overrides them where they differ. Utage and Re:MASTER charts are left out,
+ * as only BASIC to MASTER count towards the plate.
+ */
+export default versionFolders({
+    id: "version-murasaki-plus",
+    version: "MURASAKi PLUS",
+    title: "maimai MURASAKi PLUS",
+    plate: "菫",
+    goals: ["sss", "fc", "ap", "fdx"],
+    songs: [
+        song("華鳥風月", Type.STANDARD, [2, 7.3, 9.7, 12.8], { intl: { levels: [2, 6.6, 9.7, 12.8] } }),
+        song("リンカーネイション", Type.STANDARD, [5, 8.9, 11.3, 13.8], { intl: { levels: [5, 8.2, 11.3, 13.8] } }),
+        song("宿題が終わらないっ！", Type.STANDARD, [5, 8.3, 10.6, 12.9], { intl: { levels: [5, 7.6, 10.6, 12.9] } }),
+        song("GO BACK 2 YOUR RAVE", Type.STANDARD, [5, 9.2, 12.3, 13.9], { intl: { levels: [5, 8.5, 12.3, 13.9] } }),
+        song("天国と地獄 -言ノ葉リンネ-", Type.STANDARD, [4, 8.3, 11.7, 13.3], { intl: { levels: [4, 7.6, 11.7, 13.3] } }),
+        song("夢花火", Type.STANDARD, [6, 9.2, 11.5, 13.7], { intl: { levels: [6, 8.5, 11.5, 13.7] } }),
+        // Revived after being removed, and listed in 菫除外曲 in both regions, so it does not count towards the 菫 plate.
+        song("前前前世", Type.STANDARD, [4, 7.7, 10.7, 13.3], { jp: false, intl: false }),
+        song("オトヒメモリー☆ウタゲーション", Type.STANDARD, [5, 8.5, 11.7, 12.9], { intl: { levels: [5, 7.8, 11.7, 12.9] } }),
+        song("ラブチーノ", Type.STANDARD, [4, 8, 9.9, 11.9], { intl: { levels: [4, 7.3, 9.9, 11.9] } }),
+        song("ヘルシーエンド", Type.STANDARD, [4, 8.5, 11.1, 12.9], { intl: { levels: [4, 7.8, 11.1, 12.9] } }),
+        song("東京レトロ", Type.STANDARD, [4, 7.7, 9.8, 11.6], { intl: false }),
+        song("ARROW", Type.STANDARD, [4, 8.3, 12.1, 13.3], { intl: { levels: [4, 7.6, 12.1, 13.3] } }),
+        song("バッド・ダンス・ホール", Type.STANDARD, [5, 8.2, 11.6, 13.4], { intl: { levels: [5, 7.5, 11.6, 13.4] } }),
+        song("ちがう!!!", Type.STANDARD, [5, 8.7, 10.9, 13.4], { intl: false }),
+        song("KISS CANDY FLAVOR", Type.STANDARD, [4, 9, 11.3, 13.4], { intl: { levels: [4, 8.3, 11.3, 13.4] } }),
+        song("Maxi", Type.STANDARD, [6, 9.9, 12.8, 14], { intl: { levels: [6, 9.3, 12.8, 14] } }),
+        song("人里に下ったアタイがいつの間にか社畜になっていた件", Type.STANDARD, [5, 9.7, 13.2, 14], { intl: { levels: [5, 9, 13.2, 14] } }),
+        song("ユビキリ", Type.STANDARD, [4, 8.7, 11.8, 13.3], { intl: { levels: [4, 8, 11.8, 13.3] } }),
+        song("相思創愛", Type.STANDARD, [6, 9.3, 11.4, 13.5], { intl: { levels: [6, 8.6, 11.4, 13.5] } }),
+        song("心象蜃気楼", Type.STANDARD, [5, 8.5, 11, 13.4], { intl: { levels: [5, 7.8, 11, 13.4] } }),
+        song("光線チューニング", Type.STANDARD, [6, 8.7, 11.7, 13.7], { intl: { levels: [6, 8, 11.7, 13.7] } }),
+        song("Limit Break", Type.STANDARD, [6, 9, 11.5, 13.4], { intl: { levels: [6, 8.3, 11.5, 13.4] } }),
+        song("曖昧mind", Type.STANDARD, [5, 9.3, 11.8, 13.4], { intl: { levels: [5, 8.6, 11.8, 13.4] } }),
+        song("KING is BACK!!", Type.STANDARD, [6, 9.5, 11.9, 13.9], { intl: { levels: [6, 8.8, 11.9, 13.9] } }),
+        song("Ultranova", Type.STANDARD, [6, 9.3, 12.9, 14], { intl: { levels: [6, 8.6, 12.9, 14] } }),
+        song("GET!! 夢&DREAM", Type.STANDARD, [4, 8.5, 9.8, 12.4], { intl: { levels: [4, 7.8, 9.8, 12.4] } }),
+        song("真・ハンサム体操でズンドコホイ", Type.STANDARD, [5, 7.7, 10.2, 13.4], { intl: { levels: [5, 7, 10.2, 13.4] } }),
+        song("Moon of Noon", Type.STANDARD, [7, 9.7, 13.1, 14.4], { intl: { levels: [7, 9, 13.1, 14.4] } }),
+        song("デスパレイト", Type.STANDARD, [5, 9.3, 11.9, 13.9], { intl: { levels: [5, 8.6, 11.9, 13.9] } }),
+        song("Starlight Dance Floor", Type.STANDARD, [4, 8.3, 10.2, 12.5], { intl: { levels: [4, 7.6, 10.2, 12.5] } }),
+        song("妖精村の月誕祭 ～Lunate Elf", Type.STANDARD, [4, 8, 10.5, 13.3], { intl: { levels: [4, 7.3, 10.5, 13.3] } }),
+        song("オーディエンスを沸かす程度の能力 feat.タイツォン", Type.STANDARD, [4, 8.7, 10.6, 13.7], { intl: { levels: [4, 8, 10.6, 13.7] } }),
+        song("チルノのパーフェクトさんすう教室　⑨周年バージョン", Type.STANDARD, [5, 8.5, 10.8, 13.4], { intl: { levels: [5, 7.8, 10.8, 13.4] } }),
+        song("My Dearest Song", Type.STANDARD, [5, 9, 11.8, 13.3], { intl: { levels: [5, 8.3, 11.8, 13.3] } }),
+        song("猛進ソリストライフ！", Type.STANDARD, [7, 9.9, 12.6, 13.7], { intl: { levels: [7, 9.5, 12.6, 13.7] } }),
+        song("幸せになれる隠しコマンドがあるらしい", Type.STANDARD, [6, 9.9, 12.7, 14], { intl: { levels: [6, 9.3, 12.7, 14] } }),
+        song("白ゆき", Type.STANDARD, [5, 8.9, 11.7, 13.4], { intl: { levels: [5, 8.2, 11.7, 13.4] } }),
+        song("エイリアンエイリアン", Type.STANDARD, [4, 8.7, 10, 12.8], { intl: { levels: [4, 8, 10, 12.8] } }),
+        song("フラジール", Type.STANDARD, [5, 8.5, 9.8, 12.8], { intl: { levels: [5, 7.8, 9.8, 12.8] } }),
+        song("日本の米は世界一", Type.STANDARD, [4, 8.2, 10.7, 13.3], { intl: { levels: [4, 7.5, 10.7, 13.3] } }),
+        song("ないせんのうた", Type.STANDARD, [5, 7.5, 10.8, 12.8], { intl: { levels: [5, 6.8, 10.8, 12.7] } }),
+        song("Calamity Fortune", Type.STANDARD, [7, 9.9, 12.9, 14.2], { intl: { levels: [7, 9.3, 12.9, 14.2] } }),
+    ],
+});

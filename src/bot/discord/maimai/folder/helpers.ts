@@ -54,7 +54,7 @@ export function song(title: string, type: Type, levels: (number | null)[], optio
  * @param plate First half of the version plate, e.g. `"丸"`, to name the plate of each goal.
  */
 export function withGoals(
-    base: Omit<FolderDefinition, "lamp" | "check" | "group" | "groupTitle" | "variant">,
+    base: Omit<FolderDefinition, "lamp" | "check" | "group" | "variant">,
     goals: GoalKey[],
     plate?: string,
 ): FolderDefinition[] {
@@ -68,7 +68,7 @@ export function withGoals(
             lamp: goal.lamp,
             check: goal.check,
             group: base.id,
-            groupTitle: base.title,
+            groupTitle: base.groupTitle ?? base.title,
             variant: key,
         };
     });
@@ -93,6 +93,10 @@ export function versionFolders(options: {
      */
     version: string;
     /**
+     * Full name of the version, without the region. Defaults to `"maimai DX"` followed by `version`.
+     */
+    title?: string;
+    /**
      * First half of the version plate, e.g. `"丸"`.
      */
     plate: string;
@@ -111,11 +115,13 @@ export function versionFolders(options: {
             return allDifficulties(song.title, song.type, override?.levels ?? song.levels, override?.ids ?? song.ids);
         });
     const regions = { jp: charts("jp"), intl: charts("intl"), ca: charts("intl") } satisfies Record<Region, ChartRef[]>;
+    const title = options.title ?? `maimai DX ${options.version}`;
     return (Object.keys(regions) as Region[]).flatMap((region) =>
         withGoals(
             {
                 id: `${options.id}-${region}`,
-                title: `maimai DX ${options.version} (${REGIONS[region].name})`,
+                title: `${title} (${REGIONS[region].name})`,
+                groupTitle: `${title} ${options.plate} (${REGIONS[region].name})`,
                 folders: byLevel(regions[region]),
                 compact: options.compact ?? ((chart) => chart.difficulty === Difficulty.MASTER || chart.level >= 13),
                 aliases: [...(options.aliases ?? []), options.version, options.plate, ...REGIONS[region].aliases],
