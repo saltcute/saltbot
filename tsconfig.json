@@ -9,8 +9,7 @@
         "paths": {
             "@/*": ["./src/*"],
             "@util/*": ["./src/bot/util/*"],
-            "@discord/*": ["./src/bot/discord/*"],
-            "@kook/*": ["./src/bot/kook/*"]
+            "@discord/*": ["./src/bot/discord/*"]
         },
         "rootDirs": ["src"],
         "rootDir": "./src",

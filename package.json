@@ -53,7 +53,6 @@
         "gcm-database-otogedb": "^1.1.2",
         "hono": "^4.12.27",
         "json5": "^2.2.3",
-        "kasumi.js": "^0.6.0",
         "kuroshiro": "^1.2.0",
         "kuroshiro-analyzer-kuromoji": "^1.1.0",
         "lodash": "^4.17.21",
