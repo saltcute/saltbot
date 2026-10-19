@@ -6,6 +6,7 @@ import { LxnsScoreAdapter } from "maidraw-lxns-adapter/maimai";
 import { MaishiftScoreAdapter } from "maidraw-maishift-adapter/maimai";
 import { getConfig } from "@/bot/core/config";
 import { Connections } from "@/bot/core/connections";
+import { Preferences } from "@/bot/core/preferences";
 import { Util } from "@/bot/util/index";
 import { Telemetry } from "@/bot/util/telemetry";
 import { ResultTypes } from "@/bot/util/telemetry/type";
@@ -36,7 +37,11 @@ export class Level50ChartCommand {
 
         let result: DataOrError<Buffer>,
             useBrainrot = false;
-        const theme = interaction.options.getString("theme", false) || (Util.isAprilFools() ? "salt-2026-portrait" : this.DEFAULT_THEME);
+        const saved = await Preferences.get(interaction.user.id, { game: "mai", command: "level50" });
+        const theme =
+            interaction.options.getString("theme", false) ||
+            Preferences.pick(saved.theme, this.themes) ||
+            (Util.isAprilFools() ? "salt-2026-portrait" : this.DEFAULT_THEME);
         const level = interaction.options.getNumber("level", true);
         if (level < 1 || level > 15) {
             await interaction.reply({
@@ -46,7 +51,7 @@ export class Level50ChartCommand {
         }
         const page = interaction.options.getInteger("page", false) || 1;
         const pfpOption = interaction.options.getBoolean("use_profile_picture", false);
-        const useProfilePicture = pfpOption == null ? this.DEFAULT_USE_TRACKER_PROFILE_PICTURE : pfpOption;
+        const useProfilePicture = pfpOption ?? Preferences.flag(saved.use_profile_picture) ?? this.DEFAULT_USE_TRACKER_PROFILE_PICTURE;
         const tracker = interaction.options.getSubcommand();
         if (!(tracker === "kamai" || tracker === "divingfish" || tracker === "lxns" || tracker === "maishift")) {
             await interaction.editReply({

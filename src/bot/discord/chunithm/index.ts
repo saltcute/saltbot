@@ -1,6 +1,7 @@
 import type { Interaction } from "discord.js";
 import { Best50ChartCommand } from "./b50";
 import { ChartQueryCommand } from "./chart";
+import { ConfigCommand } from "./config";
 import { LinkUserCommand } from "./link";
 import { UnlinkUserCommand } from "./unlink";
 
@@ -12,6 +13,8 @@ export class Chuni {
         LinkUserCommand.CHAT_COMMAND_HANDLER(interaction);
         LinkUserCommand.BUTTON_HANDLER(interaction);
         UnlinkUserCommand.CHAT_COMMAND_HANDLER(interaction);
+        ConfigCommand.CHAT_COMMAND_HANDLER(interaction);
+        ConfigCommand.COMPONENT_HANDLER(interaction);
     };
     static getCommand() {
         return {
@@ -27,6 +30,7 @@ export class Chuni {
                 ...LinkUserCommand.getCommand(),
                 ...ChartQueryCommand.getCommand(),
                 ...UnlinkUserCommand.getCommand(),
+                ...ConfigCommand.getCommand(),
             ],
         };
     }

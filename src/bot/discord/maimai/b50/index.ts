@@ -7,6 +7,7 @@ import { LxnsScoreAdapter } from "maidraw-lxns-adapter/maimai";
 import { MaishiftScoreAdapter } from "maidraw-maishift-adapter/maimai";
 import { getConfig } from "@/bot/core/config";
 import { Connections } from "@/bot/core/connections";
+import { Preferences } from "@/bot/core/preferences";
 import { Util } from "@/bot/util/index";
 import { Telemetry } from "@/bot/util/telemetry";
 import { ResultTypes } from "@/bot/util/telemetry/type";
@@ -85,17 +86,22 @@ export class Best50ChartCommand {
             });
             return ResultTypes.INVALID_TRACKER;
         }
-        const version = interaction.options.getString("version", false) || this.DEFAULT_VERSION_BY_TRACKER[tracker];
+        const saved = await Preferences.get(interaction.user.id, { game: "mai", command: "b50", tracker });
+        const version =
+            interaction.options.getString("version", false) ||
+            Preferences.pick(saved.version, this.versions) ||
+            this.DEFAULT_VERSION_BY_TRACKER[tracker];
         const theme =
             interaction.options.getString("theme", false) ||
+            Preferences.pick(saved.theme, this.themes) ||
             (Util.isAprilFools()
                 ? "salt-2026-landscape"
                 : version && this.AVAILABLE_VERSION_THEME.includes(version)
                   ? `${version}-landscape`
                   : this.DEFAULT_THEME_BY_TRACKER[tracker]);
         const pfpOption = interaction.options.getBoolean("use_profile_picture", false);
-        const useProfilePicture = pfpOption == null ? this.DEFAULT_USE_TRACKER_PROFILE_PICTURE : pfpOption;
-        const showRecentUpscore = interaction.options.getBoolean("show_recent_upscore", false);
+        const useProfilePicture = pfpOption ?? Preferences.flag(saved.use_profile_picture) ?? this.DEFAULT_USE_TRACKER_PROFILE_PICTURE;
+        const showRecentUpscore = interaction.options.getBoolean("show_recent_upscore", false) ?? Preferences.flag(saved.show_recent_upscore) ?? null;
 
         let dxRatingType: "dx" | "circleplus";
         switch (version) {

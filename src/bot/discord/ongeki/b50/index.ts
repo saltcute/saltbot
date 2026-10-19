@@ -4,6 +4,7 @@ import { Best50Painter } from "maidraw/ongeki";
 import { OngekiNetAdapter } from "maidraw-gcm-net-adapter/ongeki";
 import { KamaiTachiScoreAdapter } from "maidraw-kamai-tachi-adapter/ongeki";
 import { Connections } from "@/bot/core/connections";
+import { Preferences } from "@/bot/core/preferences";
 import { Util } from "@/bot/util/index";
 import { Telemetry } from "@/bot/util/telemetry";
 import { ResultTypes } from "@/bot/util/telemetry/type";
@@ -62,17 +63,23 @@ export class Best50ChartCommand {
             return ResultTypes.INVALID_TRACKER;
         }
         let username: string | null = null;
-        const version = interaction.options.getString("version", false) || this.DEFAULT_VERSION_BY_TRACKER[tracker];
+        const saved = await Preferences.get(interaction.user.id, { game: "geki", command: "b50", tracker });
+        const version =
+            interaction.options.getString("version", false) ||
+            Preferences.pick(saved.version, this.versions) ||
+            this.DEFAULT_VERSION_BY_TRACKER[tracker];
         const themeVersion = version.includes("act") ? version.replace(/act[1-3]/, "") : version;
+        const requestedType = interaction.options.getString("type", false) || Preferences.pick(saved.type, this.types);
         const type =
-            interaction.options.getString("type", false) === "classic"
+            requestedType === "classic"
                 ? "classic"
-                : interaction.options.getString("type", false) === "refresh"
+                : requestedType === "refresh"
                   ? "refresh"
                   : this.DEFAULT_VERSION_RATING_ALOGRITHM_MAP[version] || this.DEFAULT_RATING_ALOGRITHM_BY_TRACKER[tracker];
 
         const theme =
             (interaction.options.getString("theme", false) ||
+                Preferences.pick(saved.theme, this.themes) ||
                 (themeVersion && this.AVAILABLE_VERSION_THEME.includes(themeVersion)
                     ? `${themeVersion}-landscape`
                     : this.DEFAULT_THEME_BY_TRACKER[tracker])) +
@@ -80,7 +87,7 @@ export class Best50ChartCommand {
             type;
 
         const pfpOption = interaction.options.getBoolean("use_profile_picture", false);
-        const useProfilePicture = pfpOption == null ? this.DEFAULT_USE_TRACKER_PROFILE_PICTURE : pfpOption;
+        const useProfilePicture = pfpOption ?? Preferences.flag(saved.use_profile_picture) ?? this.DEFAULT_USE_TRACKER_PROFILE_PICTURE;
         switch (tracker) {
             case "kamai": {
                 username = interaction.options.getString("user");

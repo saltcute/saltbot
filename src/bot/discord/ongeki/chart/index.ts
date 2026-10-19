@@ -12,6 +12,7 @@ import TSV from "tsv";
 import upath from "upath";
 import { getConfig } from "@/bot/core/config";
 import { Connections } from "@/bot/core/connections";
+import { Preferences } from "@/bot/core/preferences";
 import { Util } from "@/bot/util/index";
 import { Telemetry } from "@/bot/util/telemetry";
 import { ResultTypes } from "@/bot/util/telemetry/type";
@@ -38,13 +39,14 @@ export class ChartQueryCommand {
         await interaction.deferReply();
 
         const song = interaction.options.getInteger("song", true);
-        const tracker = this.getChoices<"kamai" | "none">(interaction.options.getString("source", false), ["kamai", "none"], "kamai");
+        const saved = await Preferences.get(interaction.user.id, { game: "geki", command: "chart" });
+        const tracker = this.getChoices<"kamai" | "none">(interaction.options.getString("source", false) ?? saved.source, ["kamai", "none"], "kamai");
         const type = this.getChoices<"refresh" | "classic">(
-            interaction.options.getString("type", false),
+            interaction.options.getString("type", false) ?? saved.type,
             ["refresh", "classic"],
             this.DEFAULT_RATING_ALOGRITHM,
         );
-        const theme = interaction.options.getString("theme", false) || this.DEFAULT_THEME;
+        const theme = interaction.options.getString("theme", false) || Preferences.pick(saved.theme, this.themes) || this.DEFAULT_THEME;
         // const region = this.getChoices<"DX" | "EX" | "CN">(
         //     interaction.options.getString("region", false),
         //     ["DX", "EX", "CN"],
@@ -233,6 +235,18 @@ export class ChartQueryCommand {
         },
     ];
 
+    static readonly sources = [
+        { name: "Kamaitachi", value: "kamai" },
+        {
+            name: "None",
+            nameLocalizations: {
+                "zh-CN": "无",
+                "zh-TW": "无",
+            },
+            value: "none",
+        },
+    ];
+
     static readonly themes = [
         {
             name: "オンゲキ Re:Fresh (Japan)",
@@ -346,17 +360,7 @@ export class ChartQueryCommand {
                                 "zh-CN": "生成图片使用的查分器。（默认为 Kamaitachi）",
                                 "zh-TW": "生成圖片使用的查分器。（默認為 Kamaitachi）",
                             },
-                            choices: [
-                                { name: "Kamaitachi", value: "kamai" },
-                                {
-                                    name: "None",
-                                    nameLocalizations: {
-                                        "zh-CN": "无",
-                                        "zh-TW": "无",
-                                    },
-                                    value: "none",
-                                },
-                            ],
+                            choices: ChartQueryCommand.sources,
                             required: false,
                         },
                         {

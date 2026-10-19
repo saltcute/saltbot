@@ -15,6 +15,7 @@ import TSV from "tsv";
 import upath from "upath";
 import { getConfig } from "@/bot/core/config";
 import { Connections } from "@/bot/core/connections";
+import { Preferences } from "@/bot/core/preferences";
 import { Util } from "@/bot/util/index";
 import { Telemetry } from "@/bot/util/telemetry";
 import { ResultTypes } from "@/bot/util/telemetry/type";
@@ -40,14 +41,15 @@ export class ChartQueryCommand {
         await interaction.deferReply();
 
         const song = interaction.options.getInteger("song", true);
+        const saved = await Preferences.get(interaction.user.id, { game: "mai", command: "chart" });
         const tracker = this.getChoices<"kamai" | "maishift" | "lxns" | "divingfish" | "none">(
-            interaction.options.getString("source", false),
+            interaction.options.getString("source", false) ?? saved.source,
             ["kamai", "maishift", "lxns", "none"],
             "kamai",
         );
-        const theme = interaction.options.getString("theme", false) || this.DEFAULT_THEME;
+        const theme = interaction.options.getString("theme", false) || Preferences.pick(saved.theme, this.themes) || this.DEFAULT_THEME;
         const region = this.getChoices<"DX" | "EX" | "CN">(
-            interaction.options.getString("region", false),
+            interaction.options.getString("region", false) ?? saved.region,
             ["DX", "EX", "CN"],
             (() => {
                 switch (tracker) {
@@ -234,6 +236,54 @@ export class ChartQueryCommand {
         return songs;
     }
 
+    static readonly regions = [
+        {
+            name: "Japan",
+            nameLocalizations: {
+                "zh-CN": "日服",
+                "zh-TW": "日本",
+            },
+            value: "DX",
+        },
+        {
+            name: "International",
+            nameLocalizations: {
+                "zh-CN": "国际服",
+                "zh-TW": "國際",
+            },
+            value: "EX",
+        },
+        {
+            name: "China",
+            nameLocalizations: {
+                "zh-CN": "国服",
+                "zh-TW": "中國",
+            },
+            value: "CN",
+        },
+    ];
+
+    static readonly sources = [
+        { name: "Kamaitachi", value: "kamai" },
+        { name: "Maishift", value: "maishift" },
+        {
+            name: "LXNS",
+            value: "lxns",
+            nameLocalizations: {
+                "zh-CN": "落雪查分器",
+                "zh-TW": "LXNS",
+            },
+        },
+        {
+            name: "None",
+            nameLocalizations: {
+                "zh-CN": "无",
+                "zh-TW": "无",
+            },
+            value: "none",
+        },
+    ];
+
     static readonly themes = [
         {
             name: "maimai でらっくす MAGiCAL (Japan)",
@@ -316,32 +366,7 @@ export class ChartQueryCommand {
                                 "zh-CN": "选择谱面详情的地区版本。",
                                 "zh-TW": "選擇譜面資料的地區版本。",
                             },
-                            choices: [
-                                {
-                                    name: "Japan",
-                                    nameLocalizations: {
-                                        "zh-CN": "日服",
-                                        "zh-TW": "日本",
-                                    },
-                                    value: "DX",
-                                },
-                                {
-                                    name: "International",
-                                    nameLocalizations: {
-                                        "zh-CN": "国际服",
-                                        "zh-TW": "國際",
-                                    },
-                                    value: "EX",
-                                },
-                                {
-                                    name: "China",
-                                    nameLocalizations: {
-                                        "zh-CN": "国服",
-                                        "zh-TW": "中國",
-                                    },
-                                    value: "CN",
-                                },
-                            ],
+                            choices: ChartQueryCommand.regions,
                         },
                         {
                             type: 3,
@@ -355,26 +380,7 @@ export class ChartQueryCommand {
                                 "zh-CN": "生成图片使用的查分器。（默认为 Kamaitachi）",
                                 "zh-TW": "生成圖片使用的查分器。（默認為 Kamaitachi）",
                             },
-                            choices: [
-                                { name: "Kamaitachi", value: "kamai" },
-                                { name: "Maishift", value: "maishift" },
-                                {
-                                    name: "LXNS",
-                                    value: "lxns",
-                                    nameLocalizations: {
-                                        "zh-CN": "落雪查分器",
-                                        "zh-TW": "LXNS",
-                                    },
-                                },
-                                {
-                                    name: "None",
-                                    nameLocalizations: {
-                                        "zh-CN": "无",
-                                        "zh-TW": "无",
-                                    },
-                                    value: "none",
-                                },
-                            ],
+                            choices: ChartQueryCommand.sources,
                             required: false,
                         },
                         {

@@ -11,6 +11,7 @@ export enum ResultTypes {
 
     GENERATE_SUCCESS = "Success::generate",
     LINK_SUCCESS = "Success::link",
+    CONFIG_SUCCESS = "Success::config",
     SUCCESS = "Success::generic",
 
     GENERATE_BAQEELA_SUCCESS = "Success::generate.baqeela",

@@ -14,6 +14,7 @@ import TSV from "tsv";
 import upath from "upath";
 import { getConfig } from "@/bot/core/config";
 import { Connections } from "@/bot/core/connections";
+import { Preferences } from "@/bot/core/preferences";
 import { Util } from "@/bot/util/index";
 import { Telemetry } from "@/bot/util/telemetry";
 import { ResultTypes } from "@/bot/util/telemetry/type";
@@ -40,17 +41,18 @@ export class ChartQueryCommand {
         await interaction.deferReply();
 
         const song = interaction.options.getInteger("song", true);
+        const saved = await Preferences.get(interaction.user.id, { game: "chu", command: "chart" });
         const tracker = this.getChoices<"kamai" | "lxns-chuni" | "divingfish" | "none">(
-            interaction.options.getString("source", false),
+            interaction.options.getString("source", false) ?? saved.source,
             ["kamai", "lxns-chuni", "none"],
             "kamai",
         );
         const type = this.getChoices<"new" | "recents">(
-            interaction.options.getString("type", false),
+            interaction.options.getString("type", false) ?? saved.type,
             ["new", "recents"],
             this.DEFAULT_RATING_ALOGRITHM,
         );
-        const theme = interaction.options.getString("theme", false) || this.DEFAULT_THEME;
+        const theme = interaction.options.getString("theme", false) || Preferences.pick(saved.theme, this.themes) || this.DEFAULT_THEME;
         // const region = this.getChoices<"DX" | "EX" | "CN">(
         //     interaction.options.getString("region", false),
         //     ["DX", "EX", "CN"],
@@ -240,6 +242,26 @@ export class ChartQueryCommand {
         },
     ];
 
+    static readonly sources = [
+        { name: "Kamaitachi", value: "kamai" },
+        {
+            name: "LXNS",
+            value: "lxns-chuni",
+            nameLocalizations: {
+                "zh-CN": "落雪查分器",
+                "zh-TW": "LXNS",
+            },
+        },
+        {
+            name: "None",
+            nameLocalizations: {
+                "zh-CN": "无",
+                "zh-TW": "无",
+            },
+            value: "none",
+        },
+    ];
+
     static readonly themes = [
         {
             name: "CHUNITHM Mate (Japan)",
@@ -369,25 +391,7 @@ export class ChartQueryCommand {
                                 "zh-CN": "生成图片使用的查分器。（默认为 Kamaitachi）",
                                 "zh-TW": "生成圖片使用的查分器。（默認為 Kamaitachi）",
                             },
-                            choices: [
-                                { name: "Kamaitachi", value: "kamai" },
-                                {
-                                    name: "LXNS",
-                                    value: "lxns-chuni",
-                                    nameLocalizations: {
-                                        "zh-CN": "落雪查分器",
-                                        "zh-TW": "LXNS",
-                                    },
-                                },
-                                {
-                                    name: "None",
-                                    nameLocalizations: {
-                                        "zh-CN": "无",
-                                        "zh-TW": "无",
-                                    },
-                                    value: "none",
-                                },
-                            ],
+                            choices: ChartQueryCommand.sources,
                             required: false,
                         },
                         {

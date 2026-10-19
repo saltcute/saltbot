@@ -16,6 +16,7 @@ import { MaishiftScoreAdapter } from "maidraw-maishift-adapter/maimai";
 import sharp from "sharp";
 import { getConfig } from "@/bot/core/config";
 import { Connections } from "@/bot/core/connections";
+import { Preferences } from "@/bot/core/preferences";
 import { Util } from "@/bot/util/index";
 import { Telemetry } from "@/bot/util/telemetry";
 import { ResultTypes } from "@/bot/util/telemetry/type";
@@ -102,9 +103,10 @@ export class FolderCommand {
             });
             return ResultTypes.INVALID_INPUT;
         }
-        const theme = interaction.options.getString("theme", false) || this.DEFAULT_THEME;
+        const saved = await Preferences.get(interaction.user.id, { game: "mai", command: "folder" });
+        const theme = interaction.options.getString("theme", false) || Preferences.pick(saved.theme, this.themes) || this.DEFAULT_THEME;
 
-        const requested = interaction.options.getString("source", false);
+        const requested = interaction.options.getString("source", false) ?? Preferences.pick(saved.source, this.sources) ?? null;
         let tracker: Tracker | "none";
         let username: string | undefined;
         if (requested == null) {
@@ -333,6 +335,43 @@ export class FolderCommand {
         return (variant && GOALS[variant as keyof typeof GOALS]?.name) || variant || "";
     }
 
+    static readonly sources = [
+        { name: "Kamaitachi", value: "kamai" },
+        { name: "Maishift", value: "maishift" },
+        {
+            name: "LXNS",
+            value: "lxns",
+            nameLocalizations: {
+                "zh-CN": "落雪查分器",
+                "zh-TW": "LXNS",
+            },
+        },
+        {
+            name: "maimai DX NET (Japan)",
+            value: "gcm-net",
+            nameLocalizations: {
+                "zh-CN": "maimai DX NET（日服）",
+                "zh-TW": "maimai DX NET（日本）",
+            },
+        },
+        {
+            name: "maimai DX NET (International)",
+            value: "gcm-net-intl",
+            nameLocalizations: {
+                "zh-CN": "maimai DX NET（国际服）",
+                "zh-TW": "maimai DX NET（國際）",
+            },
+        },
+        {
+            name: "None",
+            nameLocalizations: {
+                "zh-CN": "无",
+                "zh-TW": "無",
+            },
+            value: "none",
+        },
+    ];
+
     static readonly themes = [
         {
             name: "maimai でらっくす MAGiCAL (Japan)",
@@ -398,42 +437,7 @@ export class FolderCommand {
                             "zh-CN": "生成图片使用的查分器。（默认为第一个已绑定的查分器）",
                             "zh-TW": "生成圖片使用的查分器。（預設為第一個已綁定的查分器）",
                         },
-                        choices: [
-                            { name: "Kamaitachi", value: "kamai" },
-                            { name: "Maishift", value: "maishift" },
-                            {
-                                name: "LXNS",
-                                value: "lxns",
-                                nameLocalizations: {
-                                    "zh-CN": "落雪查分器",
-                                    "zh-TW": "LXNS",
-                                },
-                            },
-                            {
-                                name: "maimai DX NET (Japan)",
-                                value: "gcm-net",
-                                nameLocalizations: {
-                                    "zh-CN": "maimai DX NET（日服）",
-                                    "zh-TW": "maimai DX NET（日本）",
-                                },
-                            },
-                            {
-                                name: "maimai DX NET (International)",
-                                value: "gcm-net-intl",
-                                nameLocalizations: {
-                                    "zh-CN": "maimai DX NET（国际服）",
-                                    "zh-TW": "maimai DX NET（國際）",
-                                },
-                            },
-                            {
-                                name: "None",
-                                nameLocalizations: {
-                                    "zh-CN": "无",
-                                    "zh-TW": "無",
-                                },
-                                value: "none",
-                            },
-                        ],
+                        choices: FolderCommand.sources,
                         required: false,
                     },
                     {

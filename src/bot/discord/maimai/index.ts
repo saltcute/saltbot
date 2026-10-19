@@ -1,6 +1,7 @@
 import type { Interaction } from "discord.js";
 import { Best50ChartCommand } from "./b50";
 import { ChartQueryCommand } from "./chart";
+import { ConfigCommand } from "./config";
 import { FolderCommand } from "./folder";
 import { Level50ChartCommand } from "./level50";
 import { LinkUserCommand } from "./link";
@@ -20,6 +21,8 @@ export class Maimai {
         LinkUserCommand.CHAT_COMMAND_HANDLER(interaction);
         LinkUserCommand.BUTTON_HANDLER(interaction);
         UnlinkUserCommand.CHAT_COMMAND_HANDLER(interaction);
+        ConfigCommand.CHAT_COMMAND_HANDLER(interaction);
+        ConfigCommand.COMPONENT_HANDLER(interaction);
     };
     static getCommand() {
         return {
@@ -37,6 +40,7 @@ export class Maimai {
                 ...FolderCommand.getCommand(),
                 ...Level50ChartCommand.getCommand(),
                 ...UnlinkUserCommand.getCommand(),
+                ...ConfigCommand.getCommand(),
             ],
         };
     }
