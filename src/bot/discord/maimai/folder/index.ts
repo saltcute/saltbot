@@ -8,11 +8,12 @@ import {
     MessageFlags,
 } from "discord.js";
 import { BaseError, type DataOrError } from "maidraw";
-import { FolderPainter, type MaimaiScoreAdapter } from "maidraw/maimai";
+import { type Folder, FolderPainter, type MaimaiScoreAdapter } from "maidraw/maimai";
 import { MaimaiDxNetAdapter, MaimaiDxNetEngAdapter } from "maidraw-gcm-net-adapter/maimai";
 import { KamaiTachiScoreAdapter } from "maidraw-kamai-tachi-adapter/maimai";
 import { LxnsScoreAdapter } from "maidraw-lxns-adapter/maimai";
 import { MaishiftScoreAdapter } from "maidraw-maishift-adapter/maimai";
+import sharp from "sharp";
 import { client as kasumi } from "@/bot/kook/init/client";
 import { Util } from "@/bot/util/index";
 import { Telemetry } from "@/bot/util/telemetry";
@@ -50,6 +51,25 @@ const PAINTERS: Record<DatabaseKey, FolderPainter> = {
     otogedb: new FolderPainter(otogedb),
     otogedbIntl: new FolderPainter(otogedbIntl),
 };
+
+/**
+ * Layout of the folder element in the themes, used to estimate the height of a drawn folder.
+ */
+const FOLDER_LAYOUT = {
+    horizontalSize: 9,
+    rowHeight: 130 + 16,
+    titleHeight: 40 + 16,
+    gap: 32,
+};
+/**
+ * Height the folders of one image may take. Canvases cannot exceed 32767px on either side,
+ * but the images are kept far shorter so each stays under the attachment size limit once encoded.
+ */
+const MAX_FOLDER_HEIGHT = 14000;
+/**
+ * Images above this size are sent as JPEG instead of PNG. Discord rejects attachments over 10 MiB.
+ */
+const MAX_PNG_SIZE = 8 * 1024 * 1024;
 
 export class FolderCommand {
     static readonly DEFAULT_THEME = "jp-magical";
@@ -129,11 +149,7 @@ export class FolderCommand {
         } else {
             await interaction.editReply({
                 content: this.getContent(definition, false),
-                files: [
-                    new AttachmentBuilder(result.data, {
-                        name: "result.png",
-                    }),
-                ],
+                files: this.getAttachments(result.data),
                 components: definition.compact
                     ? [
                           {
@@ -192,11 +208,7 @@ export class FolderCommand {
         await interaction
             .editReply({
                 content: this.getContent(definition, true),
-                files: [
-                    new AttachmentBuilder(result.data, {
-                        name: "result.png",
-                    }),
-                ],
+                files: this.getAttachments(result.data),
                 components: [],
             })
             .catch(() => {});
@@ -214,18 +226,75 @@ export class FolderCommand {
         username: string | undefined,
         theme: string,
         full: boolean,
-    ): Promise<DataOrError<Buffer>> {
+    ): Promise<DataOrError<Buffer[]>> {
         const databaseKey = tracker === "none" ? "local" : SOURCES[tracker].database;
         const { folders } = await resolveFolder(definition, databaseKey, full);
         if (!folders.length) {
             return { err: new BaseError("saltbot", "empty-folder", `Folder "${definition.id}" has no charts available in ${databaseKey}.`) };
         }
         const painter = PAINTERS[databaseKey];
-        if (tracker !== "none" && username) {
-            return painter.drawWithScoreSource(SOURCES[tracker].adapter, { username, folders }, { theme });
-        } else {
-            return painter.draw({ username: "maimai", rating: 0, folders, scores: {} }, { theme });
+        const images: Buffer[] = [];
+        // Drawn one after another, so the tracker is not hit by every chunk at once.
+        for (const chunk of FolderCommand.chunkFolders(folders)) {
+            const result =
+                tracker !== "none" && username
+                    ? await painter.drawWithScoreSource(SOURCES[tracker].adapter, { username, folders: chunk }, { theme })
+                    : await painter.draw({ username: "maimai", rating: 0, folders: chunk, scores: {} }, { theme });
+            if (result.err) return { err: result.err };
+            images.push(
+                result.data.length > MAX_PNG_SIZE
+                    ? await sharp(result.data, { limitInputPixels: false }).jpeg({ quality: 85 }).toBuffer()
+                    : result.data,
+            );
         }
+        return { data: images };
+    }
+
+    /**
+     * Split folders into groups that each fit in one canvas. A folder too tall on its own is split into parts.
+     */
+    static chunkFolders(folders: Folder[]): Folder[][] {
+        const { horizontalSize, rowHeight, titleHeight, gap } = FOLDER_LAYOUT;
+        const getHeight = (folder: Folder) => titleHeight + Math.max(1, Math.ceil(folder.elements.length / horizontalSize)) * rowHeight + gap;
+        const maxRows = Math.floor((MAX_FOLDER_HEIGHT - titleHeight - gap) / rowHeight);
+        const perPart = maxRows * horizontalSize;
+
+        const parts = folders.flatMap((folder) => {
+            if (folder.elements.length <= perPart) return [folder];
+            const count = Math.ceil(folder.elements.length / perPart);
+            return Array.from({ length: count }, (_, i) => ({
+                ...folder,
+                title: `${folder.title} (${i + 1}/${count})`,
+                elements: folder.elements.slice(i * perPart, (i + 1) * perPart),
+            }));
+        });
+
+        const chunks: Folder[][] = [];
+        let current: Folder[] = [];
+        let height = 0;
+        for (const folder of parts) {
+            const folderHeight = getHeight(folder);
+            if (current.length && height + folderHeight > MAX_FOLDER_HEIGHT) {
+                chunks.push(current);
+                current = [];
+                height = 0;
+            }
+            current.push(folder);
+            height += folderHeight;
+        }
+        if (current.length) chunks.push(current);
+        return chunks;
+    }
+
+    /**
+     * One attachment per drawn image, numbered when there are several.
+     */
+    static getAttachments(images: Buffer[]): AttachmentBuilder[] {
+        return images.map((image, i) => {
+            // JPEG files start with FF D8.
+            const extension = image[0] === 0xff && image[1] === 0xd8 ? "jpg" : "png";
+            return new AttachmentBuilder(image, { name: images.length > 1 ? `result-${i + 1}.${extension}` : `result.${extension}` });
+        });
     }
 
     /**
