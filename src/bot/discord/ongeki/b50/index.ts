@@ -328,7 +328,7 @@ export class Best50ChartCommand {
                 "zh-CN": "オンゲキ Bright （日服）",
                 "zh-TW": "オンゲキ Bright （日本）",
             },
-            value: "jp-sun",
+            value: "jp-bright",
         },
         {
             name: "オンゲキ R.E.D. PLUS (Japan)",
@@ -518,7 +518,6 @@ export class Best50ChartCommand {
                                     "zh-CN": "使用你在 Kamaitachi 上的头像。",
                                     "zh-TW": "使用您在 Kamaitachi 上的個人資料圖像。",
                                 },
-                                choices: Best50ChartCommand.versions,
                             },
                         ],
                     },
