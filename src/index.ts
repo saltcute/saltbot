@@ -1,5 +1,3 @@
-import "./bot/kook";
-
 import axios from "axios";
 import { Util } from "./bot/util";
 

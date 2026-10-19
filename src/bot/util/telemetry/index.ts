@@ -8,7 +8,7 @@ export class Telemetry {
     private static mongodb: MongoClient;
     private static collection: Collection;
     static {
-        kasumi.on("connect.*", async () => {
+        (async () => {
             const mongodbUri = kasumi.config.getSync("kasumi::config.mongoConnectionString");
             const mongodbDatabase = kasumi.config.getSync("kasumi::config.mongoDatabaseName");
             if (mongodbUri) {
@@ -20,10 +20,10 @@ export class Telemetry {
                 Telemetry.collection = await Telemetry.mongodb.db(mongodbDatabase).collection("usage");
             }
             Telemetry.isReady = true;
-        });
+        })();
     }
     public static logCommandUsage(content: {
-        source: "kook" | "discord";
+        source: "discord";
         user: { name: string; id: string };
         place: { guildId: string; channelId: string };
         command: string[];
