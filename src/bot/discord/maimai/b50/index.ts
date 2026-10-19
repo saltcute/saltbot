@@ -5,6 +5,7 @@ import { MaimaiDxNetAdapter, MaimaiDxNetEngAdapter } from "maidraw-gcm-net-adapt
 import { KamaiTachiScoreAdapter } from "maidraw-kamai-tachi-adapter/maimai";
 import { LxnsScoreAdapter } from "maidraw-lxns-adapter/maimai";
 import { MaishiftScoreAdapter } from "maidraw-maishift-adapter/maimai";
+import { getConfig } from "@/bot/core/config";
 import { client as kasumi } from "@/bot/kook/init/client";
 import { Util } from "@/bot/util/index";
 import { Telemetry } from "@/bot/util/telemetry";
@@ -12,7 +13,7 @@ import { ResultTypes } from "@/bot/util/telemetry/type";
 import { database, otogedb, otogedbIntl } from "../database";
 
 const lxns = new LxnsScoreAdapter({
-    auth: kasumi.config.getSync("maimai::lxns.token"),
+    auth: getConfig("maimai::lxns.token"),
     database,
 });
 const kamai = new KamaiTachiScoreAdapter({ database });
@@ -20,7 +21,7 @@ const maishift = new MaishiftScoreAdapter(database);
 const gcmNet = new MaimaiDxNetAdapter({ database: otogedb });
 const gcmNetIntl = new MaimaiDxNetEngAdapter({ database: otogedbIntl });
 // const divingfish = new MaiDraw.Maimai.Adapters.DivingFish({
-//     auth: kasumi.config.getSync("maimai::divingFish.token"),
+//     auth: getConfig("maimai::divingFish.token"),
 // });
 
 const painter = new Best50Painter(database);
@@ -1183,7 +1184,7 @@ export class Best50ChartCommand {
                         ],
                     },
                     ...(() => {
-                        return kasumi.config.getSync("maimai::lxns.token")
+                        return getConfig("maimai::lxns.token")
                             ? [
                                   {
                                       type: ApplicationCommandOptionType.Subcommand,
@@ -1253,7 +1254,7 @@ export class Best50ChartCommand {
                             : [];
                     })(),
                     ...(() => {
-                        return kasumi.config.getSync("maimai::divingFish.token")
+                        return getConfig("maimai::divingFish.token")
                             ? [
                                   {
                                       type: ApplicationCommandOptionType.Subcommand,

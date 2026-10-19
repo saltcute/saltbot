@@ -40,9 +40,11 @@
     "dependencies": {
         "@m31coding/fuzzy-search": "^1.0.2",
         "@saltcute/cache": "^1.0.6",
+        "@saltcute/logger": "^1.0.1",
         "@types/lodash": "^4.17.16",
         "@types/memory-cache": "^0.2.6",
         "@types/tsv": "^0.2.4",
+        "axios": "^1.20.0",
         "concurrently": "^9.2.3",
         "discord.js": "^14.16.3",
         "fuse.js": "^7.1.0",
@@ -50,6 +52,7 @@
         "gcm-database-local": "^1.1.2",
         "gcm-database-otogedb": "^1.1.2",
         "hono": "^4.12.27",
+        "json5": "^2.2.3",
         "kasumi.js": "^0.6.0",
         "kuroshiro": "^1.2.0",
         "kuroshiro-analyzer-kuromoji": "^1.1.0",
@@ -68,6 +71,7 @@
     },
     "devDependencies": {
         "@biomejs/biome": "^2.5.0",
+        "pino-pretty": "^13.2.0",
         "typescript": "^6.0.3"
     },
     "allowScripts": {

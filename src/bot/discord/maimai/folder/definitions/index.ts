@@ -1,6 +1,6 @@
 import * as fs from "node:fs";
+import { logger } from "@saltcute/logger";
 import upath from "upath";
-import { client as kasumi } from "@/bot/kook/init/client";
 import type { FolderDefinition } from "../types";
 
 /**
@@ -55,13 +55,12 @@ function loadFolders(): FolderDefinition[] {
             const exported: FolderDefinition | FolderDefinition[] | undefined = require(upath.join(__dirname, file)).default;
             const definitions = Array.isArray(exported) ? exported : [exported];
             if (!definitions.length || definitions.some((folder) => !folder?.id || !Array.isArray(folder.folders))) {
-                kasumi.logger.error(`[maimai] Folder file ${file} does not default-export folder definitions.`);
+                logger.error(`[maimai] Folder file ${file} does not default-export folder definitions.`);
                 continue;
             }
             folders.push(...(definitions as FolderDefinition[]));
         } catch (e) {
-            kasumi.logger.error(`[maimai] Error loading folder file ${file}`);
-            kasumi.logger.error(e);
+            logger.withError(e).error(`[maimai] Error loading folder file ${file}`);
         }
     }
     return folders;

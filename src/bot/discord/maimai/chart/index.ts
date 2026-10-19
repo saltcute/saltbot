@@ -1,5 +1,6 @@
 import fs from "node:fs";
 import { Cache } from "@saltcute/cache";
+import { logger } from "@saltcute/logger";
 import axios from "axios";
 import { type ApplicationCommandOption, ApplicationCommandOptionType, AttachmentBuilder, type Interaction } from "discord.js";
 import Fuse from "fuse.js";
@@ -12,6 +13,7 @@ import { LxnsScoreAdapter } from "maidraw-lxns-adapter/maimai";
 import { MaishiftScoreAdapter } from "maidraw-maishift-adapter/maimai";
 import TSV from "tsv";
 import upath from "upath";
+import { getConfig } from "@/bot/core/config";
 import { client as kasumi } from "@/bot/kook/init/client";
 import { Util } from "@/bot/util/index";
 import { Telemetry } from "@/bot/util/telemetry";
@@ -21,7 +23,7 @@ import { database } from "../database";
 const painter = new ChartPainter(database);
 
 export class ChartQueryCommand {
-    static readonly DATABASE_PATH = kasumi.config.getSync("maimai::config.localDatabasePath");
+    static readonly DATABASE_PATH = getConfig("maimai::config.localDatabasePath");
     static readonly CHART_PATH = upath.join(this.DATABASE_PATH, "assets", "maimai", "charts");
 
     static getChoices<T>(payload: unknown, choices: T[], defaults: T): T {
@@ -68,7 +70,7 @@ export class ChartQueryCommand {
                 break;
             case "lxns":
                 source = new LxnsScoreAdapter({
-                    auth: kasumi.config.getSync("maimai::lxns.token"),
+                    auth: getConfig("maimai::lxns.token"),
                     database,
                 });
                 break;
@@ -198,7 +200,7 @@ export class ChartQueryCommand {
                 ignoreFieldNorm: true,
                 includeMatches: true,
             });
-            kasumi.logger.info(`[maimai] Fuzzy search database loading finished.`);
+            logger.info(`[maimai] Fuzzy search database loading finished.`);
             ChartQueryCommand.searchDatabaseLock = false;
         })();
     }

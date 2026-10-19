@@ -1,7 +1,7 @@
+import { logger } from "@saltcute/logger";
 import type { Chart, Database } from "gcm-database/maimai";
 import type { Chart as LocalChart } from "gcm-database-local/maimai";
 import type { Folder } from "maidraw/maimai";
-import { client as kasumi } from "@/bot/kook/init/client";
 import { database, otogedb, otogedbIntl } from "../database";
 import type { ChartRef, DatabaseKey, FolderDefinition } from "./types";
 
@@ -93,14 +93,14 @@ async function doResolveFolder(definition: FolderDefinition, key: DatabaseKey, f
         });
     }
     if (missing.length) {
-        kasumi.logger.warn(
+        logger.warn(
             `[maimai] Folder "${definition.id}" has ${missing.length} unresolved chart(s) in ${key}: ${missing
                 .map((ref) => `${ref.title} (${ref.type} ${ref.difficulty})`)
                 .join(", ")}`,
         );
     }
     if (unchecked.length) {
-        kasumi.logger.warn(
+        logger.warn(
             `[maimai] Folder "${definition.id}" has ${unchecked.length} chart(s) not in the local database, kept without checking for a USA lock: ${unchecked
                 .map((ref) => `${ref.title} (${ref.type} ${ref.difficulty})`)
                 .join(", ")}`,

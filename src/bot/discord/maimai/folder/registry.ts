@@ -1,4 +1,4 @@
-import { client as kasumi } from "@/bot/kook/init/client";
+import { logger } from "@saltcute/logger";
 import { FOLDERS } from "./definitions";
 import { resolveFolder } from "./resolve";
 import type { ChartRef, DatabaseKey, FolderDefinition } from "./types";
@@ -47,7 +47,7 @@ for (const folder of FOLDERS) {
 for (const choice of CHOICES) {
     for (const alias of choice.searchKeys.aliases) {
         const other = CHOICES.find((other) => other !== choice && other.value.toLowerCase() === alias.toLowerCase());
-        if (other) kasumi.logger.warn(`[maimai] Folder alias "${alias}" of "${choice.value}" is the id of "${other.value}".`);
+        if (other) logger.warn(`[maimai] Folder alias "${alias}" of "${choice.value}" is the id of "${other.value}".`);
     }
 }
 

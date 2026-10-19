@@ -14,6 +14,7 @@ import { KamaiTachiScoreAdapter } from "maidraw-kamai-tachi-adapter/maimai";
 import { LxnsScoreAdapter } from "maidraw-lxns-adapter/maimai";
 import { MaishiftScoreAdapter } from "maidraw-maishift-adapter/maimai";
 import sharp from "sharp";
+import { getConfig } from "@/bot/core/config";
 import { client as kasumi } from "@/bot/kook/init/client";
 import { Util } from "@/bot/util/index";
 import { Telemetry } from "@/bot/util/telemetry";
@@ -27,7 +28,7 @@ import type { DatabaseKey, FolderDefinition } from "./types";
 type Tracker = "kamai" | "maishift" | "lxns" | "gcm-net" | "gcm-net-intl";
 
 const lxns = new LxnsScoreAdapter({
-    auth: kasumi.config.getSync("maimai::lxns.token"),
+    auth: getConfig("maimai::lxns.token"),
     database,
 });
 const kamai = new KamaiTachiScoreAdapter({ database });

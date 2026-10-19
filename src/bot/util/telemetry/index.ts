@@ -1,3 +1,4 @@
+import { logger } from "@saltcute/logger";
 import type { CacheType, Interaction } from "discord.js";
 import { type Collection, MongoClient } from "mongodb";
 import { client as kasumi } from "@/bot/kook/init/client";
@@ -86,7 +87,7 @@ export class Telemetry {
                         });
                 } else await handler(interaction);
             } catch (e) {
-                kasumi.logger.error(e);
+                logger.errorOnly(e);
             }
         };
     }

@@ -4,6 +4,7 @@ import { BestPainter } from "maidraw/chunithm";
 import { ChunithmNetAdapter, ChunithmNetEngAdapter } from "maidraw-gcm-net-adapter/chunithm";
 import { KamaiTachiScoreAdapter } from "maidraw-kamai-tachi-adapter/chunithm";
 import { LxnsScoreAdapter } from "maidraw-lxns-adapter/chunithm";
+import { getConfig } from "@/bot/core/config";
 import { client as kasumi } from "@/bot/kook/init/client";
 import { Util } from "@/bot/util/index";
 import { Telemetry } from "@/bot/util/telemetry";
@@ -12,7 +13,7 @@ import { database, otogedb, otogedbIntl } from "../database";
 
 const kamai = new KamaiTachiScoreAdapter({ database });
 const lxns = new LxnsScoreAdapter({
-    auth: kasumi.config.getSync("maimai::lxns.token"),
+    auth: getConfig("maimai::lxns.token"),
     database,
 });
 const gcmNet = new ChunithmNetAdapter({ database: otogedb });
@@ -756,7 +757,7 @@ export class Best50ChartCommand {
                         ],
                     },
                     ...(() => {
-                        return kasumi.config.getSync("maimai::lxns.token")
+                        return getConfig("maimai::lxns.token")
                             ? [
                                   {
                                       type: ApplicationCommandOptionType.Subcommand,

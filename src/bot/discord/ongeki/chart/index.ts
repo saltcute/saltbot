@@ -1,5 +1,6 @@
 import fs from "node:fs";
 import { Cache } from "@saltcute/cache";
+import { logger } from "@saltcute/logger";
 import { type ApplicationCommandOption, ApplicationCommandOptionType, AttachmentBuilder, type Interaction } from "discord.js";
 import Fuse from "fuse.js";
 import { Difficulty, LunaticType } from "gcm-database/ongeki";
@@ -9,6 +10,7 @@ import { ChartPainter, type OngekiScoreAdapter } from "maidraw/ongeki";
 import { KamaiTachiScoreAdapter } from "maidraw-kamai-tachi-adapter/ongeki";
 import TSV from "tsv";
 import upath from "upath";
+import { getConfig } from "@/bot/core/config";
 import { client as kasumi } from "@/bot/kook/init/client";
 import { Util } from "@/bot/util/index";
 import { Telemetry } from "@/bot/util/telemetry";
@@ -18,7 +20,7 @@ import { database } from "../database";
 const painter = new ChartPainter(database);
 
 export class ChartQueryCommand {
-    static readonly DATABASE_PATH = kasumi.config.getSync("maimai::config.localDatabasePath");
+    static readonly DATABASE_PATH = getConfig("maimai::config.localDatabasePath");
     static readonly CHART_PATH = upath.join(this.DATABASE_PATH, "assets", "ongeki", "charts");
     private static readonly DEFAULT_RATING_ALOGRITHM = "refresh";
 
@@ -180,7 +182,7 @@ export class ChartQueryCommand {
                 ignoreFieldNorm: true,
                 includeMatches: true,
             });
-            kasumi.logger.info(`[ONGEKI] Fuzzy search database loading finished.`);
+            logger.info(`[ONGEKI] Fuzzy search database loading finished.`);
             ChartQueryCommand.searchDatabaseLock = false;
         })();
     }

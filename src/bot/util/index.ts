@@ -1,6 +1,7 @@
 import type { BaseError } from "maidraw";
 import "./telemetry";
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, type CacheType, type CommandInteraction, type Interaction, MessageFlags } from "discord.js";
+import { getConfig } from "@/bot/core/config";
 import { client as kasumi } from "../kook/init/client";
 
 export class Util {
@@ -23,7 +24,7 @@ export class Util {
         const linked = await kasumi.config.getOne(`salt::connection.discord.${tracker}.${interaction.user.id}`);
         const otherServices = Util.services.filter((v) => v !== service && !(tracker === "gcm-net-intl" && v === "ongeki"));
 
-        const baseUrl = (kasumi.config.getSync("webui::config.baseUrl") || "").replace(/\/+$/, "");
+        const baseUrl = (getConfig("webui::config.baseUrl") || "").replace(/\/+$/, "");
         const linkUrl = `${baseUrl}/link?service=${service}&tracker=${tracker}`;
         await interaction.reply({
             content: `${linked ? `-# (Note: You don't have to link again if you have already linked ${otherServices.map((v) => Util.serviceNamesMap[v][tracker]).join(" or ")})\n\n` : ""}Before linking your ${Util.serviceNamesMap[service][tracker]} account to saltbot,
