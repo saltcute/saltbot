@@ -77,7 +77,7 @@ export function withGoals(
 const REGIONS: Record<Region, { name: string; aliases: string[] }> = {
     jp: { name: "Japan", aliases: ["jp", "japan", "日本"] },
     intl: { name: "International", aliases: ["intl", "international", "国际"] },
-    ca: { name: "Canada", aliases: ["ca", "canada"] },
+    ca: { name: "North America", aliases: ["ca", "canada", "Canada", "north america", "USA", "America", "america", "US", "usa", "us"] },
 };
 
 /**
