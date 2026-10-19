@@ -5,7 +5,7 @@ import { KamaiTachiScoreAdapter } from "maidraw-kamai-tachi-adapter/maimai";
 import { LxnsScoreAdapter } from "maidraw-lxns-adapter/maimai";
 import { MaishiftScoreAdapter } from "maidraw-maishift-adapter/maimai";
 import { getConfig } from "@/bot/core/config";
-import { client as kasumi } from "@/bot/kook/init/client";
+import { Connections } from "@/bot/core/connections";
 import { Util } from "@/bot/util/index";
 import { Telemetry } from "@/bot/util/telemetry";
 import { ResultTypes } from "@/bot/util/telemetry/type";
@@ -74,7 +74,7 @@ export class Level50ChartCommand {
             }
         }
         if (username == null) {
-            const dbUsername = await kasumi.config.getOne(`salt::connection.discord.${tracker}.${interaction.user.id}`);
+            const dbUsername = await Connections.getLink(interaction.user.id, tracker);
             if (!dbUsername) {
                 await interaction.reply({
                     content: `Please provide your ${tracker === "lxns" ? "friend code" : "username"}. To use without a ${tracker === "lxns" ? "friend code" : "username"}, you need to select "remember my username" after generating a chart or use \`/mai link\` to link your account.`,
@@ -159,8 +159,9 @@ export class Level50ChartCommand {
                     },
                 ],
             });
-            const link = await kasumi.config.getOne(`salt::connection.discord.${tracker}.${interaction.user.id}`);
-            const ignore = await kasumi.config.getOne(`salt::connection.discord.ignore.${tracker}.${interaction.user.id}`);
+            const connections = await Connections.get(interaction.user.id);
+            const link = connections?.links?.[tracker];
+            const ignore = connections?.ignored?.[tracker];
             if (!link && !ignore) {
                 await interaction.followUp({
                     content: `Do you want to link this user on \`${tracker}\` to your discord account?`,

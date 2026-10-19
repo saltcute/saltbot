@@ -1,4 +1,4 @@
-import { client as kasumi } from "@/bot/kook/init/client";
+import { Connections } from "@/bot/core/connections";
 import { Telemetry } from "@/bot/util/telemetry";
 import { ResultTypes } from "@/bot/util/telemetry/type";
 
@@ -12,7 +12,7 @@ export class UnlinkUserCommand {
         switch (tracker) {
             case "kamai":
             case "gcm-net":
-                kasumi.config.set(`salt::connection.discord.${tracker}.${interaction.user.id}`, undefined);
+                await Connections.removeLink(interaction.user.id, tracker);
                 await interaction.reply({
                     content: `Your \`${tracker}\` account is now unlinked. `,
                     ephemeral: true,

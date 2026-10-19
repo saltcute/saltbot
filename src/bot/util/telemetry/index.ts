@@ -1,28 +1,9 @@
 import { logger } from "@saltcute/logger";
 import type { CacheType, Interaction } from "discord.js";
-import { type Collection, MongoClient } from "mongodb";
-import { client as kasumi } from "@/bot/kook/init/client";
+import { getDatabase } from "@/bot/core/database";
 import { ResultTypes } from "./type";
 
 export class Telemetry {
-    private static isReady = false;
-    private static mongodb: MongoClient;
-    private static collection: Collection;
-    static {
-        (async () => {
-            const mongodbUri = kasumi.config.getSync("kasumi::config.mongoConnectionString");
-            const mongodbDatabase = kasumi.config.getSync("kasumi::config.mongoDatabaseName");
-            if (mongodbUri) {
-                Telemetry.mongodb = new MongoClient(mongodbUri);
-                Telemetry.mongodb.on("error", () => {
-                    console.error("Telemetry initialization failed");
-                });
-                await Telemetry.mongodb.connect();
-                Telemetry.collection = await Telemetry.mongodb.db(mongodbDatabase).collection("usage");
-            }
-            Telemetry.isReady = true;
-        })();
-    }
     public static logCommandUsage(content: {
         source: "discord";
         user: { name: string; id: string };
@@ -30,10 +11,11 @@ export class Telemetry {
         command: string[];
         args: Record<string, string>[];
         result: string;
-    }): boolean {
-        if (!Telemetry.isReady) return false;
-        Telemetry.collection.insertOne({ ...content, time: new Date() });
-        return true;
+    }): void {
+        getDatabase()
+            .collection("usage")
+            .insertOne({ ...content, time: new Date() })
+            .catch((e) => logger.withError(e).error("Failed to log command usage"));
     }
     public static discordMiddleware(handler: (interaction: Interaction<CacheType>) => Promise<ResultTypes> | ResultTypes) {
         return async (interaction: Interaction<CacheType>) => {

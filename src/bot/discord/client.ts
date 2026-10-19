@@ -21,4 +21,6 @@ client.on(Events.InteractionCreate, async (interaction) => {
     WhenMaint.getCommandHandler()(interaction);
 });
 
-client.login(getConfig("discord::auth.token"));
+export async function login() {
+    await client.login(getConfig("discord::auth.token"));
+}

@@ -14,7 +14,7 @@ import { MaishiftScoreAdapter } from "maidraw-maishift-adapter/maimai";
 import TSV from "tsv";
 import upath from "upath";
 import { getConfig } from "@/bot/core/config";
-import { client as kasumi } from "@/bot/kook/init/client";
+import { Connections } from "@/bot/core/connections";
 import { Util } from "@/bot/util/index";
 import { Telemetry } from "@/bot/util/telemetry";
 import { ResultTypes } from "@/bot/util/telemetry/type";
@@ -79,7 +79,7 @@ export class ChartQueryCommand {
         }
         let username = "";
         if (tracker !== "none") {
-            const dbUsername = await kasumi.config.getOne(`salt::connection.discord.${tracker}.${interaction.user.id}`);
+            const dbUsername = await Connections.getLink(interaction.user.id, tracker);
             if (dbUsername) username = dbUsername;
         }
         const chart = this.getChartsBySongId(song);

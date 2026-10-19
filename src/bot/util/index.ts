@@ -2,7 +2,7 @@ import type { BaseError } from "maidraw";
 import "./telemetry";
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, type CacheType, type CommandInteraction, type Interaction, MessageFlags } from "discord.js";
 import { getConfig } from "@/bot/core/config";
-import { client as kasumi } from "../kook/init/client";
+import { Connections } from "@/bot/core/connections";
 
 export class Util {
     static readonly services = ["maimaidx", "chunithm", "ongeki"] as const;
@@ -21,7 +21,7 @@ export class Util {
         },
     };
     static async gcmNetLinkNotice(interaction: CommandInteraction, tracker: "gcm-net" | "gcm-net-intl", service: "maimaidx" | "chunithm" | "ongeki") {
-        const linked = await kasumi.config.getOne(`salt::connection.discord.${tracker}.${interaction.user.id}`);
+        const linked = await Connections.getLink(interaction.user.id, tracker);
         const otherServices = Util.services.filter((v) => v !== service && !(tracker === "gcm-net-intl" && v === "ongeki"));
 
         const baseUrl = (getConfig("webui::config.baseUrl") || "").replace(/\/+$/, "");
@@ -60,7 +60,7 @@ If you wish to proceed, please click "Continue".`,
     }
 
     static getUserAgent(): string {
-        return `salt/${process.env.npm_package_version} (+https://maimaidx.cab/github)`;
+        return `saltbot/${process.env.npm_package_version} (+https://maimaidx.cab/github)`;
     }
 
     static symbolMap: Record<string, string> = {

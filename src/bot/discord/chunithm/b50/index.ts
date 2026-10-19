@@ -5,7 +5,7 @@ import { ChunithmNetAdapter, ChunithmNetEngAdapter } from "maidraw-gcm-net-adapt
 import { KamaiTachiScoreAdapter } from "maidraw-kamai-tachi-adapter/chunithm";
 import { LxnsScoreAdapter } from "maidraw-lxns-adapter/chunithm";
 import { getConfig } from "@/bot/core/config";
-import { client as kasumi } from "@/bot/kook/init/client";
+import { Connections } from "@/bot/core/connections";
 import { Util } from "@/bot/util/index";
 import { Telemetry } from "@/bot/util/telemetry";
 import { ResultTypes } from "@/bot/util/telemetry/type";
@@ -155,7 +155,7 @@ export class Best50ChartCommand {
         const mention = interaction.options.getUser("dox");
         if (username == null) {
             if (mention) {
-                const dbUsername = await kasumi.config.getOne(`salt::connection.discord.${tracker}.${mention.id}`);
+                const dbUsername = await Connections.getLink(mention.id, tracker);
                 if (!dbUsername) {
                     await interaction.reply({
                         content: `This user has not connected their ${tracker} ${tracker === "lxns-chuni" ? "friend code" : "username"} to their Discord account.`,
@@ -164,7 +164,7 @@ export class Best50ChartCommand {
                     return ResultTypes.INVALID_USERNAME;
                 } else username = dbUsername;
             } else {
-                const dbUsername = await kasumi.config.getOne(`salt::connection.discord.${tracker}.${interaction.user.id}`);
+                const dbUsername = await Connections.getLink(interaction.user.id, tracker);
                 if (!dbUsername) {
                     if (tracker === "gcm-net" || tracker === "gcm-net-intl") {
                         await interaction.reply({
@@ -323,8 +323,9 @@ export class Best50ChartCommand {
                     }),
                 ],
             });
-            const link = await kasumi.config.getOne(`salt::connection.discord.${tracker}.${interaction.user.id}`);
-            const ignore = await kasumi.config.getOne(`salt::connection.discord.ignore.${tracker}.${interaction.user.id}`);
+            const connections = await Connections.get(interaction.user.id);
+            const link = connections?.links?.[tracker];
+            const ignore = connections?.ignored?.[tracker];
             if (!link && !ignore && !mention) {
                 await interaction.followUp({
                     content: `Do you want to link this user on \`${tracker}\` to your discord account?`,

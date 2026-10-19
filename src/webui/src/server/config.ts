@@ -2,7 +2,7 @@ import fs from "node:fs";
 import JSON5 from "json5";
 
 /**
- * Subset of the bot's `CustomStorage` (src/bot/kook/init/type.ts) that the web
+ * Subset of the bot's `BotConfig` (src/bot/core/config.ts) that the web
  * interface needs. Kept as a local copy so the webui does not import from the
  * bot source tree across the workspace boundary.
  */
@@ -11,7 +11,7 @@ export type GcmService = "maimaidx" | "chunithm" | "ongeki";
 
 /**
  * The config keys the webui reads. The `discord::*`/`webui::*` keys back the
- * OAuth flow and session signing; the `kasumi::config.mongo*` keys back the
+ * OAuth flow and session signing; the `database::mongo.*` keys back the
  * direct MongoDB connection used for linked credentials (see `mongo.ts`).
  */
 interface WebuiConfig {
@@ -19,17 +19,16 @@ interface WebuiConfig {
     "discord::auth.clientSecret": string;
     "webui::config.baseUrl": string;
     "webui::config.sessionSecret": string;
-    "kasumi::config.mongoConnectionString": string;
-    "kasumi::config.mongoDatabaseName": string;
-    "kasumi::config.mongoCollectionName": string;
+    "database::mongo.connectionString": string;
+    "database::mongo.databaseName": string;
 }
 
 let cache: Record<string, unknown> | undefined;
 
 /**
  * Read and parse the same `config.json5` the bot uses, located via `CONFIG_PATH`.
- * Mirrors Kasumi's loader so both processes share a single source of truth, but
- * without pulling in the whole bot framework. Parsed once and cached.
+ * Mirrors the bot's loader so both processes share a single source of truth.
+ * Parsed once and cached.
  */
 function load(): Record<string, unknown> {
     if (cache) return cache;

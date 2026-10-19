@@ -15,7 +15,7 @@ import { LxnsScoreAdapter } from "maidraw-lxns-adapter/maimai";
 import { MaishiftScoreAdapter } from "maidraw-maishift-adapter/maimai";
 import sharp from "sharp";
 import { getConfig } from "@/bot/core/config";
-import { client as kasumi } from "@/bot/kook/init/client";
+import { Connections } from "@/bot/core/connections";
 import { Util } from "@/bot/util/index";
 import { Telemetry } from "@/bot/util/telemetry";
 import { ResultTypes } from "@/bot/util/telemetry/type";
@@ -109,8 +109,9 @@ export class FolderCommand {
         let username: string | undefined;
         if (requested == null) {
             tracker = "none";
+            const links = (await Connections.get(interaction.user.id))?.links;
             for (const candidate of this.DEFAULT_TRACKER_ORDER) {
-                username = await kasumi.config.getOne(`salt::connection.discord.${candidate}.${interaction.user.id}`);
+                username = links?.[candidate];
                 if (username) {
                     tracker = candidate;
                     break;
@@ -119,7 +120,7 @@ export class FolderCommand {
         } else {
             tracker = this.getChoices<Tracker | "none">(requested, [...this.DEFAULT_TRACKER_ORDER, "none"], "none");
             if (tracker !== "none") {
-                username = await kasumi.config.getOne(`salt::connection.discord.${tracker}.${interaction.user.id}`);
+                username = await Connections.getLink(interaction.user.id, tracker);
                 if (!username) {
                     await interaction.reply({
                         content:
@@ -189,7 +190,7 @@ export class FolderCommand {
         }
         let username: string | undefined;
         if (tracker !== "none") {
-            username = await kasumi.config.getOne(`salt::connection.discord.${tracker}.${owner}`);
+            username = await Connections.getLink(owner, tracker);
             if (!username) {
                 await interaction.reply({
                     content: "The tracker account used for this folder is no longer linked.",

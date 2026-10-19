@@ -18,6 +18,9 @@ export interface BotConfig {
 
     "webui::config.baseUrl": string;
     "webui::config.sessionSecret": string;
+
+    "database::mongo.connectionString": string;
+    "database::mongo.databaseName": string;
 }
 
 let cache: Partial<BotConfig> | undefined;

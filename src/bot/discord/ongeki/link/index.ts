@@ -1,5 +1,5 @@
 import { type Interaction, MessageFlags } from "discord.js";
-import { client as kasumi } from "@/bot/kook/init/client";
+import { Connections } from "@/bot/core/connections";
 import { Util } from "@/bot/util";
 import { Telemetry } from "@/bot/util/telemetry";
 import { ResultTypes } from "@/bot/util/telemetry/type";
@@ -27,7 +27,7 @@ export class LinkUserCommand {
         }
         switch (tracker) {
             case "kamai":
-                kasumi.config.set(`salt::connection.discord.${tracker}.${interaction.user.id}`, username);
+                await Connections.setLink(interaction.user.id, tracker, username as string);
                 await interaction.reply({
                     content: `I have linked your discord account to your \`${tracker}\` account \`${username}\`. You can now omit the username field next time you use \`/geki b50 ${tracker}\`.`,
                     flags: MessageFlags.Ephemeral,
@@ -71,7 +71,7 @@ export class LinkUserCommand {
                             });
                             return;
                         }
-                        kasumi.config.set(`salt::connection.discord.ignore.${tracker}.${userId}`, true);
+                        await Connections.setIgnored(userId, tracker);
                         await interaction.update({
                             content: `Okay, I won't bother you again, but you can always use \`/geki link ${tracker}\` to link your account if you changed your mind.`,
                             components: [],
@@ -105,7 +105,7 @@ export class LinkUserCommand {
                             });
                             return;
                         }
-                        kasumi.config.set(`salt::connection.discord.${tracker}.${userId}`, username);
+                        await Connections.setLink(userId, tracker, username);
                         await interaction.update({
                             content: `I have linked your discord account to your \`${tracker}\` account \`${username}\`. You can now omit the username field next time you use the command.`,
                             components: [],
