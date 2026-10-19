@@ -272,6 +272,9 @@ export class Best50ChartCommand {
                     case "jp-xversex":
                         kamaiInstance = kamai.xversex();
                         break;
+                    case "jp-mate":
+                        kamaiInstance = kamai.mate();
+                        break;
                     default:
                         kamaiInstance = kamai;
                         break;
@@ -382,10 +385,10 @@ export class Best50ChartCommand {
 
     static readonly themes = [
         {
-            name: "CHUNITHM MATE (Japan)",
+            name: "CHUNITHM Mate (Japan)",
             nameLocalizations: {
-                "zh-CN": "CHUNITHM MATE（日服）",
-                "zh-TW": "CHUNITHM MATE（日本）",
+                "zh-CN": "CHUNITHM Mate（日服）",
+                "zh-TW": "CHUNITHM Mate（日本）",
             },
             value: "jp-mate-landscape",
         },
@@ -440,6 +443,14 @@ export class Best50ChartCommand {
     ];
 
     static readonly versions = [
+        {
+            name: "CHUNITHM Mate (Japan)",
+            nameLocalizations: {
+                "zh-CN": "CHUNITHM Mate（日服）",
+                "zh-TW": "CHUNITHM Mate（日本）",
+            },
+            value: "jp-mate",
+        },
         {
             name: "CHUNITHM X-VERSE-X (Japan)",
             nameLocalizations: {
@@ -760,7 +771,6 @@ export class Best50ChartCommand {
                                     "zh-CN": "使用你在 Kamaitachi 上的头像。",
                                     "zh-TW": "使用您在 Kamaitachi 上的個人資料圖像。",
                                 },
-                                choices: Best50ChartCommand.versions,
                             },
                         ],
                     },
